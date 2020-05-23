@@ -5,7 +5,19 @@ close all
 %------------------------------
 %-- Parameters
 %------------------------------
-path_for_sources = './';
+
+%path_for_sources = './';
+%path_for_testbench = './';
+%path_for_sim_do = './';
+%path_for_inside_do_src = './';
+%path_for_inside_do_tb = './';
+%filename = 'file.vhd';
+
+path_for_sources = '../../vhdl/spi/src/';
+path_for_testbench = '../../vhdl/spi/tb/';
+path_for_sim_do = '../../vhdl/spi/sim/';
+path_for_inside_do_src = '../src/';
+path_for_inside_do_tb = '../tb/';
 filename = 'spi_master.vhd';
 
 %------------------------------
@@ -277,7 +289,7 @@ value_reset_is=input_result;
 %------------------------------
 %-- Create the testbench
 %------------------------------
-testbench_filename= [value_entity_name '_tb.vhd'];
+testbench_filename= [path_for_testbench value_entity_name '_tb.vhd'];
 testbench_entity_name = [value_entity_name '_tb'];
 testbench_clock_name = value_port_name(value_clock_is,:);
 if value_reset_is>0
@@ -315,10 +327,10 @@ fprintf(fid,'    -- %s generation\n',strtrim(value_port_name(value_clock_is,:)))
 fprintf(fid,'    -----------------------------------------\n');
 fprintf(fid,'    %s_gen_pr: process\n',strtrim(value_port_name(value_clock_is,:)));
 fprintf(fid,'    begin\n');
-fprintf(fid,'        %s <= '1';\n',strtrim(value_port_name(value_clock_is,:)));
+fprintf(fid,"        %s <= '1';\n",strtrim(value_port_name(value_clock_is,:)));
 fprintf(fid,'        wait for %s_const;\n',strtrim(testbench_clock_name));
 fprintf(fid,'\n');
-fprintf(fid,'        %s <= '0';\n',strtrim(value_port_name(value_clock_is,:)));
+fprintf(fid,"        %s <= '0';\n",strtrim(value_port_name(value_clock_is,:)));
 fprintf(fid,'        wait for %s_const;\n',strtrim(testbench_clock_name));
 fprintf(fid,'    end process;\n');
 fprintf(fid,'\n');
@@ -331,13 +343,13 @@ if value_reset_is>0
   fprintf(fid,'    %s_gen_pr:process\n',strtrim(value_port_name(value_reset_is,:)));
   fprintf(fid,'    begin\n');
   fprintf(fid,'\n');
-  fprintf(fid,'        %s <= '1';\n',strtrim(value_port_name(value_reset_is,:)));
+  fprintf(fid,"        %s <= '1';\n",strtrim(value_port_name(value_reset_is,:)));
   fprintf(fid,'        wait for 1 us;\n');
   fprintf(fid,'\n');
-  fprintf(fid,'        %s <= '0';\n',strtrim(value_port_name(value_reset_is,:)));
+  fprintf(fid,"        %s <= '0';\n",strtrim(value_port_name(value_reset_is,:)));
   fprintf(fid,'        wait for %s_const;\n',strtrim(testbench_reset_name));
   fprintf(fid,'\n');
-  fprintf(fid,'        %s <= '1';\n',strtrim(value_port_name(value_reset_is,:)));
+  fprintf(fid,"        %s <= '1';\n",strtrim(value_port_name(value_reset_is,:)));
   fprintf(fid,'        wait;\n');
   fprintf(fid,'\n');
   fprintf(fid,'    end process;\n');
@@ -368,18 +380,18 @@ fclose(fid);
 %------------------------------
 %-- create the do file
 %------------------------------
-fid = fopen('compile.do','w');
+fid = fopen([path_for_sim_do 'compile.do'],'w');
 
 fprintf(fid,'quit -sim\n');
 fprintf(fid,'vlib work\n');
 fprintf(fid,'\n');
-fprintf(fid,'vcom -work work -quiet %s%s.vhd\n',path_for_sources,strtrim(value_entity_name));
+fprintf(fid,'vcom -work work -quiet %s%s.vhd\n',path_for_inside_do_src,strtrim(value_entity_name));
 fprintf(fid,'\n');
-fprintf(fid,'vcom -work work -quiet %s_tb.vhd\n',strtrim(value_entity_name));
+fprintf(fid,'vcom -work work -quiet %s%s_tb.vhd\n',path_for_inside_do_tb,strtrim(value_entity_name));
 fprintf(fid,'\n');
 fprintf(fid,'\n');
 fprintf(fid,'# Simulation launch\n');
-fprintf(fid,'vsim -gui -t ps work.%s_tb -novopt\n',strtrim(value_entity_1name));
+fprintf(fid,'vsim -gui -t ps work.%s_tb -novopt\n',strtrim(value_entity_name));
 fprintf(fid,'\n');
 fprintf(fid,'add wave -position insertpoint sim:/%s_tb/*\n',strtrim(value_entity_name));
 fprintf(fid,'add wave -position insertpoint sim:/%s_tb/%s_inst/*\n',strtrim(value_entity_name),strtrim(value_entity_name));
