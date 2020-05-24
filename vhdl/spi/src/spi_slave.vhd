@@ -4,30 +4,32 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
 entity spi_slave is
-    generic ( msb_lsb_first : integer:=1; -- 0: lsb / 1: msb
-              bit_size      : integer:=8
+    generic (   msb_lsb_first : integer:=1; -- 0: lsb / 1: msb
+                bit_size      : integer:=8;
+                timeout       : integer:=9999 --Should be period value x4
     );
  port (
-  clk             : in std_logic;
-  rst             : in std_logic;
+            clk             : in std_logic;
+            rst             : in std_logic;
      
-        data_in         : in std_logic_vector(7 downto 0);
-        data_in_en      : in std_logic;
-        data_out        : out std_logic_vector(7 downto 0);
-        data_out_en     : out std_logic;
-
-        sclk            : in std_logic;
-        ce              : in std_logic;
-        mosi            : in std_logic;
-        miso            : out std_logic;
-     
-        busy            : out std_logic
+            data_in         : in std_logic_vector(7 downto 0);
+            data_in_en      : in std_logic;
+            data_out        : out std_logic_vector(7 downto 0);
+            data_out_en     : out std_logic;
+    
+            sclk            : in std_logic;
+            ce              : in std_logic;
+            mosi            : in std_logic;
+            miso            : out std_logic;
+        
+            busy            : out std_logic
 
  );
 end entity spi_slave;
 
 architecture rtl of spi_slave is
 
+signal timeout_cnt              : unsigned(15 downto 0);
 signal sclk_d1                  : std_logic;
 signal ce_d1                    : std_logic;
 signal re_rcv_cnt               : unsigned(15 downto 0);
@@ -63,14 +65,27 @@ end process;
 process(clk, rst)
 begin
     if rst='1' then
+	
+        timeout_cnt     <= (others=>'0');
+        re_rcv_cnt      <= (others=>'0');
+		data_out_reg    <= (others=>'0'); 
+        data_out        <= (others=>'0'); 
+        data_out_en     <= '0';	
 
     elsif rising_edge(clk) then
  
         --reset the counter
         if ce='1' then
             re_rcv_cnt <= (others=>'0');
+            timeout_cnt <= (others=>'0');
+        elsif timeout_cnt=to_unsigned(timeout,16) then
+            re_rcv_cnt <= (others=>'0');
+            timeout_cnt <= (others=>'0');
         elsif sclk='1' and sclk_d1='0' then
             re_rcv_cnt <= re_rcv_cnt+1;
+            timeout_cnt <= (others=>'0');
+        else
+            timeout_cnt <= timeout_cnt+1;
         end if;
      
         --sample data
@@ -115,7 +130,7 @@ begin
         end if;
 
         --sample data
-        if sclk='1' and sclk_d1='0' then
+        if sclk='0' and sclk_d1='1' then
             for I in 0 to bit_size-1 loop
                 if re_rcv_cnt=to_unsigned(I,16) then
                     --MSB first

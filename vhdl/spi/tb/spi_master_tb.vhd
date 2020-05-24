@@ -67,13 +67,12 @@ begin
         wait for 500 us;
         wait until rising_edge(clk);
 
-        for I in 0 to 10 loop
+        for I in 0 to 512 loop
             wait until rising_edge(clk);
-            data_in    <= x"85";
+            data_in    <= std_logic_vector(unsigned(data_in)+1);
             data_in_en <= '1';
             wait until rising_edge(clk);
          
-            data_in    <= (others=>'0');
             data_in_en <= '0';
          
             wait for 500 us;
@@ -82,6 +81,18 @@ begin
 
         wait;
 
+    end process;
+    
+    -----------------------------------------
+    -- Check data
+    -----------------------------------------
+    check_pr:process(clk, rst)
+    begin
+        if rst='1' then
+        
+        elsif rising_edge(clk) then
+
+        end if;
     end process;
 
 
@@ -114,7 +125,7 @@ begin
         ce => ce,
         mosi => mosi,
         miso => miso,
-        busy => busy
+        busy => open
 );
 
 end rtl;

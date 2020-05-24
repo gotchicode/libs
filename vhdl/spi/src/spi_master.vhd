@@ -235,5 +235,20 @@ begin
     end if;
 end process;
 
+----------------------------
+-- Busy process
+----------------------------
+process(clk, rst)
+begin
+    if rst='1' then
+        busy <= '0';
+    elsif rising_edge(clk) then
+        if sm_stages=idle then
+            busy <= '0';
+        else
+            busy <= '1';
+        end if;
+    end if;
+end process;
 
 end rtl;
