@@ -11,6 +11,9 @@ architecture rtl of pn_enc_dec_tb is
 constant clk_const      : time := 5 ns;
 constant rst_n_const    : time := 123 ns;
 
+constant const_all_ones : std_logic_vector(63 downto 0):=x"FFFFFFFFFFFFFFFF";
+constant const_all_zeros : std_logic_vector(63 downto 0):=x"0000000000000000";
+
 constant bit_size       : integer:=32;
 
 signal clk : std_logic;

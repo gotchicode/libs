@@ -68,7 +68,7 @@ begin
                 v_out_tmp := v_shift_reg_enc(23) xor v_shift_reg_enc(18);
                 v_out := v_tmp xor v_out_tmp;
                 v_out_enc_table(I) := v_out;
-                v_shift_reg_enc(23 downto 2) := v_shift_reg_enc(22 downto 1);
+                v_shift_reg_enc(31 downto 2) := v_shift_reg_enc(30 downto 1);
                 v_shift_reg_enc(1) := v_out;
             end loop;
         end if;
@@ -110,7 +110,7 @@ begin
                 v_out_tmp := v_shift_reg_dec(23) xor v_shift_reg_dec(18);
                 v_out := v_tmp xor v_out_tmp;
                 v_out_dec_table(I) := v_out;
-                v_shift_reg_dec(23 downto 2) := v_shift_reg_dec(22 downto 1);
+                v_shift_reg_dec(31 downto 2) := v_shift_reg_dec(30 downto 1);
                 v_shift_reg_dec(1) := v_tmp;
             end loop;
         end if;
