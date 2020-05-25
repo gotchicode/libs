@@ -74,12 +74,12 @@ begin
 
         for I in 0 to 65535 loop
             wait until rising_edge(clk);
-            enc_data_in    <= x"FFFFFFFF";
+            enc_data_in    <= const_all_ones(bit_size-1 downto 0);
             enc_data_in_en <= '1';
             wait until rising_edge(clk);
          
             enc_data_in_en <= '0';
-         
+            
             wait until rising_edge(clk);
             wait until rising_edge(clk);
             wait until rising_edge(clk);
