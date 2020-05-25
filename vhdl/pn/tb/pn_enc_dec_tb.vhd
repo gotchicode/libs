@@ -11,7 +11,7 @@ architecture rtl of pn_enc_dec_tb is
 constant clk_const      : time := 5 ns;
 constant rst_n_const    : time := 123 ns;
 
-constant bit_size       : integer:=8;
+constant bit_size       : integer:=32;
 
 signal clk : std_logic;
 signal rst_n : std_logic;
@@ -69,9 +69,9 @@ begin
         wait for 500 us;
         wait until rising_edge(clk);
 
-        for I in 0 to 512 loop
+        for I in 0 to 65535 loop
             wait until rising_edge(clk);
-            enc_data_in    <= x"FF";
+            enc_data_in    <= x"FFFFFFFF";
             enc_data_in_en <= '1';
             wait until rising_edge(clk);
          
