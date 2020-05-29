@@ -10,7 +10,7 @@ int main()
 
 
  //fft variables
- int size=256;
+ int size=32;
  float *data_in_re   = malloc(size*sizeof(float));
  float *data_in_im   = malloc(size*sizeof(float));
  float *data_out_re  = malloc(size*sizeof(float));
@@ -81,8 +81,8 @@ fclose(fp);
 //	//////////////////////////////////
 //	// Test the complex multiplication
 //	//////////////////////////////////
-//	
-//	
+//
+//
 //		float *data_in_A_re	= malloc(1*sizeof(float));
 //		float *data_in_A_im	= malloc(1*sizeof(float));
 //		float *data_in_B_re	= malloc(1*sizeof(float));
@@ -90,12 +90,12 @@ fclose(fp);
 //		float *data_out_re	= malloc(1*sizeof(float));
 //		float *data_out_im	= malloc(1*sizeof(float));
 //		int size;
-//	
-//	
-//	
-//	
-//	
-//	
+//
+//
+//
+//
+//
+//
 //		*data_in_A_re	= 0;
 //		*data_in_A_im	= 1;
 //		*data_in_B_re	= 0;
@@ -103,9 +103,9 @@ fclose(fp);
 //		*data_out_re	= 1;
 //		*data_out_im	= 1;
 //		size =1;
-//	
+//
 //		my_float_complex_multiply(data_in_A_re, data_in_A_im, data_in_B_re, data_in_B_im, data_out_re, data_out_im, 1);
-//	
+//
 //		printf("data_in_A_re = %f\n", *data_in_A_re	);
 //		printf("data_in_A_im = %f\n", *data_in_A_im	);
 //		printf("data_in_B_re = %f\n", *data_in_B_re	);

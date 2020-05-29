@@ -30,6 +30,12 @@ int my_float_fft(float *data_in_re, float *data_in_im, float *data_out_re, float
     float *butterfly_factor_re = malloc(size*sizeof(float));
     float *butterfly_factor_im = malloc(size*sizeof(float));
 
+    float *butterfly_factor_re_to_mid = malloc(size*sizeof(float));
+    float *butterfly_factor_im_to_mid = malloc(size*sizeof(float));
+
+    float *butterfly_factor_re_from_mid = malloc(size*sizeof(float));
+    float *butterfly_factor_im_from_mid = malloc(size*sizeof(float));
+
     float *sign_table = malloc(size*sizeof(float));
     float *gain_table_re = malloc(size*sizeof(float));
     float *gain_table_im = malloc(size*sizeof(float));
@@ -83,9 +89,14 @@ int my_float_fft(float *data_in_re, float *data_in_im, float *data_out_re, float
 
     //Complete the butterfly factor
     printf("butterfly_factor_re start begin\n");
-    for( k = 0; k < size; k++ ){
-        *(butterfly_factor_re+k) = *(gain_table_re+k) * *(sign_table+k);
-        *(butterfly_factor_im+k) = *(gain_table_im+k) * *(sign_table+k);
+    for( k = 0; k < size/2; k++ ){
+        *(butterfly_factor_re_to_mid+k) = *(gain_table_re+k) * *(sign_table+k);
+        *(butterfly_factor_im_to_mid+k) = *(gain_table_im+k) * *(sign_table+k);
+    }
+
+    for( k = size/2; k < size; k++ ){
+        *(butterfly_factor_re_from_mid+k-size/2) = *(gain_table_re+k) * *(sign_table+k);
+        *(butterfly_factor_im_from_mid+k-size/2) = *(gain_table_im+k) * *(sign_table+k);
     }
 
     if (size>8)
@@ -161,8 +172,8 @@ int my_float_fft(float *data_in_re, float *data_in_im, float *data_out_re, float
     //first part
     my_float_complex_multiply(  odd_data_out_re,
                                 odd_data_out_im,
-                                butterfly_factor_re,
-                                butterfly_factor_im,
+                                butterfly_factor_re_to_mid,
+                                butterfly_factor_im_to_mid,
                                 tmp_re,
                                 tmp_im,
                                 mid_index);
@@ -176,8 +187,8 @@ int my_float_fft(float *data_in_re, float *data_in_im, float *data_out_re, float
     //second part
     my_float_complex_multiply(  odd_data_out_re,
                                 odd_data_out_im,
-                                butterfly_factor_re+4,
-                                butterfly_factor_im+4,
+                                butterfly_factor_re_from_mid,
+                                butterfly_factor_im_from_mid,
                                 tmp_re,
                                 tmp_im,
                                 mid_index);
@@ -195,7 +206,7 @@ int my_float_fft(float *data_in_re, float *data_in_im, float *data_out_re, float
     //}
     //system("pause");
 
-
+    //printf("size=%d\n",k,size);
     //for( k = 0; k < size; k++ ){
     //    printf("*(data_out_re+%d)=%.16f\n",k,*(data_out_re+k));
     //    printf("*(data_out_im+%d)=%.16f\n",k,*(data_out_im+k));
@@ -216,6 +227,10 @@ int my_float_fft(float *data_in_re, float *data_in_im, float *data_out_re, float
     free(even_data_out_im);
     free(butterfly_factor_re);
     free(butterfly_factor_im);
+    free(butterfly_factor_re_to_mid);
+    free(butterfly_factor_im_to_mid);
+    free(butterfly_factor_re_from_mid);
+    free(butterfly_factor_im_from_mid);
 
     return 0;
 
