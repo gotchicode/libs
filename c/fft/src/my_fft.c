@@ -75,10 +75,10 @@ int my_float_fft(float *data_in_re, float *data_in_im, float *data_out_re, float
 
     //Prepare butterfly factor
     for( k = 0; k < size/2; k++ ){
-        *(gain_table_re+k) = cos(2*3.14159265359/(float)size*k);
-        *(gain_table_im+k) = -1*sin(2*3.14159265359/(float)size*k);
-        *(gain_table_re+size/2+k) = cos(2*3.14159265359/(float)size*k);
-        *(gain_table_im+size/2+k) = -1*sin(2*3.14159265359/(float)size*k);
+        *(gain_table_re+k) = cos(2*3.14159265359/(float)size*(float)k);
+        *(gain_table_im+k) = -1*sin(2*3.14159265359/(float)size*(float)k);
+        *(gain_table_re+size/2+k) = cos(2*3.14159265359/(float)size*(float)k);
+        *(gain_table_im+size/2+k) = -1*sin(2*3.14159265359/(float)size*(float)k);
     }
 
     //Complete the butterfly factor
@@ -194,15 +194,15 @@ int my_float_dft(float *data_in_re, float *data_in_im, float *data_out_re, float
     float accu_re;
     float accu_im;
 
-    //printf dtf inputs for debug
+    ////printf dtf inputs for debug
     //for( k = 0; k < size; k++ ){
     //    printf("*(data_in_re+%d)=%.16f\n",k,*(data_in_re+k));
     //    printf("*(data_in_im+%d)=%.16f\n",k,*(data_in_im+k));
     //}
     //system("pause");
 
-    printf("size=%d\n",size);
-    system("pause");
+    //printf("size=%d\n",size);
+    //system("pause");
 
     for( k = 0; k < size; k++ ){
         accu_re=0;
@@ -217,8 +217,8 @@ int my_float_dft(float *data_in_re, float *data_in_im, float *data_out_re, float
             //printf("(*tmp_im)=%.16f\n",*tmp_im);
 
             //printf("cos and sin done\n");
-            *data_in_re_tmp = *(data_in_re+k);
-            *data_in_im_tmp = *(data_in_im+k);
+            *data_in_re_tmp = *(data_in_re+n);
+            *data_in_im_tmp = *(data_in_im+n);
 
             //printf("Loop of dft and call my_float_complex_multiply\n");
             my_float_complex_multiply(tmp_re, tmp_im, data_in_re_tmp, data_in_im_tmp, accu_tmp_re, accu_tmp_im, 1);
@@ -238,7 +238,14 @@ int my_float_dft(float *data_in_re, float *data_in_im, float *data_out_re, float
         *(data_out_re+k) =  accu_re;
         *(data_out_im+k) =  accu_im;
     }
-    system("pause");
+
+    //for( k = 0; k < size; k++ ){
+    //    printf("*(data_out_re+%d)=%.16f\n",k,*(data_out_re+k));
+    //    printf("*(data_out_im+%d)=%.16f\n",k,*(data_out_im+k));
+    //}
+    //system("pause");
+
+    //system("pause");
     return 0;
 }
 

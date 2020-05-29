@@ -3,10 +3,11 @@ clear all;
 close all;
 
 %Param
-nb_size = 2^12; 
+nb_size = 2^8; 
 
 %Input gen
 test_in = rand(1,nb_size);
+test_in = csvread('../../c/fft/prj/data_in_re.txt').'+j*csvread('../../c/fft/prj/data_in_im.txt').';
 
 %Timestamp
 localtime_start_DFT = (time());
