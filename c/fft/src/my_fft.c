@@ -158,10 +158,9 @@ int my_float_fft(float *data_in_re, float *data_in_im, float *data_out_re, float
                       mid_index);
     }
 
-    //Data out
-    //printf("call my_float_complex_multiplmid_indexy\n");
+    //first part
     my_float_complex_multiply(  odd_data_out_re,
-                                odd_data_out_re,
+                                odd_data_out_im,
                                 butterfly_factor_re,
                                 butterfly_factor_im,
                                 tmp_re,
@@ -170,19 +169,38 @@ int my_float_fft(float *data_in_re, float *data_in_im, float *data_out_re, float
 
     for( k = 0; k < mid_index; k++ ){
 
-        //tmp_re = *(odd_data_out_re+k) * *(
-        //tmp_im = *(odd_data_out_im+k) * *(
-
-
         *(data_out_re+k) = *(even_data_out_re+k) + *(tmp_re+k);
         *(data_out_im+k) = *(even_data_out_im+k) + *(tmp_im+k);
     }
 
-    for( k = 0; k < size; k++ ){
-        printf("*(data_out_re+%d)=%.16f\n",k,*(data_out_re+k));
-        printf("*(data_out_im+%d)=%.16f\n",k,*(data_out_im+k));
+    //second part
+    my_float_complex_multiply(  odd_data_out_re,
+                                odd_data_out_im,
+                                butterfly_factor_re+4,
+                                butterfly_factor_im+4,
+                                tmp_re,
+                                tmp_im,
+                                mid_index);
+
+
+    for( k = 0; k < mid_index; k++ ){
+
+        *(data_out_re+mid_index+k) = *(even_data_out_re+k) + *(tmp_re+k);
+        *(data_out_im+mid_index+k) = *(even_data_out_im+k) + *(tmp_im+k);
     }
-    system("pause");
+
+    //for( k = 0; k < size; k++ ){
+    //    printf("*(butterfly_factor_re+%d)=%.16f\n",k,*(butterfly_factor_re+k));
+    //    printf("*(butterfly_factor_im+%d)=%.16f\n",k,*(butterfly_factor_im+k));
+    //}
+    //system("pause");
+
+
+    //for( k = 0; k < size; k++ ){
+    //    printf("*(data_out_re+%d)=%.16f\n",k,*(data_out_re+k));
+    //    printf("*(data_out_im+%d)=%.16f\n",k,*(data_out_im+k));
+    //}
+    //system("pause");
 
 
 
