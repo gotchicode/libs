@@ -1,14 +1,14 @@
-function [x_out,y_out] = cordic_cos_sin(input_rad,iterations,debug)
+function [x_out,y_out] = cordic_cos_sin(input_rad,iterations,debug, quant)
   
   %const
-  cordic_cos_sin_const;
+  [const_1em9_val, const_45_val, const_90_val, const_135_val, const_180_val, const_225_val, const_270_val, const_315_val, const_360_val, const_K, atan_const]=cordic_cos_sin_const(quant);
 
   %Const
   K=const_K;
   n=iterations;
   
   %Rad quadrants recalc
-  input_rad_recalc = cordic_cos_sin_rad_recalc(input_rad);
+  input_rad_recalc = cordic_cos_sin_rad_recalc(input_rad, quant);
 
   %Start computing
   x=K;
@@ -38,7 +38,7 @@ function [x_out,y_out] = cordic_cos_sin(input_rad,iterations,debug)
     end
     
   %Update coordinates
-  [x_new, y_new] = cordic_cos_sin_x_y_update(input_rad,x,y);
+  [x_new, y_new] = cordic_cos_sin_x_y_update(input_rad,x,y,quant);
 
 
   %for debug purpose

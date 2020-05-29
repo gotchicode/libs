@@ -10,7 +10,7 @@ result_real=[];
 for k=1:359
   input_degres = k;
   input_rad = input_degres/360*2*pi;
-  [x_out,y_out] = cordic_cos_sin(input_rad,n,0);
+  [x_out,y_out] = cordic_cos_sin(input_rad,n,0,1);
   result_cordic=[result_cordic; input_degres x_out y_out];
   result_real=[result_real; input_degres cos(input_degres/360*2*pi) sin(input_degres/360*2*pi)];
 end

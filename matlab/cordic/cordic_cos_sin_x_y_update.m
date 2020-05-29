@@ -1,7 +1,7 @@
-function [x_new, y_new] = cordic_cos_sin_x_y_update(input_rad,x,y)
+function [x_new, y_new] = cordic_cos_sin_x_y_update(input_rad,x,y,quant)
 
   %const
-  cordic_cos_sin_const;
+  [const_1em9_val, const_45_val, const_90_val, const_135_val, const_180_val, const_225_val, const_270_val, const_315_val, const_360_val, const_K, atan_const]=cordic_cos_sin_const(quant);
 
   % input radians between 0 and 45
   if (input_rad>0 && input_rad<=const_45_val)
@@ -50,3 +50,5 @@ function [x_new, y_new] = cordic_cos_sin_x_y_update(input_rad,x,y)
    x_new = x;
    y_new = -y;
   end
+  
+end

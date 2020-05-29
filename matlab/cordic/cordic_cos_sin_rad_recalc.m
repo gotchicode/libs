@@ -1,7 +1,7 @@
-function [input_rad_recalc] = cordic_cos_sin_rad_recalc(input_rad)
+function [input_rad_recalc] = cordic_cos_sin_rad_recalc(input_rad, quant)
 
   %const
-  cordic_cos_sin_const;
+  [const_1em9_val, const_45_val, const_90_val, const_135_val, const_180_val, const_225_val, const_270_val, const_315_val, const_360_val, const_K, atan_const]=cordic_cos_sin_const(quant);
 
   %Recalc
   input_rad_recalc=input_rad;
