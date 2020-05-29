@@ -2,14 +2,6 @@ function [x_out,y_out] = cordic_cos_sin(input_rad,iterations,debug)
   
   %const
   cordic_cos_sin_const;
-  
-  atan_const=[];
-  for k=0:31
-    if debug==1
-      fprintf("i=%d 2^-i=%f atan=%f rad atan=%f deg\n",k,2^-k,atan(2^-k),atan(2^-k)/2/pi*const_360_val);
-    end
-    atan_const=[atan_const atan(2^-k)];
-  end
 
   %Const
   K=const_K;
