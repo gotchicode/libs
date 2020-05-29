@@ -1,0 +1,11 @@
+  pi_const          =   pi;%3.14159265359;
+  const_1em9_val    =   2 * pi_const/360 * 1e-9;
+  const_45_val      =   2 * pi_const/360 * 45;
+  const_90_val      =   2 * pi_const/360 * 90;
+  const_135_val     =   2 * pi_const/360 * 135;
+  const_180_val     =   2 * pi_const/360 * 180;
+  const_225_val     =   2 * pi_const/360 * 225;
+  const_270_val     =   2 * pi_const/360 * 270;
+  const_315_val     =   2 * pi_const/360 * 315;
+  const_360_val     =   2 * pi_const/360 * 360;
+  const_K           =   0.6072529350088814;
