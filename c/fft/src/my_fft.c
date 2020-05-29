@@ -113,6 +113,22 @@ int my_float_fft(float *data_in_re, float *data_in_im, float *data_out_re, float
                       odd_data_out_re,
                       odd_data_out_im,
                       mid_index);
+
+    //printf dtf inputs for debug
+    //for( k = 0; k < size; k++ ){
+    //    printf("*(even_data_in_re+%d)=%.16f\n",k,*(even_data_in_re+k));
+    //    printf("*(even_data_in_re+%d)=%.16f\n",k,*(even_data_in_re+k));
+    //}
+    //system("pause");
+
+    //printf dtf inputs for debug
+    //for( k = 0; k < size; k++ ){
+    //    printf("*(even_data_out_re+%d)=%.16f\n",k,*(even_data_out_re+k));
+    //    printf("*(even_data_out_re+%d)=%.16f\n",k,*(even_data_out_re+k));
+    //}
+    //system("pause");
+
+
     }
     if (size==8)
     {
@@ -161,6 +177,14 @@ int my_float_fft(float *data_in_re, float *data_in_im, float *data_out_re, float
         *(data_out_re+k) = *(even_data_out_re+k) + *(tmp_re+k);
         *(data_out_im+k) = *(even_data_out_im+k) + *(tmp_im+k);
     }
+
+    for( k = 0; k < size; k++ ){
+        printf("*(data_out_re+%d)=%.16f\n",k,*(data_out_re+k));
+        printf("*(data_out_im+%d)=%.16f\n",k,*(data_out_im+k));
+    }
+    system("pause");
+
+
 
     //Free
     free(even_data_in_re);
@@ -233,8 +257,8 @@ int my_float_dft(float *data_in_re, float *data_in_im, float *data_out_re, float
 
 
         }
-        printf("(*accu_re)=%.16f  ",accu_re);
-        printf("(*accu_im)=%.16f\n",accu_im);
+        //printf("(*accu_re)=%.16f  ",accu_re);
+        //printf("(*accu_im)=%.16f\n",accu_im);
         *(data_out_re+k) =  accu_re;
         *(data_out_im+k) =  accu_im;
     }
