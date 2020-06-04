@@ -11,6 +11,7 @@ f=f_norm_axis;
 
 %Compute response
 h_cic_resp_lin=abs(sin(pi*f*R)./sin(pi.*f)).^N;
+h_cic_resp_lin(1)=h_cic_resp_lin(2);
 h_cic_resp_log = 20*log10(h_cic_resp_lin);
 
 %Find max
