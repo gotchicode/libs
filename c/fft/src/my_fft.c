@@ -1,6 +1,87 @@
 #include <stdlib.h>
 #include <math.h>
 
+int my_float_fft_init_get_size(int size)
+{
+    //Variable
+	int m;
+    int space_needed;
+
+    //Calculate the needed space inside a table and find each start
+    space_needed=0;
+    m=size;
+    while(m>4)
+    {
+        space_needed=space_needed+m;
+        m=m>>1;
+    }
+
+    return space_needed;
+
+}
+
+int my_float_fft_init(int size, float *data_out_re, float *data_out_im)
+{
+    //Variable
+	int m;
+	int k;
+    int space_needed;
+    int index;
+
+    //Calculate the needed space inside a table and find each start
+    space_needed=0;
+    m=size;
+    while(m>4)
+    {
+        space_needed=space_needed+m;
+        m=m>>1;
+    }
+
+    space_needed=0;
+    m=size;
+    index=0;
+    while(m>4)
+    {
+        space_needed=space_needed+k;
+
+        for( k = space_needed; k < space_needed/2; k++ ){
+            *(data_out_re+k) = cos(2*3.14159265359/(float)size*(float)k);
+            *(data_out_im+k) = -1*sin(2*3.14159265359/(float)size*(float)k);
+            *(data_out_re+size/2+k) = cos(2*3.14159265359/(float)size*(float)k);
+            *(data_out_im+size/2+k) = -1*sin(2*3.14159265359/(float)size*(float)k);
+        index = index+1;
+        }
+
+        m=m>>1;
+    }
+
+    return 0;
+
+}
+
+int my_float_dft_init(int size, float *data_out_re, float *data_out_im)
+{
+    //Variable
+	int k;
+	int n;
+	int index;
+
+	index=0;
+    for( k = 0; k < size; k++ ){
+
+        for( n = 0; n < size; n++ ){
+
+            *(data_out_re+index) = cos(2*3.14159265359/(float)size *(float)k*(float)n);
+            *(data_out_im+index) = -1*sin(2*3.14159265359/(float)size *(float)k*(float)n);
+
+			index=index+1;
+        }
+    }
+
+    return 0;
+
+}
+
 int my_float_fft(float *data_in_re, float *data_in_im, float *data_out_re, float *data_out_im, int size)
 {
     //Variable

@@ -8,9 +8,12 @@ int main()
 {
 int k;
 
+ //Init variables
+ int fft_init_size;
+
 
  //fft variables
- int size=128;
+ int size=256;
  float *data_in_re   = malloc(size*sizeof(float));
  float *data_in_im   = malloc(size*sizeof(float));
  float *data_out_re  = malloc(size*sizeof(float));
@@ -20,6 +23,29 @@ int k;
  float *tie_to_one   = malloc(size*sizeof(float));
 
  printf("Start the app!\n");
+
+ //test initialization
+ fft_init_size= my_float_fft_init_get_size(size);
+ //printf (fft_init_size="%d\n",fft_init_size);
+
+ float *data_from_my_float_fft_init_re   = malloc(fft_init_size*sizeof(float));
+ float *data_from_my_float_fft_init_im   = malloc(fft_init_size*sizeof(float));
+
+ my_float_fft_init(size, data_from_my_float_fft_init_re, data_from_my_float_fft_init_im);
+
+// Debug write in file
+fp = fopen ("data_from_my_float_fft_init_re.txt","w");
+for(k = 0; k < fft_init_size;k++){
+    fprintf (fp, "%f\n",*(data_from_my_float_fft_init_re+k));
+}
+fclose(fp);
+
+// Debug write in file
+fp = fopen ("data_from_my_float_fft_init_im.txt","w");
+for(k = 0; k < fft_init_size;k++){
+     fprintf (fp, "%f\n",*(data_from_my_float_fft_init_im+k));
+}
+fclose(fp);
 
  //generate table of zeros
  for( k = 0; k < size; k++ ){
