@@ -2,7 +2,7 @@ clc;
 clear all;
 close all
 
-nb_size= 256*256;
+nb_size= 256;
 select_size=1024;
 debug=1;
 

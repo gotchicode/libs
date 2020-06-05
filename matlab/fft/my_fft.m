@@ -1,4 +1,6 @@
-function data_out =  my_fft(data_in,nb_size)
+function data_out =  my_fft(data_in,nb_size_max,nb_size,my_dft_init_table,my_fft_init_table)
+  
+  %fprintf('call %d size fft\n',nb_size);
   
   if length(data_in)>8
     
@@ -16,19 +18,21 @@ function data_out =  my_fft(data_in,nb_size)
     sign_table(length(sign_table)/2+1:end)=-1;
     
     %butterfly
+    fft_init_table_extracted=get_fft_init_table(my_fft_init_table, nb_size_max, nb_size,0);
     tmp = (1:length(sign_table))-1;
-    gain_table = [cos(+2*pi/length(sign_table)*tmp)-j*sin(+2*pi/length(sign_table)*tmp)];
+    %gain_table = [cos(+2*pi/length(sign_table)*tmp)-j*sin(+2*pi/length(sign_table)*tmp)];
+    gain_table=fft_init_table_extracted;
     gain_table = [gain_table(1:mid_index) gain_table(1:mid_index)];
     butterfly_factor = sign_table.*gain_table;
     
     %Call dft
-    even_data_out=my_fft(even_data_in,mid_index);
-    odd_data_out=my_fft(odd_data_in,mid_index);
+    even_data_out=my_fft(even_data_in,nb_size_max,mid_index,my_dft_init_table,my_fft_init_table);
+    odd_data_out=my_fft(odd_data_in,nb_size_max,mid_index,my_dft_init_table,my_fft_init_table);
     
     data_out(1:mid_index) = even_data_out + odd_data_out.*butterfly_factor(1:mid_index);
     data_out(mid_index+1:max_index) = even_data_out + odd_data_out.*butterfly_factor(mid_index+1:max_index);
     
-    fprintf("One butterfly done of %d\n",nb_size);
+    %fprintf("One butterfly done of %d\n",nb_size);
     
   elseif (length(data_in)==8)
     
@@ -51,13 +55,13 @@ function data_out =  my_fft(data_in,nb_size)
     butterfly_factor = sign_table.*gain_table;
     
     %Call dft
-    even_data_out=my_dft(even_data_in,mid_index);
-    odd_data_out=my_dft(odd_data_in,mid_index);
+    even_data_out=my_dft(even_data_in,mid_index,my_dft_init_table);
+    odd_data_out=my_dft(odd_data_in,mid_index,my_dft_init_table);
     
     data_out(1:mid_index) = even_data_out + odd_data_out.*butterfly_factor(1:mid_index);
     data_out(mid_index+1:max_index) = even_data_out + odd_data_out.*butterfly_factor(mid_index+1:max_index);
     
-    fprintf("One butterfly done of %d\n",nb_size);
+    %fprintf("One butterfly done of %d\n",nb_size);
     
   else
     fprintf("Error in the size of the FFT\n");
