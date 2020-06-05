@@ -13,7 +13,7 @@ int k;
 
 
  //fft variables
- int size=256;
+ int size=64;
  float *data_in_re   = malloc(size*sizeof(float));
  float *data_in_im   = malloc(size*sizeof(float));
  float *data_out_re  = malloc(size*sizeof(float));
@@ -26,26 +26,30 @@ int k;
 
  //test initialization
  fft_init_size= my_float_fft_init_get_size(size);
- //printf (fft_init_size="%d\n",fft_init_size);
 
  float *data_from_my_float_fft_init_re   = malloc(fft_init_size*sizeof(float));
  float *data_from_my_float_fft_init_im   = malloc(fft_init_size*sizeof(float));
 
  my_float_fft_init(size, data_from_my_float_fft_init_re, data_from_my_float_fft_init_im);
 
-// Debug write in file
-fp = fopen ("data_from_my_float_fft_init_re.txt","w");
-for(k = 0; k < fft_init_size;k++){
-    fprintf (fp, "%f\n",*(data_from_my_float_fft_init_re+k));
-}
-fclose(fp);
+ float *my_float_dft_init_dft_init_re   = malloc(16*sizeof(float));
+ float *my_float_dft_init_dft_init_im   = malloc(16*sizeof(float));
 
-// Debug write in file
-fp = fopen ("data_from_my_float_fft_init_im.txt","w");
-for(k = 0; k < fft_init_size;k++){
-     fprintf (fp, "%f\n",*(data_from_my_float_fft_init_im+k));
-}
-fclose(fp);
+ my_float_dft_init(4, my_float_dft_init_dft_init_re, my_float_dft_init_dft_init_im);
+
+//// Debug write in file
+//fp = fopen ("data_from_my_float_fft_init_re.txt","w");
+//for(k = 0; k < fft_init_size;k++){
+//    fprintf (fp, "%f\n",*(data_from_my_float_fft_init_re+k));
+//}
+//fclose(fp);
+//
+//// Debug write in file
+//fp = fopen ("data_from_my_float_fft_init_im.txt","w");
+//for(k = 0; k < fft_init_size;k++){
+//     fprintf (fp, "%f\n",*(data_from_my_float_fft_init_im+k));
+//}
+//fclose(fp);
 
  //generate table of zeros
  for( k = 0; k < size; k++ ){
@@ -78,8 +82,16 @@ for(k = 0; k < size;k++){
 fclose(fp);
 
  //Launch the fft
- my_float_fft(data_in_re, data_in_im, data_out_re, data_out_im, size);
-
+ my_float_fft(data_in_re,
+              data_in_im,
+              data_out_re,
+              data_out_im,
+              data_from_my_float_fft_init_re,
+              data_from_my_float_fft_init_im,
+              my_float_dft_init_dft_init_re,
+              my_float_dft_init_dft_init_im,
+              size,
+              size);
 
 // Debug write in file
 fp = fopen ("data_out_re.txt","w");

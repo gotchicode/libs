@@ -42,15 +42,13 @@ int my_float_fft_init(int size, float *data_out_re, float *data_out_im)
     index=0;
     while(m>4)
     {
-        space_needed=space_needed+k;
+        for( k = space_needed; k < (space_needed+m); k++ ){
 
-        for( k = space_needed; k < space_needed/2; k++ ){
-            *(data_out_re+k) = cos(2*3.14159265359/(float)size*(float)k);
-            *(data_out_im+k) = -1*sin(2*3.14159265359/(float)size*(float)k);
-            *(data_out_re+size/2+k) = cos(2*3.14159265359/(float)size*(float)k);
-            *(data_out_im+size/2+k) = -1*sin(2*3.14159265359/(float)size*(float)k);
-        index = index+1;
+            *(data_out_re+index) = cos(2*3.14159265359/(float)m*(float)k);
+            *(data_out_im+index) = -1*sin(2*3.14159265359/(float)m*(float)k);
+            index = index+1;
         }
+        space_needed=space_needed+k;
 
         m=m>>1;
     }
@@ -75,14 +73,25 @@ int my_float_dft_init(int size, float *data_out_re, float *data_out_im)
             *(data_out_im+index) = -1*sin(2*3.14159265359/(float)size *(float)k*(float)n);
 
 			index=index+1;
+
         }
+
     }
 
     return 0;
 
 }
 
-int my_float_fft(float *data_in_re, float *data_in_im, float *data_out_re, float *data_out_im, int size)
+int my_float_fft(float *data_in_re,
+                 float *data_in_im,
+                 float *data_out_re,
+                 float *data_out_im,
+                 float *fft_init_data_in_re,
+                 float *fft_init_data_in_im,
+                 float *dft_init_data_in_re,
+                 float *dft_init_data_in_im,
+                 int size,
+                 int max_size)
 {
     //Variable
     int k;
@@ -172,13 +181,25 @@ int my_float_fft(float *data_in_re, float *data_in_im, float *data_out_re, float
                       even_data_in_im,
                       even_data_out_re,
                       even_data_out_im,
-                      mid_index);
+                      fft_init_data_in_re,
+                      fft_init_data_in_im,
+                      dft_init_data_in_re,
+                      dft_init_data_in_im,
+                      mid_index,
+                      max_size
+                      );
 
         my_float_fft( odd_data_in_re,
                       odd_data_in_im,
                       odd_data_out_re,
                       odd_data_out_im,
-                      mid_index);
+                      fft_init_data_in_re,
+                      fft_init_data_in_im,
+                      dft_init_data_in_re,
+                      dft_init_data_in_im,
+                      mid_index,
+                      max_size
+                      );
 
     }
     if (size==8)
@@ -188,6 +209,8 @@ int my_float_fft(float *data_in_re, float *data_in_im, float *data_out_re, float
                       even_data_in_im,
                       even_data_out_re,
                       even_data_out_im,
+                      dft_init_data_in_re,
+                      dft_init_data_in_im,
                       mid_index);
 
 
@@ -195,6 +218,8 @@ int my_float_fft(float *data_in_re, float *data_in_im, float *data_out_re, float
                       odd_data_in_im,
                       odd_data_out_re,
                       odd_data_out_im,
+                      dft_init_data_in_re,
+                      dft_init_data_in_im,
                       mid_index);
     }
 
@@ -252,11 +277,12 @@ int my_float_fft(float *data_in_re, float *data_in_im, float *data_out_re, float
 
 }
 
-int my_float_dft(float *data_in_re, float *data_in_im, float *data_out_re, float *data_out_im, int size)
+int my_float_dft(float *data_in_re, float *data_in_im, float *data_out_re, float *data_out_im, float *dft_init_data_in_re, float *dft_init_data_in_im,int size)
 {
 
     int k;
     int n;
+    int index;
     float *tmp_re=malloc(sizeof(float));
     float *tmp_im=malloc(sizeof(float));
     float *accu_tmp_re=malloc(sizeof(float));
@@ -266,15 +292,17 @@ int my_float_dft(float *data_in_re, float *data_in_im, float *data_out_re, float
     float accu_re;
     float accu_im;
 
-
+    index = 0;
+    
     for( k = 0; k < size; k++ ){
         accu_re=0;
         accu_im=0;
-
         for( n = 0; n < size; n++ ){
 
-            *tmp_re = cos(2*3.14159265359/(float)size *(float)k*(float)n);
-            *tmp_im = -1*sin(2*3.14159265359/(float)size *(float)k*(float)n);
+            *tmp_re = *(dft_init_data_in_re+index);
+            *tmp_im = *(dft_init_data_in_im+index);
+            //*tmp_re = cos(2*3.14159265359/(float)size *(float)k*(float)n);
+            //*tmp_im = -1*sin(2*3.14159265359/(float)size *(float)k*(float)n);
 
             *data_in_re_tmp = *(data_in_re+n);
             *data_in_im_tmp = *(data_in_im+n);
@@ -283,7 +311,8 @@ int my_float_dft(float *data_in_re, float *data_in_im, float *data_out_re, float
 
             accu_re = accu_re + *accu_tmp_re;
             accu_im = accu_im + *accu_tmp_im;
-
+            
+            index=index+1;
 
         }
 
