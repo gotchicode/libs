@@ -1,6 +1,51 @@
 #include <stdlib.h>
 #include <math.h>
 
+int get_fft_init_table(float *data_in_re, float *data_in_im, float *data_out_re, float *data_out_im, int size, int select_size, int debug)
+{
+    //Variable
+	int m;
+	int k;
+    int space_needed;
+    int base_addr;
+    int end_addr;
+
+    space_needed=0;
+    m=size;
+    while(m>4)
+    {
+
+        if (debug==1)
+        {
+            printf("fft_size=%d\tstart address=%d\n",m,space_needed);
+        }
+
+        if (select_size==m)
+        {
+            base_addr = space_needed;
+            end_addr = space_needed+select_size-1;
+        }
+
+        space_needed=space_needed+m;
+        m=m>>1;
+    }
+
+    if (debug==1)
+    {
+        printf("base_addr=%d\t end_addr=%d diff=%d\n",base_addr,end_addr,end_addr-base_addr+1);
+    }
+
+    k=0;
+    for( m = base_addr+1; m < end_addr+1; m++ ){
+        *(data_out_re+k) = *(data_in_re+m-1);
+        *(data_out_im+k) = *(data_in_im+m-1);
+        k=k+1;
+    }
+
+
+
+}
+
 int my_float_fft_init_get_size(int size)
 {
     //Variable
@@ -122,6 +167,13 @@ int my_float_fft(float *data_in_re,
     float *gain_table_re = malloc(size*sizeof(float));
     float *gain_table_im = malloc(size*sizeof(float));
 
+    float *fft_init_data_out_re = malloc(size*sizeof(float));
+    float *fft_init_data_out_im = malloc(size*sizeof(float));
+
+    //float *new_gain_table_re = malloc(size*sizeof(float));
+    //float *new_gain_table_im = malloc(size*sizeof(float));
+
+
     float *even_data_out_re = malloc(mid_index*sizeof(float));
     float *even_data_out_im = malloc(mid_index*sizeof(float));
 
@@ -153,14 +205,29 @@ int my_float_fft(float *data_in_re,
         *(sign_table+size/2+k) = -1;
     }
 
+    get_fft_init_table(fft_init_data_in_re, fft_init_data_in_im ,fft_init_data_out_re, fft_init_data_out_im, max_size, size, 0);
 
     //Prepare butterfly factor
     for( k = 0; k < size/2; k++ ){
-        *(gain_table_re+k) = cos(2*3.14159265359/(float)size*(float)k);
-        *(gain_table_im+k) = -1*sin(2*3.14159265359/(float)size*(float)k);
-        *(gain_table_re+size/2+k) = cos(2*3.14159265359/(float)size*(float)k);
-        *(gain_table_im+size/2+k) = -1*sin(2*3.14159265359/(float)size*(float)k);
+        //printf("(fft_init_data_out_re+%d)=%f\n",k,*(fft_init_data_out_re+k));
+        //printf("(fft_init_data_out_im+%d)=%f\n",k,*(fft_init_data_out_im+k));
+
+        *(gain_table_re+k) = *(fft_init_data_out_re+k);
+        *(gain_table_im+k) = *(fft_init_data_out_im+k);
+        *(gain_table_re+size/2+k) = *(fft_init_data_out_re+k);
+        *(gain_table_im+size/2+k) = *(fft_init_data_out_im+k);
+
     }
+
+    //Prepare butterfly factor
+    //for( k = 0; k < size/2; k++ ){
+        //*(gain_table_re+k) = cos(2*3.14159265359/(float)size*(float)k);
+        //*(gain_table_im+k) = -1*sin(2*3.14159265359/(float)size*(float)k);
+        //*(gain_table_re+size/2+k) = cos(2*3.14159265359/(float)size*(float)k);
+        //*(gain_table_im+size/2+k) = -1*sin(2*3.14159265359/(float)size*(float)k);
+        //printf("(gain_table_re+%d)=%f\n",k,*(gain_table_re+k));
+        //printf("(gain_table_im+%d)=%f\n",k,*(gain_table_im+k));
+    //}
 
     //Complete the butterfly factor
     for( k = 0; k < size/2; k++ ){
@@ -272,6 +339,12 @@ int my_float_fft(float *data_in_re,
     free(butterfly_factor_re_from_mid);
     free(butterfly_factor_im_from_mid);
 
+    free(fft_init_data_out_re);
+    free(fft_init_data_out_im);
+
+    //free(new_gain_table_re);
+    //free(new_gain_table_im);
+
     return 0;
 
 
@@ -293,7 +366,7 @@ int my_float_dft(float *data_in_re, float *data_in_im, float *data_out_re, float
     float accu_im;
 
     index = 0;
-    
+
     for( k = 0; k < size; k++ ){
         accu_re=0;
         accu_im=0;
@@ -311,7 +384,7 @@ int my_float_dft(float *data_in_re, float *data_in_im, float *data_out_re, float
 
             accu_re = accu_re + *accu_tmp_re;
             accu_im = accu_im + *accu_tmp_im;
-            
+
             index=index+1;
 
         }

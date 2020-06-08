@@ -1,3 +1,5 @@
+int get_fft_init_table(float *data_in_re, float *data_in_im,float *data_out_re, float *data_out_im, int size, int select_size, int debug)
+
 int my_float_fft_init_get_size(int size);
 
 int my_float_fft_init(int size, float *data_out_re, float *data_out_im);

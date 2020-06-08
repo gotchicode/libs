@@ -13,7 +13,7 @@ int k;
 
 
  //fft variables
- int size=64;
+ int size=1024;
  float *data_in_re   = malloc(size*sizeof(float));
  float *data_in_im   = malloc(size*sizeof(float));
  float *data_out_re  = malloc(size*sizeof(float));
