@@ -46,7 +46,7 @@ int get_fft_init_table(float *data_in_re, float *data_in_im, float *data_out_re,
 
 }
 
-int my_float_fft_init_get_size(int size)
+int my_float_fft_opt1_init_get_size(int size)
 {
     //Variable
 	int m;
@@ -65,7 +65,7 @@ int my_float_fft_init_get_size(int size)
 
 }
 
-int my_float_fft_init(int size, float *data_out_re, float *data_out_im)
+int my_float_fft_opt1_init(int size, float *data_out_re, float *data_out_im)
 {
     //Variable
 	int m;
@@ -102,7 +102,7 @@ int my_float_fft_init(int size, float *data_out_re, float *data_out_im)
 
 }
 
-int my_float_dft_init(int size, float *data_out_re, float *data_out_im)
+int my_float_dft_opt1_init(int size, float *data_out_re, float *data_out_im)
 {
     //Variable
 	int k;
@@ -127,7 +127,7 @@ int my_float_dft_init(int size, float *data_out_re, float *data_out_im)
 
 }
 
-int my_float_fft(float *data_in_re,
+int my_float_fft_opt1(float *data_in_re,
                  float *data_in_im,
                  float *data_out_re,
                  float *data_out_im,
@@ -244,7 +244,7 @@ int my_float_fft(float *data_in_re,
     {
 
         //Recursive call of my_fft
-        my_float_fft( even_data_in_re,
+        my_float_fft_opt1( even_data_in_re,
                       even_data_in_im,
                       even_data_out_re,
                       even_data_out_im,
@@ -256,7 +256,7 @@ int my_float_fft(float *data_in_re,
                       max_size
                       );
 
-        my_float_fft( odd_data_in_re,
+        my_float_fft_opt1( odd_data_in_re,
                       odd_data_in_im,
                       odd_data_out_re,
                       odd_data_out_im,
@@ -272,7 +272,7 @@ int my_float_fft(float *data_in_re,
     if (size==8)
     {
         //Recursive call of my_dft
-        my_float_dft( even_data_in_re,
+        my_float_dft_opt1( even_data_in_re,
                       even_data_in_im,
                       even_data_out_re,
                       even_data_out_im,
@@ -281,7 +281,7 @@ int my_float_fft(float *data_in_re,
                       mid_index);
 
 
-        my_float_dft( odd_data_in_re,
+        my_float_dft_opt1( odd_data_in_re,
                       odd_data_in_im,
                       odd_data_out_re,
                       odd_data_out_im,
@@ -350,7 +350,7 @@ int my_float_fft(float *data_in_re,
 
 }
 
-int my_float_dft(float *data_in_re, float *data_in_im, float *data_out_re, float *data_out_im, float *dft_init_data_in_re, float *dft_init_data_in_im,int size)
+int my_float_dft_opt1(float *data_in_re, float *data_in_im, float *data_out_re, float *data_out_im, float *dft_init_data_in_re, float *dft_init_data_in_im,int size)
 {
 
     int k;
