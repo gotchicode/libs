@@ -1,5 +1,5 @@
 
-function [x_fsamp,h_cic_resp_lin_norm,h_calc_fir_lin_unfold,h_cic_comp_resp_lin,h_cic_resp_log_norm,h_calc_fir_log_unfold,h_cic_comp_resp_log,max_h_cic_resp_lin]=cic_fir_compensated_calc(M,R,N,nb_taps,nb_points,fsamp,cut_off_freq);
+function [x_fsamp,h_cic_resp_lin_norm,h_calc_fir_lin_unfold,h_cic_comp_resp_lin,h_cic_resp_log_norm,h_calc_fir_log_unfold,h_cic_comp_resp_log,max_h_cic_resp_lin,taps]=cic_fir_compensated_calc(M,R,N,nb_taps,nb_points,fsamp,cut_off_freq);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% CIC response
@@ -33,6 +33,7 @@ h_wanted_resp_lin=[ones(1,cut_off_freq_point) ones(1,nb_points-cut_off_freq_poin
 h_comp_fir=h_wanted_resp_lin./h_cic_resp_lin_norm(1:nb_points);
 x_comp_fir_norm = (0:1/(nb_points-1):1);
 b = fir2(nb_taps,x_comp_fir_norm,h_comp_fir);
+taps=b;
 
 h_calc_fir=freqz(b,1,nb_points).';
 h_calc_fir_lin=abs(h_calc_fir);

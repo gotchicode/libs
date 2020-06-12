@@ -19,7 +19,7 @@ passband_freq=fsamp/R*0.5;
 cut_off_freq=passband_freq/2;
 
 %Run the cic compensation 
-[x_fsamp,h_cic_resp_lin_norm,h_calc_fir_lin_unfold,h_cic_comp_resp_lin,h_cic_resp_log_norm,h_calc_fir_log_unfold,h_cic_comp_resp_log,max_h_cic_resp_lin]=cic_fir_compensated_calc(M,R,N,nb_taps,nb_points,fsamp,cut_off_freq);
+[x_fsamp,h_cic_resp_lin_norm,h_calc_fir_lin_unfold,h_cic_comp_resp_lin,h_cic_resp_log_norm,h_calc_fir_log_unfold,h_cic_comp_resp_log,max_h_cic_resp_lin,fir_taps]=cic_fir_compensated_calc(M,R,N,nb_taps,nb_points,fsamp,cut_off_freq);
 
 %Find the -6dB point
 position = find_minus_6dB(h_cic_comp_resp_lin);
@@ -46,9 +46,18 @@ hold on;
 description=[' R=' num2str(R) ' N=' num2str(N) ' Cut Off Freq=' num2str((cut_off_freq/1e6)) ' MHz' ' Slow samp Freq=' num2str((fsamp/R/1e6)) ' MHz'  ' -6dB @' num2str(min_6dB_freq/1e6)];
 title(description);
 
-%Export image
-filename=['image' 'R_' num2str(R) '_N_' num2str(N) '_cut_off_freq_' num2str(round(cut_off_freq)) '.bmp'];
+%Export image of cic
+filename=['image_' 'R_' num2str(R) '_N_' num2str(N) '_cut_off_freq_' num2str(round(cut_off_freq)) '.bmp'];
 saveas(fig,filename);
+
+%Export image of taps
+filename=['image_' 'R_' num2str(R) '_N_' num2str(N) '_cut_off_freq_' num2str(round(cut_off_freq)) '.txt'];
+fid_fir=fopen(filename,'w');
+for k=1:length(fir_taps)
+    fprintf(fid_fir,'%f\n',fir_taps(k));
+end;
+fclose(fid_fir);
+
 
 %Print a report to the main window
 fprintf('\n');
