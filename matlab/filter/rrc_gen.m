@@ -8,12 +8,12 @@ close all;
 nb_sample = 2^10;
 Fsymb = 1;
 Fsamp = 4;
-roll_off = 0.25;
+roll_off = 0.2;
 
 %Init
 Ts=1/Fsymb;
 Tsamp=1/Fsamp;
-t=(-9:Tsamp:9);
+t=(-5.5:Tsamp:5.5);
 
 %Filter coefficients
 h_zero = 1/Ts*(1+roll_off*(4/pi-1));
@@ -53,6 +53,3 @@ freqz(h,1,512);
 fid=fopen('taps.txt','w');
 fprintf(fid,'%f\n',h);
 fclose(fid);
-
-
-
