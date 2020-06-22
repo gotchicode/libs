@@ -39,7 +39,7 @@ signal clk_main : std_logic;
 --NCO generation signals
 --------------------------------------------------------
 signal nco_accu										: unsigned(31 downto 0):=(others=>'0');
-signal nco_accu_incr_const							: unsigned(31 downto 0):=x"00000004";
+signal nco_accu_incr_const							: unsigned(31 downto 0):=to_unsigned(429,32);
 signal nco_accu_incr							    : unsigned(31 downto 0):=nco_accu_incr_const;
 signal nco_clock                                    : std_logic;
 signal nco_clock_d1									: std_logic;
