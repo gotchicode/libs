@@ -8,7 +8,7 @@ end de0_top_tb;
 
 architecture rtl of de0_top_tb is
 
-constant clock_50_const : time := 20 ns;
+constant clock_50_const : time := 10 ns;
 
 signal clock_50 : std_logic;
 signal clock_50_2 : std_logic;
@@ -35,6 +35,9 @@ begin
     sw      <= (others=>'0');
 
     de0_top_inst : entity work.de0_top
+    generic map(
+        simu => 1
+    )
     port map
         (
         clock_50 => clock_50,

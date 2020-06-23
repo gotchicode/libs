@@ -32,14 +32,17 @@ architecture rtl of de0_top is
 --------------------------------------------------------
 --Global
 --------------------------------------------------------
-signal rst      : std_logic;
-signal clk_main : std_logic; 
+signal rst                                          : std_logic;
+signal clk_main                                     : std_logic; 
+signal rst_main                                     : std_logic; 
+signal rst_n_main                                   : std_logic; 
+
 
 --------------------------------------------------------
 --NCO generation signals
 --------------------------------------------------------
 signal nco_accu										: unsigned(31 downto 0):=(others=>'0');
-signal nco_accu_incr_const							: unsigned(31 downto 0):=to_unsigned(429,32);
+signal nco_accu_incr_const							: unsigned(31 downto 0):=to_unsigned(43,32);
 signal nco_accu_incr							    : unsigned(31 downto 0):=nco_accu_incr_const;
 signal nco_clock                                    : std_logic;
 signal nco_clock_d1									: std_logic;
@@ -50,7 +53,6 @@ begin
 
 
 rst         <= SW(0);
-clk_main    <= CLOCK_50;
 
 --template_pr: process(clk, rst_n)
 --begin
@@ -59,13 +61,26 @@ clk_main    <= CLOCK_50;
 --    end if;
 --end process;
 
-
+--------------------------------------------------------
+-- Clock and reset generation
+--------------------------------------------------------
+clk_rst_gen_inst:  entity work.clk_rst_gen
+    generic map (  simu => simu
+    )
+    port map(
+            clk             => CLOCK_50,
+            rst             => rst,
+            clk0            => clk_main,
+            rst0            => rst_main,
+            rstn0           => rst_n_main
+ );
+ 
 --------------------------------------------------------
 --NCO
 --------------------------------------------------------
-nco_pro: process(clk_main)
+nco_pro: process(clk_main, rst_main)
 begin
-	if rst='1' then
+	if rst_main='1' then
         nco_accu        <= (others=>'0');	     
         nco_clock	    <= '0';    
         nco_clock_d1    <= '0';      
