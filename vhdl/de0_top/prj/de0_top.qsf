@@ -74,7 +74,38 @@ set_location_assignment PIN_J6 -to SW[0]
 set_location_assignment PIN_F1 -to BUTTON[2]
 set_location_assignment PIN_G3 -to BUTTON[1]
 set_location_assignment PIN_H2 -to BUTTON[0]
-
+set_location_assignment PIN_U7 -to GPIO0_D_31
+set_location_assignment PIN_V5 -to GPIO0_D_30
+set_location_assignment PIN_W6 -to GPIO0_D_29
+set_location_assignment PIN_W7 -to GPIO0_D_28
+set_location_assignment PIN_V8 -to GPIO0_D_27
+set_location_assignment PIN_T8 -to GPIO0_D_26
+set_location_assignment PIN_W10 -to GPIO0_D_25
+set_location_assignment PIN_Y10 -to GPIO0_D_24
+set_location_assignment PIN_V11 -to GPIO0_D_23
+set_location_assignment PIN_R10 -to GPIO0_D_22
+set_location_assignment PIN_V12 -to GPIO0_D_21
+set_location_assignment PIN_U13 -to GPIO0_D_20
+set_location_assignment PIN_W13 -to GPIO0_D_19
+set_location_assignment PIN_Y13 -to GPIO0_D_18
+set_location_assignment PIN_U14 -to GPIO0_D_17
+set_location_assignment PIN_V14 -to GPIO0_D_16
+set_location_assignment PIN_AA4 -to GPIO0_D_15
+set_location_assignment PIN_AB4 -to GPIO0_D_14
+set_location_assignment PIN_AA5 -to GPIO0_D_13
+set_location_assignment PIN_AB5 -to GPIO0_D_12
+set_location_assignment PIN_AA8 -to GPIO0_D_11
+set_location_assignment PIN_AB8 -to GPIO0_D_10
+set_location_assignment PIN_AA10 -to GPIO0_D_9
+set_location_assignment PIN_AB10 -to GPIO0_D_8
+set_location_assignment PIN_AA13 -to GPIO0_D_7
+set_location_assignment PIN_AB13 -to GPIO0_D_6
+set_location_assignment PIN_AB14 -to GPIO0_D_5
+set_location_assignment PIN_AA14 -to GPIO0_D_4
+set_location_assignment PIN_AB15 -to GPIO0_D_3
+set_location_assignment PIN_AA15 -to GPIO0_D_2
+set_location_assignment PIN_AA16 -to GPIO0_D_1
+set_location_assignment PIN_AB16 -to GPIO0_D_0
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to CLOCK_50
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to CLOCK_50_2
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDG[9]
@@ -100,6 +131,38 @@ set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SW[0]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to BUTTON[2]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to BUTTON[1]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to BUTTON[0]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO0_D_31
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO0_D_30
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO0_D_29
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO0_D_28
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO0_D_27
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO0_D_26
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO0_D_25
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO0_D_24
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO0_D_23
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO0_D_22
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO0_D_21
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO0_D_20
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO0_D_19
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO0_D_18
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO0_D_17
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO0_D_16
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO0_D_15
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO0_D_14
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO0_D_13
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO0_D_12
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO0_D_11
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO0_D_10
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO0_D_9
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO0_D_8
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO0_D_7
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO0_D_6
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO0_D_5
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO0_D_4
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO0_D_3
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO0_D_2
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO0_D_1
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO0_D_0
 set_global_assignment -name LL_ROOT_REGION ON -section_id "Root Region"
 set_global_assignment -name LL_MEMBER_STATE LOCKED -section_id "Root Region"
 set_global_assignment -name VHDL_FILE ../src/clk_rst_gen.vhd

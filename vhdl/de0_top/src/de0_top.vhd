@@ -1,12 +1,3 @@
---		////////////////////	Clock Input	 	////////////////////	 
---		CLOCK_50,						//	50 MHz
---		CLOCK_50_2,						//	50 MHz
---		////////////////////	Push Button		////////////////////
---		BUTTON,							//	Pushbutton[2:0]
---		////////////////////	DPDT Switch		////////////////////
---		SW,								//	Toggle Switch[9:0]
-
-
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
@@ -23,7 +14,42 @@ entity de0_top is
             BUTTON                  : in std_logic_vector(2 downto 0);
             SW                      : in std_logic_vector(9 downto 0); 
             
-            LEDG                    : out std_logic_vector(9 downto 0)
+            LEDG                    : out std_logic_vector(9 downto 0);
+            
+            
+            GPIO0_D_31              : out std_logic;
+            GPIO0_D_30              : out std_logic;
+            GPIO0_D_29              : out std_logic;
+            GPIO0_D_28              : out std_logic;
+            GPIO0_D_27              : out std_logic;
+            GPIO0_D_26              : out std_logic;
+            GPIO0_D_25              : out std_logic;
+            GPIO0_D_24              : out std_logic;
+            GPIO0_D_23              : out std_logic;
+            GPIO0_D_22              : out std_logic;
+            GPIO0_D_21              : out std_logic;
+            GPIO0_D_20              : out std_logic;
+            GPIO0_D_19              : out std_logic;
+            GPIO0_D_18              : out std_logic;
+            GPIO0_D_17              : out std_logic;
+            GPIO0_D_16              : out std_logic;
+            GPIO0_D_15              : out std_logic;
+            GPIO0_D_14              : out std_logic;
+            GPIO0_D_13              : out std_logic;
+            GPIO0_D_12              : out std_logic;
+            GPIO0_D_11              : out std_logic;
+            GPIO0_D_10              : out std_logic;
+            GPIO0_D_9               : out std_logic;
+            GPIO0_D_8               : out std_logic;
+            GPIO0_D_7               : out std_logic;
+            GPIO0_D_6               : out std_logic;
+            GPIO0_D_5               : out std_logic;
+            GPIO0_D_4               : out std_logic;
+            GPIO0_D_3               : out std_logic;
+            GPIO0_D_2               : out std_logic;
+            GPIO0_D_1               : out std_logic;
+            GPIO0_D_0               : out std_logic
+     
  );
 end entity de0_top;
 
@@ -101,6 +127,39 @@ end process;
 --------------------------------------------------------   
 
 LEDG <= nco_clock & nco_clock & nco_clock & nco_clock & nco_clock & nco_clock_top & nco_clock_top & nco_clock_top & nco_clock_top & nco_clock_top;
+
+GPIO0_D_31 <= nco_clock;
+GPIO0_D_30 <= nco_clock;
+GPIO0_D_29 <= nco_clock;
+GPIO0_D_28 <= nco_clock;
+GPIO0_D_27 <= nco_clock;
+GPIO0_D_26 <= nco_clock;
+GPIO0_D_25 <= nco_clock;
+GPIO0_D_24 <= nco_clock;
+GPIO0_D_23 <= nco_clock;
+GPIO0_D_22 <= nco_clock;
+GPIO0_D_21 <= nco_clock;
+GPIO0_D_20 <= nco_clock;
+GPIO0_D_19 <= nco_clock;
+GPIO0_D_18 <= nco_clock;
+GPIO0_D_17 <= nco_clock;
+GPIO0_D_16 <= nco_clock;
+GPIO0_D_15 <= nco_clock;
+GPIO0_D_14 <= nco_clock;
+GPIO0_D_13 <= nco_clock;
+GPIO0_D_12 <= nco_clock;
+GPIO0_D_11 <= nco_clock;
+GPIO0_D_10 <= nco_clock;
+GPIO0_D_9  <= nco_clock;
+GPIO0_D_8  <= nco_clock;
+GPIO0_D_7  <= nco_clock;
+GPIO0_D_6  <= nco_clock;
+GPIO0_D_5  <= nco_clock;
+GPIO0_D_4  <= nco_clock;
+GPIO0_D_3  <= nco_clock;
+GPIO0_D_2  <= nco_clock;
+GPIO0_D_1  <= nco_clock;
+GPIO0_D_0  <= nco_clock;
 
 
 end rtl;
