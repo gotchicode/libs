@@ -13,15 +13,14 @@ constant rst_const : time := 123 ns;
 
 signal clk : std_logic;
 signal rst : std_logic;
-signal data_in_left     : std_logic_vector(24-1 downto 0);
-signal data_in_right    : std_logic_vector(24-1 downto 0);
-signal data_in_en : std_logic;
+signal data_in_left     : std_logic_vector(24-1 downto 0):=(others=>'0');
+signal data_in_right    : std_logic_vector(24-1 downto 0):=(others=>'0');
+signal data_in_en : std_logic:='0';
 signal mclk_out : std_logic;
 signal lrclk_out : std_logic;
 signal sclk_out : std_logic;
 signal sd_out : std_logic;
 signal req_data : std_logic;
-
 
 
 begin
@@ -55,7 +54,23 @@ begin
         wait;
 
     end process;
-
+    
+    -----------------------------------------
+    -- data
+    -----------------------------------------
+    data_gen: process
+    begin
+    
+        wait until rising_edge(req_data);
+        
+        data_in_left    <= std_logic_vector(unsigned(data_in_left)+1);
+        data_in_right   <= std_logic_vector(unsigned(data_in_left)+1);
+        data_in_en      <= '1';
+        
+        wait until rising_edge(clk);
+        data_in_en      <= '0';
+        
+    end process;
 
     i2s_master_tx_inst : entity work.i2s_master_tx
     port map
