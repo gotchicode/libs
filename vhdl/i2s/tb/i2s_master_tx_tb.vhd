@@ -13,8 +13,8 @@ constant rst_const : time := 123 ns;
 
 signal clk : std_logic;
 signal rst : std_logic;
-signal data_in_left     : std_logic_vector(24-1 downto 0):=(others=>'0');
-signal data_in_right    : std_logic_vector(24-1 downto 0):=(others=>'0');
+signal data_in_left     : std_logic_vector(32-1 downto 0):=x"80000000";
+signal data_in_right    : std_logic_vector(32-1 downto 0):=x"80000000";
 signal data_in_en : std_logic:='0';
 signal mclk_out : std_logic;
 signal lrclk_out : std_logic;
