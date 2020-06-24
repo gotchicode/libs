@@ -13,12 +13,14 @@ constant rst_const : time := 123 ns;
 
 signal clk : std_logic;
 signal rst : std_logic;
-signal data_in : std_logic_vector(32-1 downto 0);
+signal data_in_left     : std_logic_vector(24-1 downto 0);
+signal data_in_right    : std_logic_vector(24-1 downto 0);
 signal data_in_en : std_logic;
 signal mclk_out : std_logic;
 signal lrclk_out : std_logic;
 signal sclk_out : std_logic;
 signal sd_out : std_logic;
+signal req_data : std_logic;
 
 
 
@@ -60,12 +62,14 @@ begin
         (
         clk => clk,
         rst => rst,
-        data_in => data_in,
+        data_in_left  => data_in_left,
+        data_in_right => data_in_right,
         data_in_en => data_in_en,
         mclk_out => mclk_out,
         lrclk_out => lrclk_out,
         sclk_out => sclk_out,
-        sd_out => sd_out
+        sd_out => sd_out,
+        req_data => req_data
 );
 
 end rtl;
