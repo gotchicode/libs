@@ -56,6 +56,14 @@ end entity de0_top;
 architecture rtl of de0_top is
 
 --------------------------------------------------------
+--Constants
+--------------------------------------------------------
+
+constant const_all_ones : std_logic_vector(63 downto 0):=x"FFFFFFFFFFFFFFFF";
+constant const_all_zeros : std_logic_vector(63 downto 0):=x"0000000000000000";
+constant bit_size       : integer:=24;
+
+--------------------------------------------------------
 --Global
 --------------------------------------------------------
 signal rst                                          : std_logic;
@@ -63,6 +71,29 @@ signal clk_main                                     : std_logic;
 signal rst_main                                     : std_logic; 
 signal rst_n_main                                   : std_logic; 
 
+--------------------------------------------------------
+--Encoder signals
+--------------------------------------------------------
+signal enc_data_in      : std_logic_vector(bit_size-1 downto 0);
+signal enc_data_in_en   : std_logic;
+signal enc_data_out     : std_logic_vector(bit_size-1 downto 0);
+signal enc_data_out_en  : std_logic;
+signal dec_data_in      : std_logic_vector(bit_size-1 downto 0);
+signal dec_data_in_en   : std_logic;
+signal dec_data_out     : std_logic_vector(bit_size-1 downto 0);
+signal dec_data_out_en  : std_logic;
+
+--------------------------------------------------------
+--i2s master signals
+--------------------------------------------------------
+signal data_in_left     : std_logic_vector(24-1 downto 0);
+signal data_in_right    : std_logic_vector(24-1 downto 0);
+signal data_in_en       : std_logic:='0';
+signal mclk_out         : std_logic;
+signal lrclk_out        : std_logic;
+signal sclk_out         : std_logic;
+signal sd_out           : std_logic;
+signal req_data         : std_logic;
 
 --------------------------------------------------------
 --NCO generation signals
@@ -123,6 +154,62 @@ begin
 end process;
 
 --------------------------------------------------------
+--PN encoder
+--------------------------------------------------------
+pn_enc_dec_inst : entity work.pn_enc_dec
+generic map(
+    bit_size =>bit_size
+    )
+port map
+    (
+    clk => clk_main,
+    rst_n => rst_n_main,
+    enc_data_in => enc_data_in,
+    enc_data_in_en => enc_data_in_en,
+    enc_data_out => enc_data_out,
+    enc_data_out_en => enc_data_out_en,
+    dec_data_in => dec_data_in,
+    dec_data_in_en => dec_data_in_en,
+    dec_data_out => open,
+    dec_data_out_en => open
+);
+
+enc_data_in    <= const_all_ones(bit_size-1 downto 0);
+enc_data_in_en <= req_data;
+    
+--------------------------------------------------------
+--i2s master
+--------------------------------------------------------
+    
+i2s_master_tx_inst : entity work.i2s_master_tx
+generic map(
+    clk_MCLK_factor         => 15,           --:      5;          mclk: 100 ns        10 MHz
+    clk_LRCLK_factor        => 30*(24+24),  --:      10*(25+25); lrclk: 10000 ns      100 KHz
+    clk_SCLK_factor         => 30,          --:      10;         sclk: 200 ns        5 MHz
+    nb_bits                 => 24           --:      25         
+)
+port map
+    (
+    clk             => clk_main,
+    rst             => rst_main,
+    data_in_left    => data_in_left,
+    data_in_right   => data_in_right,
+    data_in_en      => data_in_en,
+    mclk_out        => mclk_out,
+    lrclk_out       => lrclk_out,
+    sclk_out        => sclk_out,
+    sd_out          => sd_out,
+    req_data        => req_data
+);
+
+data_in_left(23 downto 0)       <= x"00" & enc_data_out(15 downto 0);
+data_in_right(23 downto 0)      <= x"00" & enc_data_out(15 downto 0);
+
+
+data_in_en <= enc_data_out_en;
+
+
+--------------------------------------------------------
 --Outputs
 --------------------------------------------------------   
 
@@ -154,12 +241,13 @@ GPIO0_D_9  <= nco_clock;
 GPIO0_D_8  <= nco_clock;
 GPIO0_D_7  <= nco_clock;
 GPIO0_D_6  <= nco_clock;
-GPIO0_D_5  <= nco_clock;
-GPIO0_D_4  <= nco_clock;
-GPIO0_D_3  <= nco_clock;
-GPIO0_D_2  <= nco_clock;
-GPIO0_D_1  <= nco_clock;
-GPIO0_D_0  <= nco_clock;
+
+GPIO0_D_5  <= sd_out;
+GPIO0_D_4  <= '0';
+GPIO0_D_3  <= sclk_out;
+GPIO0_D_2  <= '0';
+GPIO0_D_1  <= lrclk_out;
+GPIO0_D_0  <= mclk_out;
 
 
 end rtl;

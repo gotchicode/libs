@@ -1,6 +1,10 @@
 quit -sim
 vlib work
 
+vcom -work work -quiet ../../i2s/src/i2s_master_tx.vhd
+
+vcom -work work -quiet ../../pn/src/pn_enc_dec.vhd
+
 vcom -work work -quiet ../tb/pll_sim.vhd
 
 vcom -work work -quiet ../src/clk_rst_gen.vhd
