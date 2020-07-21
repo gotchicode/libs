@@ -105,6 +105,37 @@ signal nco_clock                                    : std_logic;
 signal nco_clock_d1									: std_logic;
 signal nco_clock_top                                : std_logic;
 
+--------------------------------------------------------
+--Sinus generation signals
+--------------------------------------------------------    
+signal phase_accu_reg            : unsigned(31 downto 0);
+signal phase_accu_incr           : unsigned(31 downto 0);                           
+signal sinus_rom_addr_in         : std_logic_vector(11 downto 0);               
+signal sinus_rom_rd_en           : std_logic;                                   
+signal sinus_rom_data_out        : std_logic_vector(15 downto 0);              
+signal sinus_rom_data_out_en     : std_logic;
+
+--------------------------------------------------------
+--Mux signals
+--------------------------------------------------------   
+
+signal mux_in      : std_logic_vector(31 downto 0);   
+signal mux_in_en   : std_logic;
+signal mux_sel     : std_logic_vector(3 downto 0);   
+signal mux_out     : std_logic_vector(31 downto 0);   
+signal mux_out_en  : std_logic;
+
+--------------------------------------------------------
+--Gain mult signals
+--------------------------------------------------------  
+
+signal multiplier_data_in             : std_logic_vector(31 downto 0);
+signal multiplier_data_in_en          : std_logic;
+signal multiplier_gain_exponent_begin : std_logic_vector(3 downto 0);
+signal multiplier_gain_exponent_end   : std_logic_vector(3 downto 0);
+signal multiplier_gain_mult           : std_logic_vector(17 downto 0);
+signal multiplier_data_out            : std_logic_vector(56 downto 0);
+signal multiplier_data_out_en         : std_logic;
 
 begin
 
@@ -154,7 +185,7 @@ begin
 end process;
 
 --------------------------------------------------------
---PN encoder
+--PN encoder (Noise generator)
 --------------------------------------------------------
 pn_enc_dec_inst : entity work.pn_enc_dec
 generic map(
@@ -176,7 +207,107 @@ port map
 
 enc_data_in    <= const_all_ones(bit_size-1 downto 0);
 enc_data_in_en <= req_data;
+
+--------------------------------------------------------
+-- Sinus generator
+--------------------------------------------------------
+sinus_rom_pr: process(clk_main, rst_main)
+begin
+	if rst_main='1' then
     
+        phase_accu_reg     <= (others=>'0'); 
+        phase_accu_incr    <= x"10000000";     
+        sinus_rom_addr_in  <= (others=>'0');     
+        sinus_rom_rd_en    <= '0';
+  
+    elsif rising_edge(clk_main) then
+    
+        if req_data='1' then
+            phase_accu_reg <= phase_accu_reg + phase_accu_incr;
+        end if;
+        
+        sinus_rom_addr_in   <= std_logic_vector(phase_accu_reg(31 downto 20));   
+        sinus_rom_rd_en     <= req_data;
+
+	end if;
+end process;
+
+sinus_rom_inst: entity work.sinus_rom                                                                 
+ port map(                                                                       
+            clk             => clk_main,           
+            addr_in         => sinus_rom_addr_in,           
+            rd_en           => sinus_rom_rd_en,           
+            data_out        => sinus_rom_data_out,           
+            data_out_en     => sinus_rom_data_out_en
+ );
+ 
+--------------------------------------------------------
+-- Mux
+--------------------------------------------------------
+mux_pr: process(clk_main, rst_main)
+begin
+	if rst_main='1' then
+
+        mux_in      <= (others=>'0');
+        mux_in_en   <= '0';
+        mux_sel     <= x"2";
+        
+        mux_out     <= (others=>'0');
+        mux_out_en  <= '0';
+        
+    elsif rising_edge(clk_main) then
+        
+        case mux_sel is
+            when x"0" => 
+                mux_out     <= (others=>'0');
+                mux_out_en  <= '0';
+            when x"1" => 
+                mux_out     <= x"0000" & enc_data_out(15 downto 0);
+                mux_out_en  <= enc_data_out_en; 
+            when x"2" => 
+                mux_out     <= std_logic_vector(resize(signed(sinus_rom_data_out),32));
+                mux_out_en  <= sinus_rom_data_out_en;
+            when others => 
+        end case;
+        
+	end if;
+end process;
+
+--------------------------------------------------------
+-- Gain
+--------------------------------------------------------
+gain_pr: process(clk_main, rst_main)
+begin
+	if rst_main='1' then
+    
+        multiplier_data_in              <= (others=>'0');
+        multiplier_data_in_en           <= '0';
+        multiplier_gain_exponent_begin  <= (others=>'0'); 
+        multiplier_gain_exponent_end    <= (others=>'0');           
+        multiplier_gain_mult            <= std_logic_vector(to_unsigned(1,18));                  
+        
+    elsif rising_edge(clk_main) then
+    
+        multiplier_data_in              <= mux_out;
+        multiplier_data_in_en           <= mux_out_en;
+
+	end if;
+end process;
+
+gain_mult_inst: entity work.gain_mult 
+	port map
+	(
+		clk		            => clk_main,
+		rst		            => rst_main,
+        data_in             => multiplier_data_in,
+        data_in_en          => multiplier_data_in_en,
+        gain_exponent_begin => multiplier_gain_exponent_begin,
+        gain_exponent_end   => multiplier_gain_exponent_end,
+        gain_mult           => multiplier_gain_mult,
+        data_out            => multiplier_data_out,
+        data_out_en         => multiplier_data_out_en
+	);
+
 --------------------------------------------------------
 --i2s master
 --------------------------------------------------------
@@ -202,12 +333,14 @@ port map
     req_data        => req_data
 );
 
-data_in_left(23 downto 0)       <= x"00" & enc_data_out(15 downto 0);
-data_in_right(23 downto 0)      <= x"00" & enc_data_out(15 downto 0);
+--data_in_left(23 downto 0)       <= x"00" & enc_data_out(15 downto 0);
+--data_in_right(23 downto 0)      <= x"00" & enc_data_out(15 downto 0);
+--data_in_en <= enc_data_out_en;
 
 
-data_in_en <= enc_data_out_en;
-
+data_in_left(23 downto 0)       <= multiplier_data_out(23 downto 0);
+data_in_right(23 downto 0)      <= multiplier_data_out(23 downto 0);
+data_in_en                      <= multiplier_data_out_en;
 
 --------------------------------------------------------
 --Outputs

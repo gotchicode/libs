@@ -166,6 +166,8 @@ set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO0_D_0
 set_global_assignment -name LL_ROOT_REGION ON -section_id "Root Region"
 set_global_assignment -name LL_MEMBER_STATE LOCKED -section_id "Root Region"
 
+set_global_assignment -name VHDL_FILE ../../gain_mult/src/gain_mult.vhd
+set_global_assignment -name VHDL_FILE ../src/sinus_rom.vhd
 set_global_assignment -name VHDL_FILE ../../i2s/src/i2s_master_tx.vhd
 set_global_assignment -name VHDL_FILE ../../pn/src/pn_enc_dec.vhd
 
