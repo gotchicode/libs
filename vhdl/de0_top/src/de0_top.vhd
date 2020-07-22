@@ -234,14 +234,16 @@ enc_data_in_en <= req_data;
 -- Sinus generator
 --------------------------------------------------------
 sinus_rom_pr: process(clk_main, rst_main)
+variable sinus_rom_rd_en_d1 : std_logic;
 begin
 	if rst_main='1' then
     
-        phase_accu_reg     <= (others=>'0'); 
-        phase_accu_incr    <= to_unsigned(24740595,32); -- 200 Hz @ 34.72 KHz
-        sinus_rom_addr_in  <= (others=>'0');     
-        sinus_rom_rd_en    <= '0';
-  
+        phase_accu_reg          <= (others=>'0'); 
+        phase_accu_incr         <= to_unsigned(24740595,32); -- 200 Hz @ 34.72 KHz
+        sinus_rom_addr_in       <= (others=>'0');     
+        sinus_rom_rd_en         <= '0';
+        sinus_rom_data_out_en   <= '0';
+        sinus_rom_rd_en_d1      := '0';
     elsif rising_edge(clk_main) then
     
         --Update phase_accu_incr from a probe
@@ -254,8 +256,11 @@ begin
             phase_accu_reg <= phase_accu_reg + phase_accu_incr;
         end if;
         
-        sinus_rom_addr_in   <= std_logic_vector(phase_accu_reg(31 downto 20));   
-        sinus_rom_rd_en     <= req_data;
+        sinus_rom_addr_in       <= std_logic_vector(phase_accu_reg(31 downto 20));   
+        sinus_rom_rd_en         <= req_data;
+        sinus_rom_data_out_en   <= sinus_rom_rd_en_d1;
+        
+        sinus_rom_rd_en_d1 := sinus_rom_rd_en;
 
 	end if;
 end process;
@@ -264,9 +269,7 @@ sinus_rom_inst: entity work.sinus_rom
  port map(                                                                       
             clk             => clk_main,           
             addr_in         => sinus_rom_addr_in,           
-            rd_en           => sinus_rom_rd_en,           
-            data_out        => sinus_rom_data_out,           
-            data_out_en     => sinus_rom_data_out_en
+            data_out        => sinus_rom_data_out
  );
  
 --------------------------------------------------------
