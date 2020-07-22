@@ -27,14 +27,24 @@ fprintf(fid,'                                                                   
 fprintf(fid,'architecture rtl of %s is                                                     \n',entity_name);
 fprintf(fid,'                                                                              \n');
 fprintf(fid,'type ROM_type is array (0 to %d) of std_logic_vector(%d downto 0);            \n',2^(rom_nb_cells_calc)-1,cell_size-1);
-fprintf(fid,'signal ROM: ROM_type;                                                         \n');
+fprintf(fid,'function init_rom                                                           \n');
+fprintf(fid,'	return ROM_type is                                                       \n');
+fprintf(fid,'	variable tmp : ROM_type := (others => (others => ''0''));                  \n');
+fprintf(fid,'	begin                                                                    \n');
+for k=1:rom_nb_cells
+  fprintf(fid,'        tmp(%d) := std_logic_vector(to_signed(%d,%d));\n',k-1,values(k),cell_size);
+end;
+fprintf(fid,'	return tmp;                                                              \n');
+fprintf(fid,'end init_rom;                                                               \n');
+fprintf(fid,'signal ROM: ROM_type:=init_rom;                                                         \n');
 fprintf(fid,'                                                                              \n');
 fprintf(fid,'begin                                                                         \n');
 
-for k=1:rom_nb_cells
-  fprintf(fid,'ROM(%d) <= std_logic_vector(to_signed(%d,%d));\n',k-1,values(k),cell_size);
-end
+##for k=1:rom_nb_cells
+##  fprintf(fid,'ROM(%d) <= std_logic_vector(to_signed(%d,%d));\n',k-1,values(k),cell_size);
+##end
 
+%Never use
 ##for k=rom_nb_cells+1:2^(floor(log2(rom_nb_cells))+1)
 ##  fprintf(fid,'ROM(%d) <= std_logic_vector(to_signed(0,%d));\n',k-1,cell_size); 
 ##end
