@@ -137,6 +137,28 @@ signal multiplier_gain_mult           : std_logic_vector(17 downto 0);
 signal multiplier_data_out            : std_logic_vector(56 downto 0);
 signal multiplier_data_out_en         : std_logic;
 
+--------------------------------------------------------
+--Debug probes signals
+-------------------------------------------------------- 
+component probe32 IS
+	PORT
+	(
+		probe		: IN STD_LOGIC_VECTOR (31 DOWNTO 0);
+		source		: OUT STD_LOGIC_VECTOR (31 DOWNTO 0)
+	);
+END component;
+
+type probe_in_out_type is array (0 to 7) of std_logic_vector(31 downto 0);            
+signal probe    : probe_in_out_type;   
+signal source   : probe_in_out_type;  
+
+signal reg_phase_accu_incr                 : std_logic_vector(31 downto 0);    
+signal reg_mux_sel                         : std_logic_vector(3 downto 0);
+signal reg_multiplier_gain_exponent_begin  : std_logic_vector(3 downto 0);
+signal reg_multiplier_gain_exponent_end    : std_logic_vector(3 downto 0);
+signal reg_multiplier_gain_mult            : std_logic_vector(17 downto 0);
+ 
+
 begin
 
 
@@ -216,12 +238,18 @@ begin
 	if rst_main='1' then
     
         phase_accu_reg     <= (others=>'0'); 
-        phase_accu_incr    <= x"10000000";     
+        phase_accu_incr    <= to_unsigned(24740595,32); -- 200 Hz @ 34.72 KHz
         sinus_rom_addr_in  <= (others=>'0');     
         sinus_rom_rd_en    <= '0';
   
     elsif rising_edge(clk_main) then
     
+        --Update phase_accu_incr from a probe
+        if source(0)=x"00000001" then
+            phase_accu_incr <= unsigned(reg_phase_accu_incr);
+        end if;
+
+
         if req_data='1' then
             phase_accu_reg <= phase_accu_reg + phase_accu_incr;
         end if;
@@ -256,7 +284,12 @@ begin
         mux_out_en  <= '0';
         
     elsif rising_edge(clk_main) then
-        
+    
+        --Update mux_sel from a probe
+        if source(0)=x"00000001" then  
+            mux_sel <= reg_mux_sel;
+        end if;
+
         case mux_sel is
             when x"0" => 
                 mux_out     <= (others=>'0');
@@ -288,6 +321,15 @@ begin
         
     elsif rising_edge(clk_main) then
     
+        --Update multiplier_gain_exponent_begin from a probe
+        --Update multiplier_gain_exponent_end from a probe
+        --Update multiplier_gain_mult from a probe
+        if source(0)=x"00000001" then                                        
+            multiplier_gain_exponent_begin  <= reg_multiplier_gain_exponent_begin;
+            multiplier_gain_exponent_end    <= reg_multiplier_gain_exponent_end;           
+            multiplier_gain_mult            <= reg_multiplier_gain_mult;
+        end if;
+
         multiplier_data_in              <= mux_out;
         multiplier_data_in_en           <= mux_out_en;
 
@@ -314,10 +356,10 @@ gain_mult_inst: entity work.gain_mult
     
 i2s_master_tx_inst : entity work.i2s_master_tx
 generic map(
-    clk_MCLK_factor         => 15,           --:      5;          mclk: 100 ns        10 MHz
-    clk_LRCLK_factor        => 30*(24+24),  --:      10*(25+25); lrclk: 10000 ns      100 KHz
-    clk_SCLK_factor         => 30,          --:      10;         sclk: 200 ns        5 MHz
-    nb_bits                 => 24           --:      25         
+    clk_MCLK_factor         => 15,           --:      5;          mclk: 300 ns          3.333 MHz
+    clk_LRCLK_factor        => 30*(24+24),  --:      30*(24+24); lrclk: 28800 ns        34.72 KHz
+    clk_SCLK_factor         => 30,          --:      30;         sclk: 600 ns           6.333 MHz
+    nb_bits                 => 24           --:      24         
 )
 port map
     (
@@ -381,6 +423,50 @@ GPIO0_D_3  <= sclk_out;
 GPIO0_D_2  <= '0';
 GPIO0_D_1  <= lrclk_out;
 GPIO0_D_0  <= mclk_out;
+
+--------------------------------------------------------
+--Debug
+-------------------------------------------------------- 
+gen_probe32: 
+for I in 0 to 7 generate
+    probe32_X_inst:  probe32
+        port map
+        (
+            probe		=> probe(I),
+            source		=> source(I)
+        );
+
+end generate gen_probe32;
+
+probe_pr : process(clk_main, rst_main)
+begin
+    if rising_edge(clk_main) then
+
+            --Update phase_accu_incr from a probe
+            --Update mux_sel from a probe
+            --Update multiplier_gain_exponent_begin from a probe
+            --Update multiplier_gain_exponent_end from a probe
+            --Update multiplier_gain_mult from a probe
+
+            reg_phase_accu_incr                 <= std_logic_vector(source(1));    
+            reg_mux_sel                         <= source(2)(3 downto 0);    
+            reg_multiplier_gain_exponent_begin  <= source(3)(3 downto 0);    
+            reg_multiplier_gain_exponent_end    <= source(4)(3 downto 0);    
+            reg_multiplier_gain_mult            <= source(5)(17 downto 0);    
+
+
+        
+            probe(0) <= x"00000000"; 
+            probe(1) <= x"00000001"; 
+            probe(2) <= x"00000002"; 
+            probe(3) <= x"00000003"; 
+            probe(4) <= x"00000004"; 
+            probe(5) <= x"00000005"; 
+            probe(6) <= x"00000006"; 
+            probe(7) <= x"00000007"; 
+
+    end if;
+end process;
 
 
 end rtl;

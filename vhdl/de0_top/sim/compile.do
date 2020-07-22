@@ -19,4 +19,4 @@ add wave -position insertpoint sim:/de0_top_tb/*
 add wave -position insertpoint sim:/de0_top_tb/de0_top_inst/*
 add wave sim:/de0_top_tb/de0_top_inst/clk_rst_gen_inst/*
 
-run 1 ms
+run 5 ms
