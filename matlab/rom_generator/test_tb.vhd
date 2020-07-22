@@ -12,9 +12,7 @@ constant clk_const : time := 5 ns;
 
 signal clk : std_logic;
 signal addr_in : std_logic_vector(11 downto 0):=(others=>'0');
-signal rd_en : std_logic;
 signal data_out : std_logic_vector(15 downto 0);
-signal data_out_en : std_logic;
 
 
 
@@ -37,13 +35,10 @@ begin
     -----------------------------------------
     stim_pr: process
     begin
-        
-        rd_en <='0';
+
         wait until rising_edge(clk);
         addr_in <= std_logic_vector(unsigned(addr_in)+1);
-        rd_en <='1';
         wait until rising_edge(clk);
-        rd_en <='0';
         wait for 1 us;
     
     end process;
@@ -53,9 +48,7 @@ begin
         (
         clk => clk,
         addr_in => addr_in,
-        rd_en => rd_en,
-        data_out => data_out,
-        data_out_en => data_out_en
+        data_out => data_out
 );
 
 end rtl;

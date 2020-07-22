@@ -6,10 +6,8 @@ entity test is
  port (                                                                       
             clk             : in std_logic;                                   
             addr_in         : in std_logic_vector(11 downto 0);               
-            rd_en           : in std_logic;                                   
                                                                               
-            data_out        : out std_logic_vector(15 downto 0);              
-            data_out_en     : out std_logic                                   
+            data_out        : out std_logic_vector(15 downto 0)              
  );                                                                           
 end entity test;                                                                
                                                                               
@@ -4125,14 +4123,11 @@ begin
 process(clk)                                                                  
 begin                                                                         
     if rising_edge(clk) then                                                  
-        if rd_en='1' then                                                   
-            for I in 0 to 8191 loop                                             
+            for I in 0 to 4095 loop                                             
               if to_integer(unsigned(addr_in))=I then                         
                 data_out <= ROM(I);                                           
               end if;                                                         
             end loop;                                                         
-        end if;                                                               
-        data_out_en <= rd_en;                                                 
     end if;                                                                   
 end process;                                                                  
                                                                               

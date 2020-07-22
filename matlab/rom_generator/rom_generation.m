@@ -17,10 +17,8 @@ fprintf(fid,'entity %s is                                                       
 fprintf(fid,' port (                                                                       \n');
 fprintf(fid,'            clk             : in std_logic;                                   \n');
 fprintf(fid,'            addr_in         : in std_logic_vector(%d downto 0);               \n',rom_nb_cells_calc-1);
-fprintf(fid,'            rd_en           : in std_logic;                                   \n');
 fprintf(fid,'                                                                              \n');
-fprintf(fid,'            data_out        : out std_logic_vector(%d downto 0);              \n',cell_size-1);
-fprintf(fid,'            data_out_en     : out std_logic                                   \n');
+fprintf(fid,'            data_out        : out std_logic_vector(%d downto 0)              \n',cell_size-1);
 fprintf(fid,' );                                                                           \n');
 fprintf(fid,'end entity %s;                                                                \n',entity_name);
 fprintf(fid,'                                                                              \n');
@@ -53,14 +51,11 @@ fprintf(fid,'                                                                   
 fprintf(fid,'process(clk)                                                                  \n');
 fprintf(fid,'begin                                                                         \n');
 fprintf(fid,'    if rising_edge(clk) then                                                  \n');
-fprintf(fid,'        if rd_en=''1'' then                                                   \n');
-fprintf(fid,'            for I in 0 to %d loop                                             \n',2^(rom_nb_cells_calc+1)-1);
+fprintf(fid,'            for I in 0 to %d loop                                             \n',2^(rom_nb_cells_calc)-1);
 fprintf(fid,'              if to_integer(unsigned(addr_in))=I then                         \n');
 fprintf(fid,'                data_out <= ROM(I);                                           \n');
 fprintf(fid,'              end if;                                                         \n');
 fprintf(fid,'            end loop;                                                         \n');
-fprintf(fid,'        end if;                                                               \n');
-fprintf(fid,'        data_out_en <= rd_en;                                                 \n');
 fprintf(fid,'    end if;                                                                   \n');
 fprintf(fid,'end process;                                                                  \n');
 fprintf(fid,'                                                                              \n');
