@@ -451,11 +451,11 @@ begin
             --Update multiplier_gain_exponent_end from a probe
             --Update multiplier_gain_mult from a probe
 
-            reg_phase_accu_incr                 <= std_logic_vector(source(1));    
-            reg_mux_sel                         <= source(2)(3 downto 0);    
-            reg_multiplier_gain_exponent_begin  <= source(3)(3 downto 0);    
-            reg_multiplier_gain_exponent_end    <= source(4)(3 downto 0);    
-            reg_multiplier_gain_mult            <= source(5)(17 downto 0);    
+            reg_phase_accu_incr                 <= std_logic_vector(source(1));    --24740595
+            reg_mux_sel                         <= source(2)(3 downto 0);          -- 2
+            reg_multiplier_gain_exponent_begin  <= source(3)(3 downto 0);          -- 0
+            reg_multiplier_gain_exponent_end    <= source(4)(3 downto 0);          -- 0
+            reg_multiplier_gain_mult            <= source(5)(17 downto 0);         -- 1
 
 
         
