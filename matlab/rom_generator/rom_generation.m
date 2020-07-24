@@ -1,6 +1,6 @@
 
 
-function data_out = rom_generation( entity_name,rom_nb_cells,cell_size,values)
+function data_out = rom_generation(entity_name,rom_nb_cells,cell_size,values,mem_or_logic)
 
 
 %Calcs
@@ -51,11 +51,19 @@ fprintf(fid,'                                                                   
 fprintf(fid,'process(clk)                                                                  \n');
 fprintf(fid,'begin                                                                         \n');
 fprintf(fid,'    if rising_edge(clk) then                                                  \n');
-fprintf(fid,'            for I in 0 to %d loop                                             \n',2^(rom_nb_cells_calc)-1);
-fprintf(fid,'              if to_integer(unsigned(addr_in))=I then                         \n');
-fprintf(fid,'                data_out <= ROM(I);                                           \n');
-fprintf(fid,'              end if;                                                         \n');
-fprintf(fid,'            end loop;                                                         \n');
+
+if mem_or_logic==0 %logic
+  fprintf(fid,'            for I in 0 to %d loop                                             \n',2^(rom_nb_cells_calc)-1);
+  fprintf(fid,'              if to_integer(unsigned(addr_in))=I then                         \n');
+  fprintf(fid,'                data_out <= ROM(I);                                           \n');
+  fprintf(fid,'              end if;                                                         \n');
+  fprintf(fid,'            end loop;                                                         \n');
+end
+
+if mem_or_logic==1 %logic
+  fprintf(fid,'            data_out <= ROM(to_integer(unsigned(addr_in)));                                           \n');
+end
+
 fprintf(fid,'    end if;                                                                   \n');
 fprintf(fid,'end process;                                                                  \n');
 fprintf(fid,'                                                                              \n');
