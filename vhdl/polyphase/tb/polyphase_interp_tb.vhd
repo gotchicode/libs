@@ -119,9 +119,9 @@ begin
     elsif rising_edge(clk) then  
         
         if enc_data_out="1" then
-            data_in <= x"7000";
+            data_in <= std_logic_vector(to_signed(1024,16));
         elsif enc_data_out="0" then
-            data_in <= x"2FFF";
+            data_in <= std_logic_vector(to_signed(-1024,16));
         end if;
         data_in_en      <= enc_data_out_en;
 
