@@ -17,7 +17,7 @@ signal conf_freq_in         : std_logic_vector(31 downto 0);
 signal clock_out            : std_logic;
 signal clock_phase_out      : std_logic_vector(31 downto 0);
 signal pulse_out            : std_logic;
-signal pulse_out_phase      : std_logic_vector(31 downto 0);
+signal pulse_phase_out      : std_logic_vector(31 downto 0);
 
 
 
@@ -73,7 +73,7 @@ begin
         clock_out       => clock_out,
         clock_phase_out => clock_phase_out,
         pulse_out       => pulse_out,
-        pulse_out_phase => pulse_out_phase
+        pulse_phase_out => pulse_phase_out
 );
 
 end rtl;
