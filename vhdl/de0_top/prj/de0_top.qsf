@@ -169,6 +169,7 @@ set_global_assignment -name LL_MEMBER_STATE LOCKED -section_id "Root Region"
 set_global_assignment -name VHDL_FILE ../../gain_mult/src/gain_mult.vhd
 set_global_assignment -name VHDL_FILE ../src/sinus_rom.vhd
 set_global_assignment -name VHDL_FILE ../../i2s/src/i2s_master_tx.vhd
+set_global_assignment -name VHDL_FILE ../../i2s/src/i2s_master_rx.vhd
 set_global_assignment -name VHDL_FILE ../../pn/src/pn_enc_dec.vhd
 
 set_global_assignment -name VHDL_FILE ../src/clk_rst_gen.vhd
@@ -188,5 +189,5 @@ set_global_assignment -name CYCLONEII_OPTIMIZATION_TECHNIQUE SPEED
 set_global_assignment -name SYNTH_TIMING_DRIVEN_SYNTHESIS ON
 set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
 set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
-set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
 set_global_assignment -name SOURCE_FILE probe32.spf
+set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

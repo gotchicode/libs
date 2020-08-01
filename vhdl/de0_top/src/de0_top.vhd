@@ -34,7 +34,7 @@ entity de0_top is
             GPIO0_D_17              : out std_logic;
             GPIO0_D_16              : out std_logic;
             GPIO0_D_15              : out std_logic;
-            GPIO0_D_14              : out std_logic;
+            GPIO0_D_14              : in std_logic;
             GPIO0_D_13              : out std_logic;
             GPIO0_D_12              : out std_logic;
             GPIO0_D_11              : out std_logic;
@@ -84,16 +84,27 @@ signal dec_data_out     : std_logic_vector(bit_size-1 downto 0);
 signal dec_data_out_en  : std_logic;
 
 --------------------------------------------------------
---i2s master signals
+--i2s master tx signals
 --------------------------------------------------------
-signal data_in_left     : std_logic_vector(24-1 downto 0);
-signal data_in_right    : std_logic_vector(24-1 downto 0);
-signal data_in_en       : std_logic:='0';
-signal mclk_out         : std_logic;
-signal lrclk_out        : std_logic;
-signal sclk_out         : std_logic;
-signal sd_out           : std_logic;
-signal req_data         : std_logic;
+signal data_in_left                 : std_logic_vector(24-1 downto 0);
+signal data_in_right                : std_logic_vector(24-1 downto 0);
+signal data_in_en                   : std_logic:='0';
+signal master_tx_mclk_out           : std_logic;
+signal master_tx_lrclk_out          : std_logic;
+signal master_tx_sclk_out           : std_logic;
+signal master_tx_sd_out             : std_logic;
+signal master_tx_req_data           : std_logic;
+
+--------------------------------------------------------
+--i2s master rx signals
+--------------------------------------------------------
+signal master_rx_data_out_left      : std_logic_vector(16-1 downto 0);
+signal master_rx_data_out_right     : std_logic_vector(16-1 downto 0);
+signal master_rx_data_out_en        : std_logic:='0';
+signal master_rx_mclk_out           : std_logic;
+signal master_rx_lrclk_out          : std_logic;
+signal master_rx_sclk_out           : std_logic;
+signal master_rx_sd_in              : std_logic;
 
 --------------------------------------------------------
 --NCO generation signals
@@ -228,7 +239,7 @@ port map
 );
 
 enc_data_in    <= const_all_ones(bit_size-1 downto 0);
-enc_data_in_en <= req_data;
+enc_data_in_en <= master_tx_req_data;
 
 --------------------------------------------------------
 -- Sinus generator
@@ -252,12 +263,12 @@ begin
         end if;
 
 
-        if req_data='1' then
+        if master_tx_req_data='1' then
             phase_accu_reg <= phase_accu_reg + phase_accu_incr;
         end if;
         
         sinus_rom_addr_in       <= std_logic_vector(phase_accu_reg(31 downto 20));   
-        sinus_rom_rd_en         <= req_data;
+        sinus_rom_rd_en         <= master_tx_req_data;
         sinus_rom_data_out_en   <= sinus_rom_rd_en_d1;
         
         sinus_rom_rd_en_d1 := sinus_rom_rd_en;
@@ -354,7 +365,7 @@ gain_mult_inst: entity work.gain_mult
 	);
 
 --------------------------------------------------------
---i2s master
+--i2s master tx
 --------------------------------------------------------
     
 i2s_master_tx_inst : entity work.i2s_master_tx
@@ -371,11 +382,11 @@ port map
     data_in_left    => data_in_left,
     data_in_right   => data_in_right,
     data_in_en      => data_in_en,
-    mclk_out        => mclk_out,
-    lrclk_out       => lrclk_out,
-    sclk_out        => sclk_out,
-    sd_out          => sd_out,
-    req_data        => req_data
+    mclk_out        => master_tx_mclk_out,
+    lrclk_out       => master_tx_lrclk_out,
+    sclk_out        => master_tx_sclk_out,
+    sd_out          => master_tx_sd_out,
+    req_data        => master_tx_req_data
 );
 
 --data_in_left(23 downto 0)       <= x"00" & enc_data_out(15 downto 0);
@@ -387,45 +398,67 @@ data_in_left(23 downto 0)       <= multiplier_data_out(23 downto 0);
 data_in_right(23 downto 0)      <= multiplier_data_out(23 downto 0);
 data_in_en                      <= multiplier_data_out_en;
 
+i2s_master_rx_inst: entity work.i2s_master_rx 
+    generic map(
+        clk_MCLK_factor         => 15,         
+        clk_LRCLK_factor        => 30*(16+16), 
+        clk_SCLK_factor         => 30,         
+        nb_bits                 => 16          
+    )
+	port map
+	(
+		clk		             => clk_main,
+		rst		             => rst_main,
+        MCLK_out             => master_rx_mclk_out,
+        LRCLK_out            => master_rx_lrclk_out ,
+        SCLK_out             => master_rx_sclk_out ,        
+        SD_in                => master_rx_sd_in ,
+        data_out_left        => master_rx_data_out_left,    
+        data_out_right       => master_rx_data_out_right,   
+        data_out_en          => master_rx_data_out_en
+	);
+
+
 --------------------------------------------------------
 --Outputs
 --------------------------------------------------------   
 
 LEDG <= nco_clock & nco_clock & nco_clock & nco_clock & nco_clock & nco_clock_top & nco_clock_top & nco_clock_top & nco_clock_top & nco_clock_top;
 
-GPIO0_D_31 <= nco_clock;
-GPIO0_D_30 <= nco_clock;
-GPIO0_D_29 <= nco_clock;
-GPIO0_D_28 <= nco_clock;
-GPIO0_D_27 <= nco_clock;
-GPIO0_D_26 <= nco_clock;
-GPIO0_D_25 <= nco_clock;
-GPIO0_D_24 <= nco_clock;
-GPIO0_D_23 <= nco_clock;
-GPIO0_D_22 <= nco_clock;
-GPIO0_D_21 <= nco_clock;
-GPIO0_D_20 <= nco_clock;
-GPIO0_D_19 <= nco_clock;
-GPIO0_D_18 <= nco_clock;
-GPIO0_D_17 <= nco_clock;
-GPIO0_D_16 <= nco_clock;
-GPIO0_D_15 <= nco_clock;
-GPIO0_D_14 <= nco_clock;
-GPIO0_D_13 <= nco_clock;
-GPIO0_D_12 <= nco_clock;
-GPIO0_D_11 <= nco_clock;
-GPIO0_D_10 <= nco_clock;
-GPIO0_D_9  <= nco_clock;
-GPIO0_D_8  <= nco_clock;
-GPIO0_D_7  <= nco_clock;
-GPIO0_D_6  <= nco_clock;
+GPIO0_D_31 <= 'Z';
+GPIO0_D_30 <= 'Z';
+GPIO0_D_29 <= 'Z';
+GPIO0_D_28 <= 'Z';
+GPIO0_D_27 <= 'Z';
+GPIO0_D_26 <= 'Z';
+GPIO0_D_25 <= 'Z';
+GPIO0_D_24 <= 'Z';
+GPIO0_D_23 <= 'Z';
+GPIO0_D_22 <= 'Z';
+GPIO0_D_21 <= 'Z';
+GPIO0_D_20 <= 'Z';
+GPIO0_D_19 <= 'Z';
+GPIO0_D_18 <= 'Z';
+GPIO0_D_17 <= 'Z';
+GPIO0_D_16 <= 'Z';
 
-GPIO0_D_5  <= sd_out;
-GPIO0_D_4  <= '0';
-GPIO0_D_3  <= sclk_out;
-GPIO0_D_2  <= '0';
-GPIO0_D_1  <= lrclk_out;
-GPIO0_D_0  <= mclk_out;
+GPIO0_D_15 <= 'Z';
+master_rx_sd_in <= GPIO0_D_14;--master_rx_sd_in
+GPIO0_D_13 <= master_rx_sclk_out;--master_rx_sclk_out
+GPIO0_D_12 <= 'Z';
+GPIO0_D_11 <= master_rx_lrclk_out;--master_rx_lrclk_out
+GPIO0_D_10 <= 'Z';
+GPIO0_D_9  <= master_rx_mclk_out;--master_rx_mclk_out
+GPIO0_D_8  <= 'Z';
+GPIO0_D_7  <= 'Z';
+GPIO0_D_6  <= 'Z';
+
+GPIO0_D_5  <= master_tx_sd_out;
+GPIO0_D_4  <= 'Z';
+GPIO0_D_3  <= master_tx_sclk_out;
+GPIO0_D_2  <= 'Z';
+GPIO0_D_1  <= master_tx_lrclk_out;
+GPIO0_D_0  <= master_tx_mclk_out;
 
 --------------------------------------------------------
 --Debug
