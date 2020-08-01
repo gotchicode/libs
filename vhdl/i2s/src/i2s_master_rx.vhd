@@ -56,6 +56,12 @@ signal sample_counter           : unsigned(15 downto 0);
 signal MCLK_inside_d2           : std_logic;
 signal LRCLK_inside_d2          : std_logic;
 signal SCLK_inside_d2           : std_logic;
+signal sample_counter_d1        : unsigned(15 downto 0);
+
+signal MCLK_inside_d3           : std_logic;
+signal LRCLK_inside_d3          : std_logic;
+signal SCLK_inside_d3           : std_logic;
+signal sample_counter_d2        : unsigned(15 downto 0);
 
 begin
 
@@ -108,11 +114,21 @@ begin
         data_in_left_buffered   <= (others=>'0');
         data_in_right_buffered  <= (others=>'0'); 
         
-        SD_inside               <= '0';
-        
+        --SD_inside               <= '0';
+        sample_counter_d1       <= (others=>'0');
+        MCLK_inside_d3          <= '0';
+        LRCLK_inside_d3         <= '0';
+        SCLK_inside_d3          <= '0';
+        sample_counter_d2       <= (others=>'0');
+       
         MCLK_out                <= '0';
         LRCLK_out               <= '0';        
-        SCLK_out                <= '0';       
+        SCLK_out                <= '0';   
+
+        data_out_left           <= (others=>'0');
+        data_out_right          <= (others=>'0');
+        data_out_en             <= '0';
+        
         --SD_out                  <= '0';       
       
         --req_data                <= '0';
@@ -207,19 +223,42 @@ begin
         end if;
         
         --Delays
-        MCLK_inside_d2  <= MCLK_inside_d1;
-        LRCLK_inside_d2 <= LRCLK_inside_d1;
-        SCLK_inside_d2  <= SCLK_inside_d1;
+        MCLK_inside_d2      <= MCLK_inside_d1;
+        LRCLK_inside_d2     <= LRCLK_inside_d1;
+        SCLK_inside_d2      <= SCLK_inside_d1;
+        sample_counter_d1   <= sample_counter;
         
         ----------------------
         -- Stage 3
         ----------------------
         
         --To outputs
-        MCLK_out  <= MCLK_inside_d2;
-        LRCLK_out <= LRCLK_inside_d2;
-        SCLK_out  <= SCLK_inside_d2;
-        --SD_out    <= SD_inside;
+        MCLK_out        <= MCLK_inside_d2;
+        LRCLK_out       <= LRCLK_inside_d2;
+        SCLK_out        <= SCLK_inside_d2;
+
+        
+        --Delays
+        MCLK_inside_d3    <= MCLK_inside_d2;  
+        LRCLK_inside_d3   <= LRCLK_inside_d2;           
+        SCLK_inside_d3    <= SCLK_inside_d2;          
+        sample_counter_d2 <= sample_counter_d1;
+        
+        if LRCLK_inside_d2='0' then
+            if SCLK_inside_d2='1' and SCLK_inside_d3='0' then
+                if sample_counter_d1=to_unsigned(nb_bits-1,16) then
+                    data_out_left   <= data_in_left_buffered; 
+                    data_out_right  <= data_in_right_buffered; 
+                    data_out_en     <= '1';
+                else
+                    data_out_en <= '0';
+                end if;
+            else
+                data_out_en <= '0';
+            end if;
+        else
+            data_out_en <= '0';
+        end if;
 
     end if;
 end process;
