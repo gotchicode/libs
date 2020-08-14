@@ -16,7 +16,8 @@ fsk_deviation=0.375
 data_in = round(rand(1,nb_size));
 
 %Modulate in FSK
-mod_signal=mod_fsk(data_in,ovr,fsk_deviation);
+phase_in=0;
+[mod_signal,mod_signal_phase_out]=mod_fsk(data_in,phase_in,ovr,fsk_deviation);
 
 %Prepare Display
 x_axis=linspace(-ovr/2,ovr/2,nb_size*ovr);
