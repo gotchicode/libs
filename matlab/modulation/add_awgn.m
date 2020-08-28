@@ -54,6 +54,6 @@ updated_snr=data_in_sequence_rms/noise_sequence_rms;
 if display==1 fprintf('updated_snr=%f (linear)\n',updated_snr); end
 
 %Out
-data_out=data_in+noise_sequence;
+data_out=data_in+(noise_sequence+j*noise_sequence);
   
 end

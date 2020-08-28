@@ -6,14 +6,14 @@ close all;
 ##rand("state",0);
 modu='BPSK';
 modu_fact=1/modu_bps(modu);
-size_factor=256; %default is one
+size_factor=1; %default is one
 nb_size=2^8*8*modu_bps(modu)*size_factor;
 nb_bit=log2(nb_size);
 test_mode = 0;
 filter_mode=1; %0: zero hold; 1:zero padding
 interp_factor=4;
-display=0;
-add_noise=1;
+display=1;
+add_noise=0;
 snr_db=4-2-2;
 
 if test_mode==0

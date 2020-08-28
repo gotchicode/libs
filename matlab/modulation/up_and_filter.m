@@ -10,12 +10,6 @@ if filter_mode==0
       data_modulated_ovr(m:interp_factor:end)=data_modulated;
     end
     data_modulated_filtered=filter(taps,1,data_modulated_ovr);
-
-##  %Sync output of filter
-##  data_modulated_sync = data_modulated(7:end);
-##  data_modulated_filtered_sync = data_modulated_filtered(46:4:end);
-##  t_end=length(data_modulated_filtered_sync);
-##  data_modulated_sync=data_modulated_sync(1:t_end);
   
 end
 
@@ -25,12 +19,6 @@ if filter_mode==1
   data_modulated_ovr = zeros(1,length(data_modulated)*interp_factor);
   data_modulated_ovr(1:interp_factor:end)=data_modulated;
   data_modulated_filtered=filter(taps,1,data_modulated_ovr);
-
-##  %Sync output of filter
-##  data_modulated_sync = data_modulated(7:end);
-##  data_modulated_filtered_sync = data_modulated_filtered(46:4:end);
-##  t_end=length(data_modulated_filtered_sync);
-##  data_modulated_sync=data_modulated_sync(1:t_end);
   
 end
 
