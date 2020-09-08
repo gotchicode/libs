@@ -4,9 +4,9 @@ use ieee.numeric_std.all;
 
 entity i2s_master_rx is
     generic (
-        clk_MCLK_factor         : integer:=5;              -- 10 MHz
-        clk_LRCLK_factor        : integer:=10*(32+32);      -- 20.83 KHz 
-        clk_SCLK_factor         : integer:=10;              -- 10 MHz
+        clk_MCLK_factor         : integer:=5;              -- 10 MHz   (100e6/5/2=10e6)
+        clk_LRCLK_factor        : integer:=10*(32+32);     -- 20.83 KHz (100e6/10/2/64)
+        clk_SCLK_factor         : integer:=10;             -- 5 MHz  (100e6/10/2=5e6)
         nb_bits                 : integer:=32              --
         -- clk_MCLK_factor      : frequency = clk/clk_MCLK_factor/2
         -- clk_LRCLK_factor     : frequency = clk/clk_LRCLK_factor/2
