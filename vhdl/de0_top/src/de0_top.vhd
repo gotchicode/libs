@@ -98,8 +98,8 @@ signal master_tx_req_data           : std_logic;
 --------------------------------------------------------
 --i2s master rx signals
 --------------------------------------------------------
-signal master_rx_data_out_left      : std_logic_vector(16-1 downto 0);
-signal master_rx_data_out_right     : std_logic_vector(16-1 downto 0);
+signal master_rx_data_out_left      : std_logic_vector(24-1 downto 0);
+signal master_rx_data_out_right     : std_logic_vector(24-1 downto 0);
 signal master_rx_data_out_en        : std_logic:='0';
 signal master_rx_mclk_out           : std_logic;
 signal master_rx_lrclk_out          : std_logic;
@@ -314,8 +314,11 @@ begin
             when x"2" => 
                 mux_out     <= std_logic_vector(resize(signed(sinus_rom_data_out),32));
                 mux_out_en  <= sinus_rom_data_out_en;
-            when others => 
-        end case;
+            when x"3" =>
+                mux_out     <= std_logic_vector(resize(signed(master_rx_data_out_left),32));
+                mux_out_en  <= master_rx_data_out_en;
+            when others =>     
+        end case;              
         
 	end if;
 end process;
@@ -400,10 +403,10 @@ data_in_en                      <= multiplier_data_out_en;
 
 i2s_master_rx_inst: entity work.i2s_master_rx 
     generic map(
-        clk_MCLK_factor         => 15,         
-        clk_LRCLK_factor        => 30*(16+16), 
-        clk_SCLK_factor         => 30,         
-        nb_bits                 => 16          
+        clk_MCLK_factor         => 6,           -- 8.33e6
+        clk_LRCLK_factor        => 48*(24+24),  -- 32.55e3
+        clk_SCLK_factor         => 48,          -- 1.04e6
+        nb_bits                 => 24          
     )
 	port map
 	(
