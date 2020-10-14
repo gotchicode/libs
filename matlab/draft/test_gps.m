@@ -27,19 +27,36 @@ carrier_shifted=cos(2*pi*Foffset.*t);
 data_spread=data_spread.*carrier_shifted;
 
 %Find frequency offset
-find_freq_offset_result=zeros(1,length(data_spread)-1023);
+k_shift=0;
+shift_border=10e3;
+shift_step=1e3;
+find_freq_offset_result=zeros(shift_border*2/shift_step,length(data_spread)-1023);
 CA_code_sign_FFT_pattern=fftshift((fft(CA_code_sign)));
-for k=1:length(data_spread)-1023
-  tmp=data_spread(k:k+1023-1);
-  tmp_fft=fftshift((fft(tmp)));
-  tmp_cor=abs(sum(CA_code_sign_FFT_pattern.*conj(tmp_fft)));
-  find_freq_offset_result(k)=tmp_cor;
+
+for shift=-shift_border:shift_step:shift_border
+  
+  data_spread_unshift=data_spread.*cos(-2*pi*shift.*t);
+  k_shift=k_shift+1;
+
+  fprintf('Processing %f shift\n',shift);
+  
+  for k=1:length(data_spread_unshift)-1023
+    tmp=data_spread_unshift(k:k+1023-1);
+    tmp_fft=fftshift((fft(tmp)));
+    tmp_cor=abs(sum(CA_code_sign_FFT_pattern.*conj(tmp_fft)));
+    find_freq_offset_result(k_shift,k)=tmp_cor;
+  end
+  
 end
 
-%Correlation
-result=abs(conv(data_spread,CA_code_sign));
+%Prepare 3 plots
+tx =  linspace (-shift_border, shift_border, shift_border*2/shift_step+1)';
+ty =  (1:length(data_spread)-1023)';
+tz = find_freq_offset_result';
+[xx, yy] = meshgrid (tx, ty);
+mesh (tx, ty, tz);
+xlabel ("frequency");
+ylabel ("sample");
+zlabel ("correlation");
+title ("3-D Sombrero plot");
 
-%Display
-plot(find_freq_offset_result);
-
-##plot(20*log10(abs(fftshift(fft((cos(2*pi*Foffset.*t)))))));
