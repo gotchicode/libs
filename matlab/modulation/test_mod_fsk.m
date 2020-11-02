@@ -9,8 +9,8 @@ rand('state',1);
 nb_size=2^12;
 
 %Modulation parameters
-ovr=4; %oversampliing factor
-fsk_deviation=0.375
+ovr=8; %oversampliing factor
+fsk_deviation=0.35
 
 %Data generation
 data_in = round(rand(1,nb_size));
