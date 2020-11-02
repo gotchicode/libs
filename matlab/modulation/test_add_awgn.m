@@ -4,8 +4,8 @@ close all;
 
 %Parameters
 nb_size=2^10;
-snr_dB=50;
-snr=10^(snr_dB/20);
+snr_dB=30;
+snr=10^(snr_dB/10);
 use_seed=0;
 display=1;
 
@@ -19,7 +19,7 @@ data_with_noise=add_awgn(data_in_sequence,snr,use_seed,display);
 mean_of=mean(abs(data_with_noise));
 std_of=std(abs(data_with_noise));
 snr_measured=mean_of.^2/std_of.^2;
-snr_measured_dB=20*log10(snr_measured);
+snr_measured_dB=10*log10(snr_measured);
 
 ##Plot
 ##plot(real(data_with_noise),'.');

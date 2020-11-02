@@ -5,7 +5,7 @@ close all;
 %Parameters
 nb_size=2^15;
 snr_db=10;
-snr=10^(snr_db/20);
+snr=10^(snr_db/10);
 modu='QPSK';
 use_seed=0;
 display=0;
