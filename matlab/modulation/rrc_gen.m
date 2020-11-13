@@ -8,8 +8,8 @@ close all;
 %Parameters
 nb_sample = 2^8-1;
 Fsymb = 1;
-Fsamp = 4;
-roll_off = 1;
+Fsamp = 8;
+roll_off = 0.5;
 
 %Init
 Ts=1/Fsymb;

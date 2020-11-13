@@ -11,7 +11,7 @@ nb_size=2^8*8*modu_bps(modu)*size_factor;
 nb_bit=log2(nb_size);
 test_mode = 0;
 filter_mode=1; %0: zero hold; 1:zero padding
-interp_factor=4;
+interp_factor=8;
 display=1;
 add_noise=0;
 snr_db=4-2-2;
@@ -43,30 +43,30 @@ taps=csvread('taps.txt');
 nb_taps=length(taps);
 [data_modulated_filtered,data_modulated_ovr] = up_and_filter(data_modulated,interp_factor,filter_mode,taps);
 data_modulated_filtered_transmit = data_modulated_filtered;
-
-%Upsampling x64
-taps=csvread('interp64_filter_taps.txt');
-nb_taps=length(taps);
-data_modulated_filtered_transmit_x256_up=up_and_filter(data_modulated_filtered_transmit,64,1,taps);
-
-%Apply a gain
-data_modulated_filtered_transmit_x256_up=data_modulated_filtered_transmit_x256_up*interp_factor;
-
-%----------------------------
-%Eye diagram
-%----------------------------
-if display==1
-  eye_diagram_in=data_modulated_filtered_transmit_x256_up;
-  factor=interp_factor*64*2;
-  m=floor(length(eye_diagram_in)/factor);
-  data_eye_diagram=eye_diagram_in(1:m*factor);
-  data_eye_diagram = reshape(data_eye_diagram,factor,m);
-  plot(real(data_eye_diagram(:,512:512+128)));
-end;
-
-
-%----------------------------
-%Constellation
-%----------------------------
-##plot(data_modulated_filtered_transmit_x256_up);
+##
+##%Upsampling x64
+##taps=csvread('interp64_filter_taps.txt');
+##nb_taps=length(taps);
+##data_modulated_filtered_transmit_x256_up=up_and_filter(data_modulated_filtered_transmit,64,1,taps);
+##
+##%Apply a gain
+##data_modulated_filtered_transmit_x256_up=data_modulated_filtered_transmit_x256_up*interp_factor;
+##
+##%----------------------------
+##%Eye diagram
+##%----------------------------
+##if display==1
+##  eye_diagram_in=data_modulated_filtered_transmit_x256_up;
+##  factor=interp_factor*64*2;
+##  m=floor(length(eye_diagram_in)/factor);
+##  data_eye_diagram=eye_diagram_in(1:m*factor);
+##  data_eye_diagram = reshape(data_eye_diagram,factor,m);
+##  plot(real(data_eye_diagram(:,512:512+128)));
+##end;
+##
+##
+##%----------------------------
+##%Constellation
+##%----------------------------
+####plot(data_modulated_filtered_transmit_x256_up);
 
