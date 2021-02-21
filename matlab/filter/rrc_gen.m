@@ -7,8 +7,9 @@ close all;
 %Parameters
 nb_sample = 2^10;
 Fsymb = 1;
-Fsamp = 4;
-roll_off = 0.2;
+Fsamp = 32;
+roll_off = 0.5;
+manual_gain=1;
 
 %Init
 Ts=1/Fsymb;
@@ -39,6 +40,14 @@ for k=1:length(t)
   endif
 end;
 
+%Measure gain
+data_in=zeros(1,nb_sample)+1023;
+data_out=conv(data_in,h);
+measured_gain=data_out(nb_sample/2)/data_in(nb_sample/2);
+
+%Compense
+##h=h/measured_gain*manual_gain;
+
 %Plot the taps
 figure(1);
 x_axis = t;
@@ -52,4 +61,17 @@ freqz(h,1,512);
 %Save taps
 fid=fopen('taps.txt','w');
 fprintf(fid,'%f\n',h);
+fclose(fid);
+
+%Save taps for gnu radio
+fid=fopen('taps_gnu_radio.txt','w');
+fprintf(fid,'[');
+for k=1:length(h)
+  if k==length(h)
+    fprintf(fid,'%f]\n',h(k));
+   else
+    fprintf(fid,'%f,\n',h(k));
+   end;
+end;
+  
 fclose(fid);
