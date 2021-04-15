@@ -13,12 +13,12 @@ close all
 %path_for_inside_do_tb = './';
 %filename = 'file.vhd';
 
-path_for_sources = '../../vhdl/spi/src/';
-path_for_testbench = '../../vhdl/spi/tb/';
-path_for_sim_do = '../../vhdl/spi/sim/';
+path_for_sources = '../../vhdl/inv_chain/src/';
+path_for_testbench = '../../vhdl/inv_chain/tb/';
+path_for_sim_do = '../../vhdl/inv_chain/sim/';
 path_for_inside_do_src = '../src/';
 path_for_inside_do_tb = '../tb/';
-filename = 'spi_master.vhd';
+filename = 'top.vhd';
 
 %------------------------------
 %-- Read the file
@@ -72,23 +72,23 @@ end
 file_data_low_case = file_data_low_case_new;
 clear tmp file_data_low_case_size file_data_low_case_new k;
 
-%------------------------------
-%-- Remove generics
-%------------------------------
-%Find 'generic'
-index_generic=strfind(file_data_low_case, 'generic');
-index_bracket_last =strfind(file_data_low_case, ');');
-found_flag=0;
-for k=1:length(index_bracket_last)
-  if index_bracket_last(k)>index_generic(1) && found_flag==0
-    found_flag=1;
-    index_bracket_found=index_bracket_last(k);
-  end
-end
-
-%remove the generic from the code
-file_data_low_case=[file_data_low_case(1:index_generic-1) file_data_low_case(index_bracket_found+2:end)];
-clear k found_flag index_bracket_found index_bracket_last index_generic;
+##%------------------------------
+##%-- Remove generics
+##%------------------------------
+##%Find 'generic'
+##index_generic=strfind(file_data_low_case, 'generic');
+##index_bracket_last =strfind(file_data_low_case, ');');
+##found_flag=0;
+##for k=1:length(index_bracket_last)
+##  if index_bracket_last(k)>index_generic(1) && found_flag==0
+##    found_flag=1;
+##    index_bracket_found=index_bracket_last(k);
+##  end
+##end
+##
+##%remove the generic from the code
+##file_data_low_case=[file_data_low_case(1:index_generic-1) file_data_low_case(index_bracket_found+2:end)];
+##clear k found_flag index_bracket_found index_bracket_last index_generic;
 
 %------------------------------
 %-- Parse to ports
@@ -385,13 +385,13 @@ fid = fopen([path_for_sim_do 'compile.do'],'w');
 fprintf(fid,'quit -sim\n');
 fprintf(fid,'vlib work\n');
 fprintf(fid,'\n');
-fprintf(fid,'vcom -work work -quiet %s%s.vhd\n',path_for_inside_do_src,strtrim(value_entity_name));
+fprintf(fid,'vcom -work work +acc=rn %s%s.vhd\n',path_for_inside_do_src,strtrim(value_entity_name));
 fprintf(fid,'\n');
-fprintf(fid,'vcom -work work -quiet %s%s_tb.vhd\n',path_for_inside_do_tb,strtrim(value_entity_name));
+fprintf(fid,'vcom -work work +acc=rn %s%s_tb.vhd\n',path_for_inside_do_tb,strtrim(value_entity_name));
 fprintf(fid,'\n');
 fprintf(fid,'\n');
 fprintf(fid,'# Simulation launch\n');
-fprintf(fid,'vsim -gui -t ps work.%s_tb -novopt\n',strtrim(value_entity_name));
+fprintf(fid,'vsim -gui -t ps work.%s_tb\n',strtrim(value_entity_name));
 fprintf(fid,'\n');
 fprintf(fid,'add wave -position insertpoint sim:/%s_tb/*\n',strtrim(value_entity_name));
 fprintf(fid,'add wave -position insertpoint sim:/%s_tb/%s_inst/*\n',strtrim(value_entity_name),strtrim(value_entity_name));
