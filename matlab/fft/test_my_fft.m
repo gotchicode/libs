@@ -3,11 +3,14 @@ clear all;
 close all;
 
 %Param
-nb_size = 2^16; 
+nb_size = 2^8; 
 
 %Input gen
 test_in = rand(1,nb_size);
 % test_in = csvread('../../c/fft/prj/data_in_re.txt').'+j*csvread('../../c/fft/prj/data_in_im.txt').';
+
+%Data in pointer
+data_in_ptr=(1:nb_size);
 
 %Timestamp
 localtime_start_DFT = (time());
@@ -16,8 +19,12 @@ localtime_start_DFT = (time());
 my_dft_init_table = my_dft_init(4);
 my_fft_init_table = my_fft_init(nb_size,0);
 
+%Debug
+fid = fopen('debug.txt','w');
+fclose(fid);
+
 %my fft
-test_my_fft_out=my_fft(test_in,nb_size,nb_size,my_dft_init_table,my_fft_init_table);
+test_my_fft_out=my_fft(test_in,data_in_ptr,nb_size,nb_size,my_dft_init_table,my_fft_init_table);
 
 %Timestamp
 localtime_end_DFT = (time());

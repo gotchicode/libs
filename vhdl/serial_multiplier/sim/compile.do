@@ -12,4 +12,4 @@ vsim -gui -t ps work.serial_unsigned_multiplier_tb
 add wave -position insertpoint sim:/serial_unsigned_multiplier_tb/*
 add wave -position insertpoint sim:/serial_unsigned_multiplier_tb/serial_unsigned_multiplier_inst/*
 
-run 1 ms
+run 3 us

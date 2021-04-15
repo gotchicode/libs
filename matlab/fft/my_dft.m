@@ -30,4 +30,10 @@ fft_mat=my_dft_init_table;
 
 %fprintf("One dft done\n");
 
+%Debug
+fid = fopen('debug.txt','a');
+fprintf(fid,"One dft done\n");
+fclose(fid);
+
+
 test_dft_out = test_in*fft_mat;

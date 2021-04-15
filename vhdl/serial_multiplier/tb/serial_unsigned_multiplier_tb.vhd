@@ -62,11 +62,11 @@ begin
     data_gen_pr:process
     begin
     
-        data_a_in   <= std_logic_vector(to_unsigned(4096,nb_bits));
-        data_b_in   <= std_logic_vector(to_unsigned(4096,nb_bits));
+        data_a_in   <= x"FFFFFFFF"; --std_logic_vector(to_unsigned(4096,nb_bits));
+        data_b_in   <= std_logic_vector(to_unsigned(2,nb_bits));
         data_in_en  <= '0';
         
-        wait for 100 us;
+        wait for 2 us;
         
         wait until rising_edge(clk);
         data_in_en  <= '1';
