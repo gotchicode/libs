@@ -3,7 +3,7 @@ close all;
 clear all;
 
 %Parameters
-nb_reg=10;
+nb_reg=1000;
 
 
 %-------------------------------------------
@@ -48,6 +48,8 @@ fprintf(fid,'attribute keep of registers         : signal is "true";            
 fprintf(fid,'attribute keep of tmr_registers     : signal is "true";                                                                                  \n');
 fprintf(fid,'attribute keep of local_tmr_voter   : signal is "true";                                                                                  \n');
 fprintf(fid,'attribute keep of global_tmr_voter  : signal is "true";                                                                                  \n');
+fprintf(fid,'attribute syn_keep : boolean;                                                                                                            \n');
+fprintf(fid,'attribute syn_keep of registers, tmr_registers, local_tmr_voter, global_tmr_voter : signal is true;                                      \n');
 fprintf(fid,'                                                                                                                                         \n');
 fprintf(fid,'begin                                                                                                                                    \n');
 fprintf(fid,'                                                                                                                                         \n');
