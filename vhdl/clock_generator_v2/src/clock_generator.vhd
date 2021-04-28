@@ -12,7 +12,7 @@ end entity clock_generator;
 
 architecture rtl of clock_generator is
 
--- Cosntant  formula: frequency * 2^32 * 2^8 / 100 e6
+-- Constant  formula: frequency * 2^32 * 2^8 / 100 e6
 constant counter_incr_const : unsigned(39 downto 0) := to_unsigned(integer(real(real(41.67)*real(4294967296.0)*real(256.0)/real(100000000))),40); 
 
 
