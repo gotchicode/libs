@@ -27,3 +27,4 @@ computed_variance=accu_variance/total_occurence;
 %Display
 fprintf('mean=%f\n',computed_mean);
 fprintf('variance=%f\n',computed_variance);
+
