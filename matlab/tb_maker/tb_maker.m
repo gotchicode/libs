@@ -13,12 +13,12 @@ close all
 %path_for_inside_do_tb = './';
 %filename = 'file.vhd';
 
-path_for_sources = '../../vhdl/clock_generator_v2/src/';
-path_for_testbench = '../../vhdl/clock_generator_v2/tb/';
-path_for_sim_do = '../../vhdl/clock_generator_v2/sim/';
+path_for_sources = '../../vhdl/frame_synchronization/src/';
+path_for_testbench = '../../vhdl/frame_synchronization/tb/';
+path_for_sim_do = '../../vhdl/frame_synchronization/sim/';
 path_for_inside_do_src = '../src/';
 path_for_inside_do_tb = '../tb/';
-filename = 'clock_generator.vhd';
+filename = 'sync.vhd';
 
 %------------------------------
 %-- Read the file
