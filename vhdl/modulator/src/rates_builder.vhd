@@ -33,8 +33,12 @@ signal sample_rate_nco      : unsigned(31 downto 0);
 signal sample_rate_nco_d1   : unsigned(31 downto 0);
 signal sample_pulse         : std_logic;
 signal sample_pulse_d1      : std_logic;
+signal sample_pulse_d2      : std_logic;
 signal bit_pulse_cnt        : unsigned(15 downto 0);
 signal bit_pulse            : std_logic;
+signal bit_pulse_d1         : std_logic;
+signal symbol_pulse_cnt     : unsigned(7 downto 0);
+signal symbol_pulse         : std_logic;
 
 
 begin
@@ -60,9 +64,15 @@ begin
         sample_rate_nco_d1      <=(others=>'0');
         sample_pulse            <='0';
         sample_pulse_d1         <='0';
+        sample_pulse_d2         <='0';
         
-        bit_pulse_cnt        <=(others=>'0');
-        bit_pulse            <='0'; 
+        bit_pulse_cnt           <=(others=>'0');
+        bit_pulse               <='0';
+        bit_pulse_d1            <='0';
+        
+        symbol_pulse_cnt        <=(others=>'0');
+        symbol_pulse            <='0';  
+
         
     elsif rising_edge(clk) then
     
@@ -71,7 +81,9 @@ begin
         sample_rate_nco_d1  <= sample_rate_nco;
         sample_pulse        <= sample_rate_nco(31) and not(sample_rate_nco_d1(31));
         sample_pulse_d1     <= sample_pulse;
+        sample_pulse_d2     <= sample_pulse_d1;
         
+        --Bit rate generation
         case sample_bit_ratio is
             when x"0000"=>
                 bit_pulse_cnt        <= (others=>'0');
@@ -87,13 +99,46 @@ begin
                     bit_pulse     <= '0';
                 end if;
         end case;
+        bit_pulse_d1 <= bit_pulse;
         
-
+        --Symbol rate generation
+        case symbol_bit_ratio is
+            when x"00"=>
+                symbol_pulse_cnt        <= (others=>'0');
+                symbol_pulse            <= bit_pulse;
+            when others =>
+                if bit_pulse='1' and symbol_pulse_cnt=unsigned(symbol_bit_ratio) then
+                    symbol_pulse_cnt <= (others=>'0');
+                    symbol_pulse     <= '1';
+                elsif bit_pulse='1' then
+                    symbol_pulse_cnt <= symbol_pulse_cnt+1;
+                    symbol_pulse     <= '0';
+                else
+                    symbol_pulse     <= '0';
+                end if;
+        end case;
     end if;
 end process;
 
 ------------------------------------------                                                           
--- Generate the sampling rate                                                                         
+-- Input signal interfacing                                                                              
 ------------------------------------------ 
+
+--Bit request
+bit_request <= bit_pulse;
+
+------------------------------------------                                                           
+-- Output signal interfacing                                                                              
+------------------------------------------ 
+output_interface_pr: process(clk, rst)
+begin
+    if rst='1' then
+    
+    elsif rising_edge(clk) then
+    
+    end if;
+end process;
+
+
 
 end rtl;

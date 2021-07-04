@@ -28,6 +28,9 @@ signal symbol_out_en : std_logic;
 signal sample_out_en : std_logic;
 signal sample_instant : std_logic_vector(31 downto 0);
 
+signal pattern_register : std_logic_vector(31 downto 0);
+
+
 
 
 begin
@@ -39,6 +42,7 @@ begin
     begin
         clk <= '1';
         wait for clk_const;
+
 
         clk <= '0';
         wait for clk_const;
@@ -67,7 +71,39 @@ begin
     -----------------------------------------
     sample_rate             <= std_logic_vector(to_unsigned(integer(real(real(1000000)*real(4294967296.0)/real(100000000))),32));
     sample_bit_ratio        <= std_logic_vector(to_unsigned(32-1,16));
-    symbol_bit_ratio        <= std_logic_vector(to_unsigned(1,8));
+    symbol_bit_ratio        <= std_logic_vector(to_unsigned(1-1,8));
+    
+    
+    ------------------------------------------  
+    -- Input bits                                     
+    ------------------------------------------     
+    input_bits_pr: process(clk, rst)
+    
+    begin    
+        if rst='1' then  
+        
+            pattern_register <= x"AAAAAAAA";
+            bit_en <= '0';
+            bit_in <= '0';            
+            
+        elsif rising_edge(clk) then   
+        
+            --Pattern shifter
+            if bit_request='1' then
+                pattern_register(31 downto 1) <= pattern_register(30 downto 0);
+                pattern_register(0) <= pattern_register(31);
+            end if;
+            
+            --Input
+            bit_in <= pattern_register(31);
+            bit_en <= bit_request;
+            
+        end if;    
+    end process;    
+    
+    
+    
+    
 
     rates_builder_inst : entity work.rates_builder
     port map
