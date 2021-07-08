@@ -32,7 +32,10 @@ plot(x_axis,fft_done);
 
 %Display signal
 figure(2);
-subplot(211);
+subplot(311);
+plot(data_in(1:16));
+subplot(312);
 plot(real(mod_signal(1:ovr*16)));
-subplot(212);
+subplot(313);
 plot(imag(mod_signal(1:ovr*16)));
+
