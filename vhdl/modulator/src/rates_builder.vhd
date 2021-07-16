@@ -12,18 +12,24 @@ port(
     symbol_bit_ratio        : in std_logic_vector(7 downto 0);
     
     bit_request             : out std_logic;
-    bit_en                  : in std_logic;
+    bit_in_en                : in std_logic;
     bit_in                  : in std_logic;
     rf_on_off_in            : in std_logic;
     modu_on_off_in          : in std_logic;
-    bit_en_ack              : in std_logic;
+    power_level_in          : in std_logic_vector(15 downto 0);
+    phase_in                : in std_logic_vector(31 downto 0);
+    bit_in_en_ack           : out std_logic;
     
     bit_out                 : out std_logic;
     bit_out_en              : out std_logic;
     symbol_out_en           : out std_logic;
     sample_out_en           : out std_logic;
-    sample_instant          : out std_logic_vector(31 downto 0)
-    
+    sample_instant          : out std_logic_vector(31 downto 0);
+    rf_on_off_out           : out std_logic;
+    modu_on_off_out         : out std_logic;
+    power_level_out         : out std_logic_vector(15 downto 0);
+    phase_out               : out std_logic_vector(31 downto 0) 
+
  );
 end entity rates_builder;
 
@@ -31,6 +37,8 @@ architecture rtl of rates_builder is
 
 signal sample_rate_nco      : unsigned(31 downto 0);
 signal sample_rate_nco_d1   : unsigned(31 downto 0);
+signal sample_rate_nco_d2   : unsigned(31 downto 0);
+signal sample_rate_nco_d3   : unsigned(31 downto 0);
 signal sample_pulse         : std_logic;
 signal sample_pulse_d1      : std_logic;
 signal sample_pulse_d2      : std_logic;
@@ -62,6 +70,9 @@ begin
     
         sample_rate_nco         <=(others=>'0');
         sample_rate_nco_d1      <=(others=>'0');
+        sample_rate_nco_d2      <=(others=>'0');
+        sample_rate_nco_d3      <=(others=>'0');
+        
         sample_pulse            <='0';
         sample_pulse_d1         <='0';
         sample_pulse_d2         <='0';
@@ -76,10 +87,14 @@ begin
         
     elsif rising_edge(clk) then
     
-        --Sampling rate generation
+        --Sampling rate generation with a phase integrator
         sample_rate_nco     <= sample_rate_nco+unsigned(sample_rate);
         sample_rate_nco_d1  <= sample_rate_nco;
-        sample_pulse        <= sample_rate_nco(31) and not(sample_rate_nco_d1(31));
+        sample_rate_nco_d2  <= sample_rate_nco_d1;
+        sample_rate_nco_d3  <= sample_rate_nco_d2;
+        
+        --Pulse generation with the MSB of the phase integrator
+        sample_pulse        <= not(sample_rate_nco(31)) and (sample_rate_nco_d1(31)); -- Falling edge detection
         sample_pulse_d1     <= sample_pulse;
         sample_pulse_d2     <= sample_pulse_d1;
         
@@ -134,7 +149,39 @@ output_interface_pr: process(clk, rst)
 begin
     if rst='1' then
     
+        -- Signals for forward modules
+        bit_out             <= '0';
+        bit_out_en          <= '0';  
+        symbol_out_en       <= '0';  
+        sample_out_en       <= '0';  
+        sample_instant      <= (others=>'0');
+        rf_on_off_out       <= '0';
+        modu_on_off_out     <= '0';        
+        power_level_out     <= (others=>'0');    
+        phase_out           <= (others=>'0');       
+        
+        -- Signal to backward module - ack of the received bit
+        bit_in_en_ack      <= '0';  
+        
+    
     elsif rising_edge(clk) then
+    
+        -- Signals for forward modules
+        bit_out_en      <= bit_pulse_d1;
+        bit_out         <= bit_in;
+        symbol_out_en   <= symbol_pulse;
+        sample_out_en   <= sample_pulse_d2;
+        sample_instant  <= std_logic_vector(sample_rate_nco_d3);
+        
+        -- Signal to backward module - ack of the received bit
+        bit_in_en_ack   <= bit_pulse_d1 and bit_in_en;
+        
+        -- Signal to pass through the modules
+        rf_on_off_out       <= rf_on_off_in; 
+        modu_on_off_out     <= modu_on_off_in;     
+        power_level_out     <= power_level_in;     
+        phase_out           <= phase_in;    
+        
     
     end if;
 end process;
