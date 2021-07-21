@@ -11,16 +11,19 @@ architecture rtl of cubic_interpolator_tb is
 constant clk_const : time := 5 ns;
 constant rst_const : time := 123 ns;
 
+constant sample_size            : integer:=12;          
+constant sample_instant_size    : integer:=8;         
+
 signal clk : std_logic;
 signal rst : std_logic;
-signal sample_in : std_logic_vector(11 downto 0);
+signal sample_in : std_logic_vector(sample_size-1 downto 0);
 signal sample_in_en : std_logic;
-signal sample_instant_in : std_logic_vector(31 downto 0);
+signal sample_instant_in : std_logic_vector(sample_instant_size-1 downto 0);
 signal rf_on_off_in : std_logic;
 signal modu_on_off_in : std_logic;
 signal power_level_in : std_logic_vector(15 downto 0);
 signal phase_in : std_logic_vector(31 downto 0);
-signal sample_out : std_logic_vector(11 downto 0);
+signal sample_out : std_logic_vector(sample_size-1 downto 0);
 signal sample_out_en : std_logic;
 signal rf_on_off_out : std_logic;
 signal modu_on_off_out : std_logic;
@@ -78,15 +81,20 @@ begin
             sample_in_en        <= '0';
             sample_instant_in   <= (others=>'0');
             sample_in           <= (others=>'0');
+            
+            rf_on_off_in        <= '0'; 
+            modu_on_off_in      <= '0';               
+            power_level_in      <= (others=>'0');              
+            phase_in            <= (others=>'0');              
 
         elsif rising_edge(clk) then
         
             if v_nco_reg(31)='0' and  v_nco_reg_d1(31)='1' then
-                sample_in <= std_logic_vector( unsigned(sample_in) + to_unsigned(100,12) );
+                sample_in <= std_logic_vector( unsigned(sample_in) + to_unsigned(100,sample_size) );
             end if;
         
             sample_in_en        <= not(v_nco_reg(31)) and v_nco_reg_d1(31);
-            sample_instant_in   <= std_logic_vector(v_nco_reg);
+            sample_instant_in   <= std_logic_vector(v_nco_reg(31 downto 32-sample_instant_size));
         
             v_nco_reg_d1        := v_nco_reg;
             v_nco_reg           := v_nco_reg + v_incr;
@@ -95,6 +103,10 @@ begin
     end process;
 
     cubic_interpolator_inst : entity work.cubic_interpolator
+    generic map(
+        sample_size         => sample_size, 
+        sample_instant_size => sample_instant_size    
+    )
     port map
         (
         clk => clk,
