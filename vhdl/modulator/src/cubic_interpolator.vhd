@@ -38,14 +38,14 @@ signal y1           : signed(sample_size-1 downto 0);
 signal y2           : signed(sample_size-1 downto 0);
 signal y3           : signed(sample_size-1 downto 0);
 signal y_en         : std_logic;
-signal mu_tmp       : signed(sample_instant_size-1 downto 0);
+signal mu_tmp       : unsigned(sample_instant_size-1 downto 0);
 
 signal a0           : signed(sample_size-1+3 downto 0);
 signal a1           : signed(sample_size-1+3+3 downto 0);
 signal a2           : signed(sample_size-1+1 downto 0);
 signal a3           : signed(sample_size-1 downto 0);
-signal mu_bis_tmp   : signed(sample_instant_size-1+sample_instant_size-1+1 downto 0);
-signal mu_tmp_d1    : signed(sample_instant_size-1 downto 0);
+signal mu_bis_tmp   : unsigned(sample_instant_size-1+sample_instant_size-1+1 downto 0);
+signal mu_tmp_d1    : unsigned(sample_instant_size-1 downto 0);
 signal a_en         : std_logic;
 
 signal a0_d1        : signed(sample_size-1+3 downto 0);
@@ -53,31 +53,32 @@ signal a1_d1        : signed(sample_size-1+3+3 downto 0);
 signal a2_d1        : signed(sample_size-1+1 downto 0);
 signal a3_d1        : signed(sample_size-1 downto 0);
 
-signal mu_cube      : signed(sample_instant_size-1+sample_instant_size-1+sample_instant_size-1+2 downto 0);
-signal mu_tmp_d2    : signed(sample_instant_size-1 downto 0);
-signal mu_bis_tmp_d1: signed(sample_instant_size-1+sample_instant_size-1+1 downto 0);
+signal mu_cube      : unsigned(sample_instant_size-1+sample_instant_size-1+sample_instant_size-1+2 downto 0);
+signal mu_tmp_d2    : unsigned(sample_instant_size-1 downto 0);
+signal mu_bis_tmp_d1: unsigned(sample_instant_size-1+sample_instant_size-1+1 downto 0);
 signal mu_cube_en   : std_logic; 
 
-signal a0_mult_term_pre : signed(sample_size-1+4+sample_instant_size-1+sample_instant_size-1+sample_instant_size-1+2 downto 0);
-signal a1_mult_term_pre : signed(sample_size-1+3+3+sample_instant_size-1+sample_instant_size-1+1+1 downto 0);
-signal a2_mult_term_pre : signed(sample_size-1+1+sample_instant_size-1+1 downto 0);
+signal a0_mult_term_pre : signed(sample_size-1+4+sample_instant_size-1+sample_instant_size-1+sample_instant_size-1+2+1 downto 0);
+signal a1_mult_term_pre : signed(sample_size-1+3+3+sample_instant_size-1+sample_instant_size-1+1+1+1 downto 0);
+signal a2_mult_term_pre : signed(sample_size-1+1+sample_instant_size-1+1+1 downto 0);
 signal a3_mult_term_pre : signed(sample_size-1 downto 0);
 signal a_mult_pre_en    : std_logic; 
 
-signal a0_mult_term : signed(sample_size-1+4+sample_instant_size-1+sample_instant_size-1+sample_instant_size-1+2 downto 0);
-signal a1_mult_term : signed(sample_instant_size + sample_size-1+3+3+sample_instant_size-1+sample_instant_size-1+1+1 downto 0);
-signal a2_mult_term : signed(sample_instant_size+sample_instant_size + sample_size-1+1+sample_instant_size-1+1 downto 0);
+signal a0_mult_term : signed(sample_size-1+4+sample_instant_size-1+sample_instant_size-1+sample_instant_size-1+2+1 downto 0);
+signal a1_mult_term : signed(sample_instant_size + sample_size-1+3+3+sample_instant_size-1+sample_instant_size-1+1+1+1 downto 0);
+signal a2_mult_term : signed(sample_instant_size+sample_instant_size + sample_size-1+1+sample_instant_size-1+1+1 downto 0);
 signal a3_mult_term : signed(sample_instant_size+sample_instant_size+sample_instant_size + sample_size-1 downto 0);
 signal a_mult_en    : std_logic;   
 
-signal a0_mult_term_PLUS_a1_mult_term : signed(sample_instant_size + sample_size-1+3+3+sample_instant_size-1+sample_instant_size-1+1+1 downto 0);
-signal a2_mult_term_PLUS_a3_mult_term : signed(sample_instant_size+sample_instant_size + sample_size-1+1+sample_instant_size-1+1 downto 0);
+signal a0_mult_term_PLUS_a1_mult_term : signed(sample_instant_size + sample_size-1+3+3+sample_instant_size-1+sample_instant_size-1+1+1+1 downto 0);
+signal a2_mult_term_PLUS_a3_mult_term : signed(sample_instant_size+sample_instant_size + sample_size-1+1+sample_instant_size-1+1+1 downto 0);
 signal a_mult_sum : std_logic;  
 
-
-signal result_pre       : signed(sample_instant_size + sample_size-1+3+3+sample_instant_size-1+sample_instant_size-1+1+1 downto 0);
+signal result_pre       : signed(sample_instant_size + sample_size-1+3+3+sample_instant_size-1+sample_instant_size-1+1+1+1 downto 0);
 signal result_pre_en    : std_logic;
 
+signal result           : signed(sample_instant_size + sample_size-1+3+3+sample_instant_size-1+sample_instant_size-1+1+1 downto 0); 
+signal result_en        : std_logic; 
 
 begin
 
@@ -129,10 +130,12 @@ begin
         a0_mult_term_PLUS_a1_mult_term  <= (others=>'0');
         a2_mult_term_PLUS_a3_mult_term  <= (others=>'0');
         a_mult_sum                      <= '0';
+                
+        result_pre          <= (others=>'0');
+        result_pre_en       <= '0';
         
-        
-        result_pre       <= (others=>'0');
-        result_pre_en    <= '0';
+        result              <= (others=>'0');
+        result_en           <= '0';
         
 
     elsif rising_edge(clk) then
@@ -146,7 +149,7 @@ begin
             y3      <= signed(sample_in);     
         end if;
         y_en        <= sample_in_en;
-        mu_tmp      <= signed(sample_instant_in);
+        mu_tmp      <= unsigned(sample_instant_in);
         
         --Compute taps
         a0          <= resize(y3,sample_size+3)-resize(y2,sample_size+3)-resize(y0,sample_size+3)+resize(y1,sample_size+3); -- +3 on bus size
@@ -168,9 +171,9 @@ begin
         mu_cube_en      <= a_en;
         
         -- interpolated value calculus part 2
-        a0_mult_term_pre    <= a0_d1 * mu_cube;
-        a1_mult_term_pre    <= a1_d1 * mu_bis_tmp_d1;
-        a2_mult_term_pre    <= a2_d1 * mu_tmp_d2;
+        a0_mult_term_pre    <= a0_d1 * signed('0' & mu_cube);
+        a1_mult_term_pre    <= a1_d1 * signed('0' & mu_bis_tmp_d1);
+        a2_mult_term_pre    <= a2_d1 * signed('0' & mu_tmp_d2);
         a3_mult_term_pre    <= a3_d1;
         a_mult_pre_en       <= mu_cube_en;
         
@@ -185,9 +188,13 @@ begin
         a2_mult_term_PLUS_a3_mult_term <= a2_mult_term+a3_mult_term;
         a_mult_sum                     <= a_mult_en;
 
-        -- result
+        -- result precalc
         result_pre                     <= a0_mult_term_PLUS_a1_mult_term + a2_mult_term_PLUS_a3_mult_term;
         result_pre_en                  <= a_mult_sum;
+        
+        -- result
+        result                         <= resize(result_pre(sample_instant_size + sample_size-1+3+3+sample_instant_size-1+sample_instant_size-1+1+1-1 downto sample_instant_size+sample_instant_size+sample_instant_size),sample_instant_size + sample_size-1+3+3+sample_instant_size-1+sample_instant_size-1+1+1+1);
+        result_en                      <= result_pre_en; 
         
     
     end if;
