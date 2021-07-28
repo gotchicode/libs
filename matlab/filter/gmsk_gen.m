@@ -5,7 +5,7 @@ close all;
 %Parameters
 nb_sample = 2^10;
 Fsymb = 1;
-Fsamp = 100;
+Fsamp = 2;
 B_T=0.3;
 manual_gain=1;
 
