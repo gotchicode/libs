@@ -9,9 +9,9 @@ rand('state',1);
 nb_size=2^12;
 
 %Modulation parameters
-ovr=8; %oversampliing factor 2bit per ovr in GMSK
+ovr=16; %oversampliing factor 2bit per ovr in GMSK
 gmsk_deviation=0.5; %This should no be changed for GMSK
-BT=0.5; %GMSK BT
+BT=0.3; %GMSK BT
 
 %Data generation
 data_in = round(rand(1,nb_size));

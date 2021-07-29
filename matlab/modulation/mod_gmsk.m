@@ -30,7 +30,7 @@ if msk_method==0
     h = gmsk_function(BT, Tb, L, k);
 
     data_in_upsamp_nrz = filter(h,1,data_in_upsamp); %filtering
-    data_in_upsamp_nrz = data_in_upsamp_nrz*8; %gain compensation of the zero hold
+    data_in_upsamp_nrz = data_in_upsamp_nrz*ovr; %gain compensation of the zero hold
     phase_step=msk_deviation/ovr*pi;
     phase=phase_step*data_in_upsamp_nrz;
     phase_cum=cumsum(phase)+phase_init_I;
