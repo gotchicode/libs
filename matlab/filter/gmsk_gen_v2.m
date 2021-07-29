@@ -3,7 +3,7 @@ clear all;
 close all;
 
 %Parameters
-BT=0.3; Tb=1; L=4; k=2;
+BT=0.3; Tb=1; L=8; k=2;
 
 %Impl parameter
 nb_quant=2^7;
