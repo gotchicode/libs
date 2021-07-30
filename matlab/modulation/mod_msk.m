@@ -3,9 +3,9 @@ function [data_out,phase_store_I,phase_store_Q]=mod_msk(data_in,phase_init_I,pha
   
 %Constant forcing how is computed the MSK modulation
 
-msk_method=0; %0: real only, 1:real and imag paths (not validated) 
+msk_method=1; %0: real only, 1:real and imag paths (not validated) 
 
-if msk_method==1
+if msk_method==0
     %-----------------------------------
     %----- MSK modulation
     %-----------------------------------
