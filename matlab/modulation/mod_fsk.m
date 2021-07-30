@@ -15,7 +15,7 @@ function [data_out,phase_store]=mod_fsk(data_in,phase_init,ovr,fsk_deviation)
   phase_step=fsk_deviation/ovr*2*pi;
   phase=phase_step*data_in_upsamp_nrz;
   phase_cum=cumsum(phase)+phase_init;
-  mod_signal=sin(phase_cum);
+  mod_signal=cos(phase_cum)+j*sin(phase_cum);
   
   data_out=mod_signal;
   phase_store = phase_cum(end);
