@@ -142,8 +142,9 @@ begin
         ram_cnt_en <= sample_in_en;
         
         -- Read a tap for ram_cnt_1
-        ram1_add_read       <= std_logic_vector(ram_cnt_1);
-        ram1_rd_en          <= ram_cnt_en;
+        if ram_cnt_en='1' then
+            ram1_add_read       <= std_logic_vector(ram_cnt_1);
+        end if;
         ram_cnt_2_d1        <= ram_cnt_2;
         ram_cnt_3_d1        <= ram_cnt_3;
         ram_cnt_4_d1        <= ram_cnt_4;
@@ -151,30 +152,37 @@ begin
         ram_cnt_en_d1       <= ram_cnt_en;
         
         -- Read a tap for ram_cnt_2
-        ram1_add_read       <= std_logic_vector(ram_cnt_2_d1);
-        ram1_rd_en          <= ram_cnt_en_d1;
+        if ram_cnt_en_d1='1' then
+            ram1_add_read       <= std_logic_vector(ram_cnt_2_d1);
+        end if;
         ram_cnt_3_d2        <= ram_cnt_3_d1;
         ram_cnt_4_d2        <= ram_cnt_4_d1;
         ram_cnt_5_d2        <= ram_cnt_5_d1;
         ram_cnt_en_d2       <= ram_cnt_en_d1;
 
         -- Read a tap for ram_cnt_3
-        ram1_add_read       <= std_logic_vector(ram_cnt_3_d2);
-        ram1_rd_en          <= ram_cnt_en_d2;
+        if ram_cnt_en_d2='1' then
+            ram1_add_read       <= std_logic_vector(ram_cnt_3_d2);
+        end if;
         ram_cnt_4_d3        <= ram_cnt_4_d2;
         ram_cnt_5_d3        <= ram_cnt_5_d2;
         ram_cnt_en_d3       <= ram_cnt_en_d2;
         
         -- Read a tap for ram_cnt_4
-        ram1_add_read       <= std_logic_vector(ram_cnt_4_d3);
-        ram1_rd_en          <= ram_cnt_en_d3;
+        if ram_cnt_en_d3='1' then
+            ram1_add_read       <= std_logic_vector(ram_cnt_4_d3);
+        end if;
         ram_cnt_5_d4        <= ram_cnt_5_d3;
         ram_cnt_en_d4       <= ram_cnt_en_d3;
 
         -- Read a tap for ram_cnt_5
-        ram1_add_read       <= std_logic_vector(ram_cnt_5_d4);
-        ram1_rd_en          <= ram_cnt_en_d4;
+        if ram_cnt_en_d4='1' then
+            ram1_add_read       <= std_logic_vector(ram_cnt_5_d4);
+        end if;
         ram_cnt_en_d5       <= ram_cnt_en_d4;
+        
+        --This is an or for 5 possible reads
+        ram1_rd_en          <= ram_cnt_en or ram_cnt_en_d1 or ram_cnt_en_d2 or ram_cnt_en_d3 or ram_cnt_en_d4;
     
 
         -- -- Interpolation counter
