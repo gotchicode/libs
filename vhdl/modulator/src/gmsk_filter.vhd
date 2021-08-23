@@ -83,6 +83,10 @@ signal ram_cnt_5_d4                 : unsigned(11 downto 0);
 signal ram_cnt_en_d4                : std_logic;
 signal ram_cnt_en_d5                : std_logic;
 
+-- Ram valid read signals
+signal ram_counter_instant_read         : unsigned(2 downto 0); --3 bits, from 0 to 7
+signal ram_counter_instant_read_valid   : std_logic;
+
 
 signal interp_counter               : unsigned(15 downto 0);
 signal interp_counter_en            : std_logic;
@@ -99,12 +103,12 @@ begin
         -- interp_counter       <= (others=>'0');
         -- interp_counter_en    <= '0';
         
-        ram_cnt_1 <= (others=>'0'); 
-        ram_cnt_2 <= (others=>'0');      
-        ram_cnt_3 <= (others=>'0');         
-        ram_cnt_4 <= (others=>'0');         
-        ram_cnt_5 <= (others=>'0');   
-        ram_cnt_en<= '0';
+        ram_cnt_1                    <= (others=>'0'); 
+        ram_cnt_2                    <= (others=>'0');      
+        ram_cnt_3                    <= (others=>'0');         
+        ram_cnt_4                    <= (others=>'0');         
+        ram_cnt_5                    <= (others=>'0');   
+        ram_cnt_en                   <= '0';
         ram_cnt_2_d1                 <= (others=>'0');
         ram_cnt_3_d1                 <= (others=>'0');       
         ram_cnt_4_d1                 <= (others=>'0');       
@@ -120,6 +124,9 @@ begin
         ram_cnt_5_d4                 <= (others=>'0');        
         ram_cnt_en_d4                <= '0';
         ram_cnt_en_d5                <= '0';   
+        
+        ram_counter_instant_read            <= (others=>'0');     
+        ram_counter_instant_read_valid      <= '0';         
 
     elsif rising_edge(clk) then
     
@@ -183,18 +190,28 @@ begin
         
         --This is an or for 5 possible reads
         ram1_rd_en          <= ram_cnt_en or ram_cnt_en_d1 or ram_cnt_en_d2 or ram_cnt_en_d3 or ram_cnt_en_d4;
-    
+        
+        --Generate a counter to catch ram output
+        if ram_cnt_en_d1='1' then
+            ram_counter_instant_read <= (others=>'0');
+        else
+            ram_counter_instant_read <= ram_counter_instant_read +1;
+        end if;
+        
+        --Generate the pulse when to reqd
+        ram_counter_instant_read_valid <= ram1_rd_en;
+        
+        --Store data to an adder tree of 5 cells
+        case ram_counter_instant_read is
+            when x"0" =>
+            when x"1" =>
+            when x"2" =>
+            when x"3" =>
+            when x"4" =>
+            when others =>
+        end case;
 
-        -- -- Interpolation counter
-        -- -- Important: symbol_in_en and sample_in_en are high together
-        -- if symbol_in_en='1' then
-        --     interp_counter <= (others=>'0');
-        -- elsif sample_in_en='1' then
-        --     interp_counter <= interp_counter+1;
-        -- end if;
-        -- interp_counter_en <= sample_in_en;
-        -- 
-        -- -- Load taps
+    
         -- 
         -- -- For example, interp_factor=4, taps_max_index=interp_factor*4+1=17 and taps_per_bank=4
         -- -- sample0: 0 4 8 12 16
