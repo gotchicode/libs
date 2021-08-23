@@ -14,9 +14,9 @@ noise=data_in_power/snr;
 
 %Scale noise
 if(isreal(data_in)),
-  noise_scaled = sqrt(noise/2)*randn(size(data_in_sequence));
+  noise_scaled = sqrt(noise)*randn(size(data_in_sequence));
 else
-  noise_scaled = sqrt(noise/2)*(randn(size(data_in_sequence))+1i*randn(size(data_in_sequence)));
+  noise_scaled = sqrt(noise)/2*(randn(size(data_in_sequence))+1i*randn(size(data_in_sequence)));
 end
 
 if display==1
