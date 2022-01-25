@@ -1,3 +1,4 @@
+ 
 clc
 clear all
 close all
@@ -6,6 +7,9 @@ close all
 %-- Parameters
 %------------------------------
 
+%Gen VUNIT
+use_vunit=1;
+
 %path_for_sources = './';
 %path_for_testbench = './';
 %path_for_sim_do = './';
@@ -13,12 +17,12 @@ close all
 %path_for_inside_do_tb = './';
 %filename = 'file.vhd';
 
-path_for_sources = '../../vhdl/frame_synchronization/src/';
-path_for_testbench = '../../vhdl/frame_synchronization/tb/';
-path_for_sim_do = '../../vhdl/frame_synchronization/sim/';
+path_for_sources = './src/';
+path_for_testbench = './tb/';
+path_for_sim_do = './sim/';
 path_for_inside_do_src = '../src/';
 path_for_inside_do_tb = '../tb/';
-filename = 'sync.vhd';
+filename = 'clk_rst_gen.vhd';
 
 %------------------------------
 %-- Read the file
@@ -72,24 +76,23 @@ end
 file_data_low_case = file_data_low_case_new;
 clear tmp file_data_low_case_size file_data_low_case_new k;
 
-##%------------------------------
-##%-- Remove generics
-##%------------------------------
-##%Find 'generic'
-##index_generic=strfind(file_data_low_case, 'generic');
-##index_bracket_last =strfind(file_data_low_case, ');');
-##found_flag=0;
-##for k=1:length(index_bracket_last)
-##  if index_bracket_last(k)>index_generic(1) && found_flag==0
-##    found_flag=1;
-##    index_bracket_found=index_bracket_last(k);
-##  end
-##end
-##
-##%remove the generic from the code
-##file_data_low_case=[file_data_low_case(1:index_generic-1) file_data_low_case(index_bracket_found+2:end)];
-##clear k found_flag index_bracket_found index_bracket_last index_generic;
+%------------------------------
+%-- Remove generics
+%------------------------------
+%Find 'generic'
+index_generic=strfind(file_data_low_case, 'generic');
+index_bracket_last =strfind(file_data_low_case, ');');
+found_flag=0;
+for k=1:length(index_bracket_last)
+  if index_bracket_last(k)>index_generic(1) && found_flag==0
+    found_flag=1;
+    index_bracket_found=index_bracket_last(k);
+  end
+end
 
+%remove the generic from the code
+file_data_low_case=[file_data_low_case(1:index_generic-1) file_data_low_case(index_bracket_found+2:end)];
+clear k found_flag index_bracket_found index_bracket_last index_generic;
 %------------------------------
 %-- Parse to ports
 %------------------------------
@@ -303,7 +306,17 @@ fprintf(fid,'library ieee;\n');
 fprintf(fid,'use ieee.std_logic_1164.all;\n');
 fprintf(fid,'use ieee.numeric_std.all;\n');
 fprintf(fid,'\n');
+
+if use_vunit==1
+  fprintf(fid, 'library vunit_lib;\ncontext vunit_lib.vunit_context;\n\n');
+end;
+
 fprintf(fid,'entity %s is\n',strtrim(testbench_entity_name));
+
+if use_vunit==1
+  fprintf(fid, '    generic (runner_cfg : string := runner_cfg_default);\n');
+end;
+
 fprintf(fid,'end %s;\n',strtrim(testbench_entity_name));
 fprintf(fid,'\n');
 fprintf(fid,'architecture rtl of %s is\n',strtrim(testbench_entity_name));
@@ -371,7 +384,19 @@ for k=1:size_ports_data_row(1)
   end
  
 end
+fprintf(fid,'\n');
+fprintf(fid,'\n');
 
+if use_vunit==1
+  fprintf(fid,'test_runner : process\n');
+  fprintf(fid,'begin\n');
+  fprintf(fid,'  test_runner_setup(runner, runner_cfg);\n');
+  fprintf(fid,'  --check_equal(to_string(17), "17");\n');
+  fprintf(fid,'  test_runner_cleanup(runner);\n');
+  fprintf(fid,'end process;\n');
+end;
+
+fprintf(fid,'\n');
 fprintf(fid,'\n');
 fprintf(fid,'end rtl;\n');
 
@@ -393,10 +418,52 @@ fprintf(fid,'\n');
 fprintf(fid,'# Simulation launch\n');
 fprintf(fid,'vsim -gui -t ps work.%s_tb\n',strtrim(value_entity_name));
 fprintf(fid,'\n');
-fprintf(fid,'add wave -position insertpoint sim:/%s_tb/*\n',strtrim(value_entity_name));
-fprintf(fid,'add wave -position insertpoint sim:/%s_tb/%s_inst/*\n',strtrim(value_entity_name),strtrim(value_entity_name));
+fprintf(fid,'do wave.do\n');
 fprintf(fid,'\n');
 fprintf(fid,'run 1 ms\n');
+fclose(fid);
 
+%------------------------------
+%-- create the wave do
+%------------------------------
+fid = fopen([path_for_sim_do 'wave.do'],'w');
+
+fprintf(fid,'\n');
+fprintf(fid,'add wave -noupdate -divider {%s_tb}\n',strtrim(value_entity_name));
+fprintf(fid,'add wave -position insertpoint sim:/%s_tb/*\n',strtrim(value_entity_name));
+fprintf(fid,'add wave -noupdate -divider {%s_inst}\n',strtrim(value_entity_name));
+fprintf(fid,'add wave -position insertpoint sim:/%s_tb/%s_inst/*\n',strtrim(value_entity_name),strtrim(value_entity_name));
+fprintf(fid,'\n');
 
 fclose(fid);
+
+if use_vunit==1
+    %------------------------------
+    %-- create run.py file
+    %------------------------------
+    fid = fopen([path_for_sim_do 'run.py'],'w');
+
+
+    fprintf(fid,'"""                                  \n');
+    fprintf(fid,'Run                                  \n');
+    fprintf(fid,'---                                  \n');
+    fprintf(fid,'Demonstrates the VUnit run library.                                  \n');
+    fprintf(fid,'"""                                  \n');
+    fprintf(fid,'                                  \n');
+    fprintf(fid,'from pathlib import Path                                  \n');
+    fprintf(fid,'from vunit import VUnit                                  \n');
+    fprintf(fid,'                                  \n');
+    fprintf(fid,'ROOT = Path(__file__).parent / "../"                                  \n');
+    fprintf(fid,'                                  \n');
+    fprintf(fid,'VU = VUnit.from_argv()                                  \n');
+    fprintf(fid,'                                  \n');
+    fprintf(fid,'LIB = VU.add_library("lib")                                  \n');
+    fprintf(fid,'LIB.add_source_files( ROOT / "src" / "*.vhd")                                  \n');
+    fprintf(fid,'LIB.add_source_files( ROOT /"tb" / "*.vhd")                                  \n');
+    fprintf(fid,'                                  \n');
+    fprintf(fid,'VU.set_sim_option(''modelsim.init_files.after_load'', [str(ROOT / ''sim'' / ''wave.do'')])\n');
+    fprintf(fid,'\n');
+    fprintf(fid,'VU.main()                                  \n');
+
+    fclose(fid);
+end;
