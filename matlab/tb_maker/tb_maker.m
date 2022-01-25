@@ -391,6 +391,12 @@ if use_vunit==1
   fprintf(fid,'test_runner : process\n');
   fprintf(fid,'begin\n');
   fprintf(fid,'  test_runner_setup(runner, runner_cfg);\n');
+  
+  fprintf(fid,'   --if run("Main_test") then\n');
+  fprintf(fid,'   --check_equal(17, 18);\n');
+  fprintf(fid,'   --check_equal(17, 19);\n');
+  fprintf(fid,'   --end if;\n');
+  
   fprintf(fid,'  --check_equal(to_string(17), "17");\n');
   fprintf(fid,'  test_runner_cleanup(runner);\n');
   fprintf(fid,'end process;\n');
