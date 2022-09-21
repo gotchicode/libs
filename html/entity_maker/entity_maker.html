@@ -1,3 +1,129 @@
+<script>
+
+var libraries_array = [];
+var space_ids_array = [];
+
+var port_ids_array = []
+var port_types_array = [];
+var port_range_max_array = [];
+var port_range_min_array = [];
+var port_inout_array = [];
+var port_used_array = [];
+
+<!-- xxxx -->
+
+<!-- function get used libraries -->
+<!-- function get space_ids_array -->
+<!-- function get port_ids_array -->
+<!-- function get port_types_array -->
+<!-- function get port_range_max_array -->
+<!-- function get port_range_min_array -->
+<!-- function get port_inout_array -->
+<!-- function get port_used_array -->
+
+function get_used_libraries(){
+
+    var local_libraries_array = [];
+    
+    local_libraries_array[0] = document.querySelector('#library_ieee_used');
+    local_libraries_array[1] = document.querySelector('#ieee_std_logic_1164_all_used');
+    local_libraries_array[2] = document.querySelector('#ieee_numeric_std_all_used');
+    local_libraries_array[3] = document.querySelector('#use_STD_textio_all');
+    
+    return local_libraries_array;
+}
+
+function get_space_ids_array(){
+
+    var local_space_ids_array = [];
+    
+    local_space_ids_array[0]= document.getElementById('entity_name').value;
+    local_space_ids_array[1]= document.getElementById('architecture_id').value;  
+
+    return local_space_ids_array;
+}
+
+function get_port_ids_array(){
+
+    var local_port_ids_array = [];
+    
+    local_port_ids_array[0] = document.getElementById('Port_01_text').value;
+    
+    return local_port_ids_array;
+
+}
+
+function get_port_types_array(){
+
+    var local_port_types_array = [];
+    
+    local_port_types_array[0] = document.getElementById('Port_01_dropdown_type').value;
+    
+    return local_port_types_array;
+
+}
+
+function get_port_range_max_array(){
+
+    var local_port_range_max_array = [];
+    
+    local_port_range_max_array[0] = document.getElementById('Port_01_from_text').value;
+    
+    return local_port_range_max_array;
+
+}
+
+function get_port_range_min_array(){
+
+    var local_port_range_min_array = [];
+    
+    local_port_range_min_array[0] = document.getElementById('Port_01_to_text').value;
+    
+    return local_port_range_min_array;
+
+}
+
+function get_port_inout_array(){
+
+    var local_port_inout_array = [];
+    
+    local_port_inout_array[0] = document.getElementById('Port_01_dropdown_way').value;
+    
+    return local_port_inout_array;
+
+}
+
+function get_port_used_array(){
+
+    var local_port_used_array = [];
+    
+    local_port_used_array[0] = document.getElementById('Port_01_used').value;
+    
+    return local_port_used_array;
+
+}
+
+function run_generation(){
+
+}
+
+function init_default_design(){
+    document.getElementById('library_ieee_used').checked = true;
+    document.getElementById('ieee_std_logic_1164_all_used').checked = true;
+    document.getElementById('ieee_numeric_std_all_used').checked = true;    
+    document.getElementById('entity_name').value = 'test_design';
+    document.getElementById('architecture_name').value = 'rtl'; 
+    document.getElementById('Port_01_text').value = 'clock'; 
+    document.getElementById('Port_01_dropdown_way').value = 'IN'; 
+    document.getElementById('Port_01_used').checked = true;
+    
+
+}
+
+//console.log(get_used_libraries());
+
+</script>
+
 
 <style>
 body {background-color: powderblue;}
@@ -7,20 +133,29 @@ p    {color: red;}
 
 <table border="0" cellpadding="1px" cellspacing="1px" align="center">  
 <tr>    
+    <td> <button onclick="init_default_design()">Default design</button>  </td>
+     <td> <button onclick="myFunction()">2</button>  </td>   
+      <td> <button onclick="myFunction()">3</button>  </td>  
+</tr> 
+</table> 
+
+
+<table border="0" cellpadding="1px" cellspacing="1px" align="center">  
+<tr>    
   <td>library ieee;</td>    
-  <td><input type = "checkbox" name = "library_ieee_used" value = "on"> </td>
+  <td><input type = "checkbox" id = "library_ieee_used" value = "on"> </td>
 </tr>   
 <tr>    
   <td>use ieee.std_logic_1164.all;</td>    
-  <td> <input type = "checkbox" name = "ieee_std_logic_1164_all_used" value = "on"> </td>
+  <td> <input type = "checkbox" id = "ieee_std_logic_1164_all_used" value = "on"> </td>
 </tr>
 <tr>    
   <td>use ieee_numeric_std_all;</td>    
-  <td><input type = "checkbox" name = "ieee_numeric_std_all_used" value = "on"> </td>
+  <td><input type = "checkbox" id = "ieee_numeric_std_all_used" value = "on"> </td>
 </tr> 
 <tr>    
   <td>use STD.textio.all;</td>    
-  <td><input type = "checkbox" name = "use_STD_textio_all;" value = "on"> </td>
+  <td><input type = "checkbox" id = "use_STD_textio_all;" value = "on"> </td>
 </tr> 
 
 </table> 
@@ -31,7 +166,7 @@ p    {color: red;}
 <table border="0" cellpadding="1px" cellspacing="1px" align="center">  
 <tr>    
   <td>Entity name:</td>    
-  <td> <input type = "text" name = "entity_name" /> </td>   
+  <td> <input type = "text" id = "entity_name" /> </td>   
 </tr>    
 </table> 
 
@@ -46,53 +181,510 @@ p    {color: red;}
 
 <table border="0" cellpadding="1px" cellspacing="1px" align="center">  
 
-<tr>   
- 
-  <td>Port_in_01</td>    
-  
-  <td> <input type = "text" name = "Port_in_01_text" /> </td>
-  
-  <td>
-    <select name = "Port_in_01_dropdown">
-        <option value = "std_logic" selected>std_logic</option>
-        <option value = "std_logic_vector">std_logic_vector</option>
-    </select>
-    </td>
-    
-  <td> <input type = "text" name = "Port_in_01_from_text" size="1"/> </td>
-  
-  <td> downto </td>
-  
-  <td> <input type = "text" name = "Port_in_01_to_text"  size="1"/> </td>
-  
-  <td> <input type = "checkbox" name = "Port_in_01_used" value = "on"> </td>
-  
-  
-  
-  <td>Port_out_01</td>  
-  
-  <td> <input type = "text" name = "Port_out_01_text" /> </td>   
-  
-   <td>
-   
-    <select name = "Port_out_01_dropdown">
+///////////////////////////
+<tr>                                                                   
+  <td>Port_01</td>                                                     
+  <td> <input type = "text" id = "Port_01_text" /> </td>               
+  <td>                                                                 
+    <select id = "Port_01_dropdown_type">                              
+        <option value = "std_logic" selected>std_logic</option>        
+        <option value = "std_logic_vector">std_logic_vector</option>   
+    </select>                                                          
+   </td>                                                               
+  <td> <input type = "text" id = "Port_01_from_text" size="1"/> </td>  
+  <td> downto </td>                                                    
+  <td> <input type = "text" id = "Port_01_to_text"  size="1"/> </td>   
+  <td> way </td>                                                       
+  <td>                                                                 
+    <select id = "Port_01_dropdown_way">                               
+        <option value = "IN" selected>IN</option>                      
+        <option value = "OUT">OUT</option>                             
+    </select>                                                          
+  </td>                                                                
+  <td> used </td>                                                      
+  <td> <input type = "checkbox" id = "Port_01_used" value = "on"> </td>
+</tr>                                                                  
 
-        <option value = "std_logic" selected>std_logic</option>
-        <option value = "std_logic_vector">std_logic_vector</option>
-    </select>
-    </td>
-    
-  <td> <input type = "text" name = "Port_out_01_from_text" size="1"/> </td>
-  
-  <td> downto </td>
-  
-  <td> <input type = "text" name = "Port_out_01_to_text"  size="1"/> </td>
-    
-    
-  <td> <input type = "checkbox" name = "Port_out_01_used" value = "on"> </td>
-  
-  
-</tr>    
+
+
+<tr>                                                                   
+  <td>Port_02</td>                                                     
+  <td> <input type = "text" id = "Port_02_text" /> </td>               
+  <td>                                                                 
+    <select id = "Port_02_dropdown_type">                              
+        <option value = "std_logic" selected>std_logic</option>        
+        <option value = "std_logic_vector">std_logic_vector</option>   
+    </select>                                                          
+   </td>                                                               
+  <td> <input type = "text" id = "Port_02_from_text" size="1"/> </td>  
+  <td> downto </td>                                                    
+  <td> <input type = "text" id = "Port_02_to_text"  size="1"/> </td>   
+  <td> way </td>                                                       
+  <td>                                                                 
+    <select id = "Port_02_dropdown_way">                               
+        <option value = "IN" selected>IN</option>                      
+        <option value = "OUT">OUT</option>                             
+    </select>                                                          
+  </td>                                                                
+  <td> used </td>                                                      
+  <td> <input type = "checkbox" id = "Port_02_used" value = "on"> </td>
+</tr>                                                                  
+
+
+
+<tr>                                                                   
+  <td>Port_03</td>                                                     
+  <td> <input type = "text" id = "Port_03_text" /> </td>               
+  <td>                                                                 
+    <select id = "Port_03_dropdown_type">                              
+        <option value = "std_logic" selected>std_logic</option>        
+        <option value = "std_logic_vector">std_logic_vector</option>   
+    </select>                                                          
+   </td>                                                               
+  <td> <input type = "text" id = "Port_03_from_text" size="1"/> </td>  
+  <td> downto </td>                                                    
+  <td> <input type = "text" id = "Port_03_to_text"  size="1"/> </td>   
+  <td> way </td>                                                       
+  <td>                                                                 
+    <select id = "Port_03_dropdown_way">                               
+        <option value = "IN" selected>IN</option>                      
+        <option value = "OUT">OUT</option>                             
+    </select>                                                          
+  </td>                                                                
+  <td> used </td>                                                      
+  <td> <input type = "checkbox" id = "Port_03_used" value = "on"> </td>
+</tr>                                                                  
+
+
+
+<tr>                                                                   
+  <td>Port_04</td>                                                     
+  <td> <input type = "text" id = "Port_04_text" /> </td>               
+  <td>                                                                 
+    <select id = "Port_04_dropdown_type">                              
+        <option value = "std_logic" selected>std_logic</option>        
+        <option value = "std_logic_vector">std_logic_vector</option>   
+    </select>                                                          
+   </td>                                                               
+  <td> <input type = "text" id = "Port_04_from_text" size="1"/> </td>  
+  <td> downto </td>                                                    
+  <td> <input type = "text" id = "Port_04_to_text"  size="1"/> </td>   
+  <td> way </td>                                                       
+  <td>                                                                 
+    <select id = "Port_04_dropdown_way">                               
+        <option value = "IN" selected>IN</option>                      
+        <option value = "OUT">OUT</option>                             
+    </select>                                                          
+  </td>                                                                
+  <td> used </td>                                                      
+  <td> <input type = "checkbox" id = "Port_04_used" value = "on"> </td>
+</tr>                                                                  
+
+
+
+<tr>                                                                   
+  <td>Port_05</td>                                                     
+  <td> <input type = "text" id = "Port_05_text" /> </td>               
+  <td>                                                                 
+    <select id = "Port_05_dropdown_type">                              
+        <option value = "std_logic" selected>std_logic</option>        
+        <option value = "std_logic_vector">std_logic_vector</option>   
+    </select>                                                          
+   </td>                                                               
+  <td> <input type = "text" id = "Port_05_from_text" size="1"/> </td>  
+  <td> downto </td>                                                    
+  <td> <input type = "text" id = "Port_05_to_text"  size="1"/> </td>   
+  <td> way </td>                                                       
+  <td>                                                                 
+    <select id = "Port_05_dropdown_way">                               
+        <option value = "IN" selected>IN</option>                      
+        <option value = "OUT">OUT</option>                             
+    </select>                                                          
+  </td>                                                                
+  <td> used </td>                                                      
+  <td> <input type = "checkbox" id = "Port_05_used" value = "on"> </td>
+</tr>                                                                  
+
+
+
+<tr>                                                                   
+  <td>Port_06</td>                                                     
+  <td> <input type = "text" id = "Port_06_text" /> </td>               
+  <td>                                                                 
+    <select id = "Port_06_dropdown_type">                              
+        <option value = "std_logic" selected>std_logic</option>        
+        <option value = "std_logic_vector">std_logic_vector</option>   
+    </select>                                                          
+   </td>                                                               
+  <td> <input type = "text" id = "Port_06_from_text" size="1"/> </td>  
+  <td> downto </td>                                                    
+  <td> <input type = "text" id = "Port_06_to_text"  size="1"/> </td>   
+  <td> way </td>                                                       
+  <td>                                                                 
+    <select id = "Port_06_dropdown_way">                               
+        <option value = "IN" selected>IN</option>                      
+        <option value = "OUT">OUT</option>                             
+    </select>                                                          
+  </td>                                                                
+  <td> used </td>                                                      
+  <td> <input type = "checkbox" id = "Port_06_used" value = "on"> </td>
+</tr>                                                                  
+
+
+
+<tr>                                                                   
+  <td>Port_07</td>                                                     
+  <td> <input type = "text" id = "Port_07_text" /> </td>               
+  <td>                                                                 
+    <select id = "Port_07_dropdown_type">                              
+        <option value = "std_logic" selected>std_logic</option>        
+        <option value = "std_logic_vector">std_logic_vector</option>   
+    </select>                                                          
+   </td>                                                               
+  <td> <input type = "text" id = "Port_07_from_text" size="1"/> </td>  
+  <td> downto </td>                                                    
+  <td> <input type = "text" id = "Port_07_to_text"  size="1"/> </td>   
+  <td> way </td>                                                       
+  <td>                                                                 
+    <select id = "Port_07_dropdown_way">                               
+        <option value = "IN" selected>IN</option>                      
+        <option value = "OUT">OUT</option>                             
+    </select>                                                          
+  </td>                                                                
+  <td> used </td>                                                      
+  <td> <input type = "checkbox" id = "Port_07_used" value = "on"> </td>
+</tr>                                                                  
+
+
+
+<tr>                                                                   
+  <td>Port_08</td>                                                     
+  <td> <input type = "text" id = "Port_08_text" /> </td>               
+  <td>                                                                 
+    <select id = "Port_08_dropdown_type">                              
+        <option value = "std_logic" selected>std_logic</option>        
+        <option value = "std_logic_vector">std_logic_vector</option>   
+    </select>                                                          
+   </td>                                                               
+  <td> <input type = "text" id = "Port_08_from_text" size="1"/> </td>  
+  <td> downto </td>                                                    
+  <td> <input type = "text" id = "Port_08_to_text"  size="1"/> </td>   
+  <td> way </td>                                                       
+  <td>                                                                 
+    <select id = "Port_08_dropdown_way">                               
+        <option value = "IN" selected>IN</option>                      
+        <option value = "OUT">OUT</option>                             
+    </select>                                                          
+  </td>                                                                
+  <td> used </td>                                                      
+  <td> <input type = "checkbox" id = "Port_08_used" value = "on"> </td>
+</tr>                                                                  
+
+
+
+<tr>                                                                   
+  <td>Port_09</td>                                                     
+  <td> <input type = "text" id = "Port_09_text" /> </td>               
+  <td>                                                                 
+    <select id = "Port_09_dropdown_type">                              
+        <option value = "std_logic" selected>std_logic</option>        
+        <option value = "std_logic_vector">std_logic_vector</option>   
+    </select>                                                          
+   </td>                                                               
+  <td> <input type = "text" id = "Port_09_from_text" size="1"/> </td>  
+  <td> downto </td>                                                    
+  <td> <input type = "text" id = "Port_09_to_text"  size="1"/> </td>   
+  <td> way </td>                                                       
+  <td>                                                                 
+    <select id = "Port_09_dropdown_way">                               
+        <option value = "IN" selected>IN</option>                      
+        <option value = "OUT">OUT</option>                             
+    </select>                                                          
+  </td>                                                                
+  <td> used </td>                                                      
+  <td> <input type = "checkbox" id = "Port_09_used" value = "on"> </td>
+</tr>                                                                  
+
+
+
+<tr>                                                                   
+  <td>Port_010</td>                                                     
+  <td> <input type = "text" id = "Port_010_text" /> </td>               
+  <td>                                                                 
+    <select id = "Port_010_dropdown_type">                              
+        <option value = "std_logic" selected>std_logic</option>        
+        <option value = "std_logic_vector">std_logic_vector</option>   
+    </select>                                                          
+   </td>                                                               
+  <td> <input type = "text" id = "Port_010_from_text" size="1"/> </td>  
+  <td> downto </td>                                                    
+  <td> <input type = "text" id = "Port_010_to_text"  size="1"/> </td>   
+  <td> way </td>                                                       
+  <td>                                                                 
+    <select id = "Port_010_dropdown_way">                               
+        <option value = "IN" selected>IN</option>                      
+        <option value = "OUT">OUT</option>                             
+    </select>                                                          
+  </td>                                                                
+  <td> used </td>                                                      
+  <td> <input type = "checkbox" id = "Port_010_used" value = "on"> </td>
+</tr>                                                                  
+
+
+
+<tr>                                                                   
+  <td>Port_011</td>                                                     
+  <td> <input type = "text" id = "Port_011_text" /> </td>               
+  <td>                                                                 
+    <select id = "Port_011_dropdown_type">                              
+        <option value = "std_logic" selected>std_logic</option>        
+        <option value = "std_logic_vector">std_logic_vector</option>   
+    </select>                                                          
+   </td>                                                               
+  <td> <input type = "text" id = "Port_011_from_text" size="1"/> </td>  
+  <td> downto </td>                                                    
+  <td> <input type = "text" id = "Port_011_to_text"  size="1"/> </td>   
+  <td> way </td>                                                       
+  <td>                                                                 
+    <select id = "Port_011_dropdown_way">                               
+        <option value = "IN" selected>IN</option>                      
+        <option value = "OUT">OUT</option>                             
+    </select>                                                          
+  </td>                                                                
+  <td> used </td>                                                      
+  <td> <input type = "checkbox" id = "Port_011_used" value = "on"> </td>
+</tr>                                                                  
+
+
+
+<tr>                                                                   
+  <td>Port_012</td>                                                     
+  <td> <input type = "text" id = "Port_012_text" /> </td>               
+  <td>                                                                 
+    <select id = "Port_012_dropdown_type">                              
+        <option value = "std_logic" selected>std_logic</option>        
+        <option value = "std_logic_vector">std_logic_vector</option>   
+    </select>                                                          
+   </td>                                                               
+  <td> <input type = "text" id = "Port_012_from_text" size="1"/> </td>  
+  <td> downto </td>                                                    
+  <td> <input type = "text" id = "Port_012_to_text"  size="1"/> </td>   
+  <td> way </td>                                                       
+  <td>                                                                 
+    <select id = "Port_012_dropdown_way">                               
+        <option value = "IN" selected>IN</option>                      
+        <option value = "OUT">OUT</option>                             
+    </select>                                                          
+  </td>                                                                
+  <td> used </td>                                                      
+  <td> <input type = "checkbox" id = "Port_012_used" value = "on"> </td>
+</tr>                                                                  
+
+
+
+<tr>                                                                   
+  <td>Port_013</td>                                                     
+  <td> <input type = "text" id = "Port_013_text" /> </td>               
+  <td>                                                                 
+    <select id = "Port_013_dropdown_type">                              
+        <option value = "std_logic" selected>std_logic</option>        
+        <option value = "std_logic_vector">std_logic_vector</option>   
+    </select>                                                          
+   </td>                                                               
+  <td> <input type = "text" id = "Port_013_from_text" size="1"/> </td>  
+  <td> downto </td>                                                    
+  <td> <input type = "text" id = "Port_013_to_text"  size="1"/> </td>   
+  <td> way </td>                                                       
+  <td>                                                                 
+    <select id = "Port_013_dropdown_way">                               
+        <option value = "IN" selected>IN</option>                      
+        <option value = "OUT">OUT</option>                             
+    </select>                                                          
+  </td>                                                                
+  <td> used </td>                                                      
+  <td> <input type = "checkbox" id = "Port_013_used" value = "on"> </td>
+</tr>                                                                  
+
+
+
+<tr>                                                                   
+  <td>Port_014</td>                                                     
+  <td> <input type = "text" id = "Port_014_text" /> </td>               
+  <td>                                                                 
+    <select id = "Port_014_dropdown_type">                              
+        <option value = "std_logic" selected>std_logic</option>        
+        <option value = "std_logic_vector">std_logic_vector</option>   
+    </select>                                                          
+   </td>                                                               
+  <td> <input type = "text" id = "Port_014_from_text" size="1"/> </td>  
+  <td> downto </td>                                                    
+  <td> <input type = "text" id = "Port_014_to_text"  size="1"/> </td>   
+  <td> way </td>                                                       
+  <td>                                                                 
+    <select id = "Port_014_dropdown_way">                               
+        <option value = "IN" selected>IN</option>                      
+        <option value = "OUT">OUT</option>                             
+    </select>                                                          
+  </td>                                                                
+  <td> used </td>                                                      
+  <td> <input type = "checkbox" id = "Port_014_used" value = "on"> </td>
+</tr>                                                                  
+
+
+
+<tr>                                                                   
+  <td>Port_015</td>                                                     
+  <td> <input type = "text" id = "Port_015_text" /> </td>               
+  <td>                                                                 
+    <select id = "Port_015_dropdown_type">                              
+        <option value = "std_logic" selected>std_logic</option>        
+        <option value = "std_logic_vector">std_logic_vector</option>   
+    </select>                                                          
+   </td>                                                               
+  <td> <input type = "text" id = "Port_015_from_text" size="1"/> </td>  
+  <td> downto </td>                                                    
+  <td> <input type = "text" id = "Port_015_to_text"  size="1"/> </td>   
+  <td> way </td>                                                       
+  <td>                                                                 
+    <select id = "Port_015_dropdown_way">                               
+        <option value = "IN" selected>IN</option>                      
+        <option value = "OUT">OUT</option>                             
+    </select>                                                          
+  </td>                                                                
+  <td> used </td>                                                      
+  <td> <input type = "checkbox" id = "Port_015_used" value = "on"> </td>
+</tr>                                                                  
+
+
+
+<tr>                                                                   
+  <td>Port_016</td>                                                     
+  <td> <input type = "text" id = "Port_016_text" /> </td>               
+  <td>                                                                 
+    <select id = "Port_016_dropdown_type">                              
+        <option value = "std_logic" selected>std_logic</option>        
+        <option value = "std_logic_vector">std_logic_vector</option>   
+    </select>                                                          
+   </td>                                                               
+  <td> <input type = "text" id = "Port_016_from_text" size="1"/> </td>  
+  <td> downto </td>                                                    
+  <td> <input type = "text" id = "Port_016_to_text"  size="1"/> </td>   
+  <td> way </td>                                                       
+  <td>                                                                 
+    <select id = "Port_016_dropdown_way">                               
+        <option value = "IN" selected>IN</option>                      
+        <option value = "OUT">OUT</option>                             
+    </select>                                                          
+  </td>                                                                
+  <td> used </td>                                                      
+  <td> <input type = "checkbox" id = "Port_016_used" value = "on"> </td>
+</tr>                                                                  
+
+
+
+<tr>                                                                   
+  <td>Port_017</td>                                                     
+  <td> <input type = "text" id = "Port_017_text" /> </td>               
+  <td>                                                                 
+    <select id = "Port_017_dropdown_type">                              
+        <option value = "std_logic" selected>std_logic</option>        
+        <option value = "std_logic_vector">std_logic_vector</option>   
+    </select>                                                          
+   </td>                                                               
+  <td> <input type = "text" id = "Port_017_from_text" size="1"/> </td>  
+  <td> downto </td>                                                    
+  <td> <input type = "text" id = "Port_017_to_text"  size="1"/> </td>   
+  <td> way </td>                                                       
+  <td>                                                                 
+    <select id = "Port_017_dropdown_way">                               
+        <option value = "IN" selected>IN</option>                      
+        <option value = "OUT">OUT</option>                             
+    </select>                                                          
+  </td>                                                                
+  <td> used </td>                                                      
+  <td> <input type = "checkbox" id = "Port_017_used" value = "on"> </td>
+</tr>                                                                  
+
+
+
+<tr>                                                                   
+  <td>Port_018</td>                                                     
+  <td> <input type = "text" id = "Port_018_text" /> </td>               
+  <td>                                                                 
+    <select id = "Port_018_dropdown_type">                              
+        <option value = "std_logic" selected>std_logic</option>        
+        <option value = "std_logic_vector">std_logic_vector</option>   
+    </select>                                                          
+   </td>                                                               
+  <td> <input type = "text" id = "Port_018_from_text" size="1"/> </td>  
+  <td> downto </td>                                                    
+  <td> <input type = "text" id = "Port_018_to_text"  size="1"/> </td>   
+  <td> way </td>                                                       
+  <td>                                                                 
+    <select id = "Port_018_dropdown_way">                               
+        <option value = "IN" selected>IN</option>                      
+        <option value = "OUT">OUT</option>                             
+    </select>                                                          
+  </td>                                                                
+  <td> used </td>                                                      
+  <td> <input type = "checkbox" id = "Port_018_used" value = "on"> </td>
+</tr>                                                                  
+
+
+
+<tr>                                                                   
+  <td>Port_019</td>                                                     
+  <td> <input type = "text" id = "Port_019_text" /> </td>               
+  <td>                                                                 
+    <select id = "Port_019_dropdown_type">                              
+        <option value = "std_logic" selected>std_logic</option>        
+        <option value = "std_logic_vector">std_logic_vector</option>   
+    </select>                                                          
+   </td>                                                               
+  <td> <input type = "text" id = "Port_019_from_text" size="1"/> </td>  
+  <td> downto </td>                                                    
+  <td> <input type = "text" id = "Port_019_to_text"  size="1"/> </td>   
+  <td> way </td>                                                       
+  <td>                                                                 
+    <select id = "Port_019_dropdown_way">                               
+        <option value = "IN" selected>IN</option>                      
+        <option value = "OUT">OUT</option>                             
+    </select>                                                          
+  </td>                                                                
+  <td> used </td>                                                      
+  <td> <input type = "checkbox" id = "Port_019_used" value = "on"> </td>
+</tr>                                                                  
+
+
+
+<tr>                                                                   
+  <td>Port_020</td>                                                     
+  <td> <input type = "text" id = "Port_020_text" /> </td>               
+  <td>                                                                 
+    <select id = "Port_020_dropdown_type">                              
+        <option value = "std_logic" selected>std_logic</option>        
+        <option value = "std_logic_vector">std_logic_vector</option>   
+    </select>                                                          
+   </td>                                                               
+  <td> <input type = "text" id = "Port_020_from_text" size="1"/> </td>  
+  <td> downto </td>                                                    
+  <td> <input type = "text" id = "Port_020_to_text"  size="1"/> </td>   
+  <td> way </td>                                                       
+  <td>                                                                 
+    <select id = "Port_020_dropdown_way">                               
+        <option value = "IN" selected>IN</option>                      
+        <option value = "OUT">OUT</option>                             
+    </select>                                                          
+  </td>                                                                
+  <td> used </td>                                                      
+  <td> <input type = "checkbox" id = "Port_020_used" value = "on"> </td>
+</tr>                                                                  
+
+
+
+///////////////////////////
+
+
 </table> 
 
 
@@ -102,8 +694,8 @@ p    {color: red;}
 
 <table border="0" cellpadding="1px" cellspacing="1px" align="center">  
 <tr>    
-  <td>Architecture name:</td>    
-  <td> <input type = "text" name = "architecture_name" /> </td>   
+  <td>Architecture id:</td>    
+  <td> <input type = "text" id = "architecture_name" /> </td>   
 </tr>  
 <tr>    
     <td> <button onclick="myFunction()">Run</button>  </td>
@@ -118,7 +710,7 @@ p    {color: red;}
 <center>
 
 
-    <textarea name="result" rows="20"
+    <textarea id="result" rows="20"
               cols="125">
         ,, click run to display the result ,,
     </textarea>
