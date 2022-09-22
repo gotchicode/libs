@@ -175,7 +175,4 @@ begin
     wait;
 end process;
 
-
-
-
 end rtl;

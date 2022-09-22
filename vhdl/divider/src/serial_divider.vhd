@@ -44,7 +44,7 @@ begin
         counter <= (others=>'0');
         r <= (others=>'0');
         enable_out <= '0';
-        busy <= '0';
+        --busy <= '0';
     elsif rising_edge(clk) then
 
         case divider_state is 
