@@ -48,6 +48,26 @@ function get_port_ids_array(){
     var local_port_ids_array = [];
     
     local_port_ids_array[0] = document.getElementById('Port_01_text').value;
+    local_port_ids_array[1] = document.getElementById('Port_02_text').value;
+    local_port_ids_array[2] = document.getElementById('Port_03_text').value;
+    local_port_ids_array[3] = document.getElementById('Port_04_text').value;
+    local_port_ids_array[4] = document.getElementById('Port_05_text').value;
+    local_port_ids_array[5] = document.getElementById('Port_06_text').value;
+    local_port_ids_array[6] = document.getElementById('Port_07_text').value;
+    local_port_ids_array[7] = document.getElementById('Port_08_text').value;
+    local_port_ids_array[8] = document.getElementById('Port_09_text').value;
+    local_port_ids_array[9] = document.getElementById('Port_010_text').value;
+    local_port_ids_array[10] = document.getElementById('Port_011_text').value;
+    local_port_ids_array[11] = document.getElementById('Port_012_text').value;
+    local_port_ids_array[12] = document.getElementById('Port_013_text').value;
+    local_port_ids_array[13] = document.getElementById('Port_014_text').value;
+    local_port_ids_array[14] = document.getElementById('Port_015_text').value;
+    local_port_ids_array[15] = document.getElementById('Port_016_text').value;
+    local_port_ids_array[16] = document.getElementById('Port_017_text').value;
+    local_port_ids_array[17] = document.getElementById('Port_018_text').value;
+    local_port_ids_array[18] = document.getElementById('Port_019_text').value;
+    local_port_ids_array[19] = document.getElementById('Port_020_text').value;
+
     
     return local_port_ids_array;
 
@@ -57,7 +77,29 @@ function get_port_types_array(){
 
     var local_port_types_array = [];
     
+    //local_port_types_array[0] = document.getElementById('Port_01_dropdown_type').value;
+    
     local_port_types_array[0] = document.getElementById('Port_01_dropdown_type').value;
+    local_port_types_array[1] = document.getElementById('Port_02_dropdown_type').value;
+    local_port_types_array[2] = document.getElementById('Port_03_dropdown_type').value;
+    local_port_types_array[3] = document.getElementById('Port_04_dropdown_type').value;
+    local_port_types_array[4] = document.getElementById('Port_05_dropdown_type').value;
+    local_port_types_array[5] = document.getElementById('Port_06_dropdown_type').value;
+    local_port_types_array[6] = document.getElementById('Port_07_dropdown_type').value;
+    local_port_types_array[7] = document.getElementById('Port_08_dropdown_type').value;
+    local_port_types_array[8] = document.getElementById('Port_09_dropdown_type').value;
+    local_port_types_array[9] = document.getElementById('Port_010_dropdown_type').value;
+    local_port_types_array[10] = document.getElementById('Port_011_dropdown_type').value;
+    local_port_types_array[11] = document.getElementById('Port_012_dropdown_type').value;
+    local_port_types_array[12] = document.getElementById('Port_013_dropdown_type').value;
+    local_port_types_array[13] = document.getElementById('Port_014_dropdown_type').value;
+    local_port_types_array[14] = document.getElementById('Port_015_dropdown_type').value;
+    local_port_types_array[15] = document.getElementById('Port_016_dropdown_type').value;
+    local_port_types_array[16] = document.getElementById('Port_017_dropdown_type').value;
+    local_port_types_array[17] = document.getElementById('Port_018_dropdown_type').value;
+    local_port_types_array[18] = document.getElementById('Port_019_dropdown_type').value;
+    local_port_types_array[19] = document.getElementById('Port_020_dropdown_type').value;
+    
     
     return local_port_types_array;
 
@@ -113,11 +155,38 @@ function init_default_design(){
     document.getElementById('ieee_numeric_std_all_used').checked = true;    
     document.getElementById('entity_name').value = 'test_design';
     document.getElementById('architecture_name').value = 'rtl'; 
+    
     document.getElementById('Port_01_text').value = 'clock'; 
     document.getElementById('Port_01_dropdown_way').value = 'IN'; 
     document.getElementById('Port_01_used').checked = true;
     
-
+    document.getElementById('Port_02_text').value = 'reset'; 
+    document.getElementById('Port_02_dropdown_way').value = 'IN'; 
+    document.getElementById('Port_02_used').checked = true;
+    
+    document.getElementById('Port_03_text').value = 'data_in'; 
+    document.getElementById('Port_03_dropdown_way').value = 'IN'; 
+    document.getElementById('Port_03_dropdown_type').value = 'std_logic_vector'; 
+    document.getElementById('Port_03_used').checked = true;
+    document.getElementById('Port_03_from_text').value = '15'; 
+    document.getElementById('Port_03_to_text').value = '0'; 
+    
+    document.getElementById('Port_04_text').value = 'data_in_enable'; 
+    document.getElementById('Port_04_dropdown_way').value = 'IN'; 
+    document.getElementById('Port_04_used').checked = true;
+    
+    document.getElementById('Port_05_text').value = 'data_out'; 
+    document.getElementById('Port_05_dropdown_way').value = 'OUT'; 
+    document.getElementById('Port_05_dropdown_type').value = 'std_logic_vector'; 
+    document.getElementById('Port_05_used').checked = true;
+    document.getElementById('Port_05_from_text').value = '15'; 
+    document.getElementById('Port_05_to_text').value = '0'; 
+    
+    document.getElementById('Port_06_text').value = 'data_out_enable'; 
+    document.getElementById('Port_06_dropdown_way').value = 'OUT'; 
+    document.getElementById('Port_06_used').checked = true;
+    
+    
 }
 
 //console.log(get_used_libraries());
@@ -717,4 +786,4 @@ p    {color: red;}
 
 
 
- </center>
+ </center> 
