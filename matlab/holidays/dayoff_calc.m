@@ -3,8 +3,12 @@ clear all;
 close all;
 
 %Init the first day of the year
-year_const=2022;
-day_const=6; %Saturday
+##year_const=2022;
+##day_const=6; %Saturday
+##is_bisextil_const=0;
+
+year_const=2023;
+day_const=7; %Saturday
 is_bisextil_const=0;
 
 %Empty table of days
@@ -92,6 +96,8 @@ if days_table(26,12)~=6 && days_table(26,12)~=7
   printf("26/12 is a week day off\n");
 end
 day_offs=tmp;
+
+printf("total_days_off_in_week=%d\n",day_offs);
 
 total_working_days=full_working_days-day_offs;
 printf("total_working_days=%d\n",total_working_days);
