@@ -24,12 +24,12 @@ var port_used_array = [];
 function get_used_libraries(){
 
     var local_libraries_array = [];
-    
-    local_libraries_array[0] = document.querySelector('#library_ieee_used');
-    local_libraries_array[1] = document.querySelector('#ieee_std_logic_1164_all_used');
-    local_libraries_array[2] = document.querySelector('#ieee_numeric_std_all_used');
-    local_libraries_array[3] = document.querySelector('#use_STD_textio_all');
-    
+
+    local_libraries_array[0] = document.getElementById('library_ieee_used').checked;
+    local_libraries_array[1] = document.getElementById('ieee_std_logic_1164_all_used').checked; 
+    local_libraries_array[2] = document.getElementById('ieee_numeric_std_all_used').checked; 
+    local_libraries_array[3] = document.getElementById('use_STD_textio_all').checked; 
+
     return local_libraries_array;
 }
 
@@ -38,7 +38,7 @@ function get_space_ids_array(){
     var local_space_ids_array = [];
     
     local_space_ids_array[0]= document.getElementById('entity_name').value;
-    local_space_ids_array[1]= document.getElementById('architecture_id').value;  
+    local_space_ids_array[1]= document.getElementById('architecture_name').value;  
 
     return local_space_ids_array;
 }
@@ -205,39 +205,137 @@ function get_port_used_array(){
     
     //local_port_used_array[0] = document.getElementById('Port_01_used').value;
 
-    local_port_used_array[0] = document.getElementById('Port_01_used').value;
-    local_port_used_array[1] = document.getElementById('Port_02_used').value;
-    local_port_used_array[2] = document.getElementById('Port_03_used').value;
-    local_port_used_array[3] = document.getElementById('Port_04_used').value;
-    local_port_used_array[4] = document.getElementById('Port_05_used').value;
-    local_port_used_array[5] = document.getElementById('Port_06_used').value;
-    local_port_used_array[6] = document.getElementById('Port_07_used').value;
-    local_port_used_array[7] = document.getElementById('Port_08_used').value;
-    local_port_used_array[8] = document.getElementById('Port_09_used').value;
-    local_port_used_array[9] = document.getElementById('Port_010_used').value;
-    local_port_used_array[10] = document.getElementById('Port_011_used').value;
-    local_port_used_array[11] = document.getElementById('Port_012_used').value;
-    local_port_used_array[12] = document.getElementById('Port_013_used').value;
-    local_port_used_array[13] = document.getElementById('Port_014_used').value;
-    local_port_used_array[14] = document.getElementById('Port_015_used').value;
-    local_port_used_array[15] = document.getElementById('Port_016_used').value;
-    local_port_used_array[16] = document.getElementById('Port_017_used').value;
-    local_port_used_array[17] = document.getElementById('Port_018_used').value;
-    local_port_used_array[18] = document.getElementById('Port_019_used').value;
-    local_port_used_array[19] = document.getElementById('Port_020_used').value;
+    local_port_used_array[0] = document.getElementById('Port_01_used').checked;
+    local_port_used_array[1] = document.getElementById('Port_02_used').checked;
+    local_port_used_array[2] = document.getElementById('Port_03_used').checked;
+    local_port_used_array[3] = document.getElementById('Port_04_used').checked;
+    local_port_used_array[4] = document.getElementById('Port_05_used').checked;
+    local_port_used_array[5] = document.getElementById('Port_06_used').checked;
+    local_port_used_array[6] = document.getElementById('Port_07_used').checked;
+    local_port_used_array[7] = document.getElementById('Port_08_used').checked;
+    local_port_used_array[8] = document.getElementById('Port_09_used').checked;
+    local_port_used_array[9] = document.getElementById('Port_010_used').checked;
+    local_port_used_array[10] = document.getElementById('Port_011_used').checked;
+    local_port_used_array[11] = document.getElementById('Port_012_used').checked;
+    local_port_used_array[12] = document.getElementById('Port_013_used').checked;
+    local_port_used_array[13] = document.getElementById('Port_014_used').checked;
+    local_port_used_array[14] = document.getElementById('Port_015_used').checked;
+    local_port_used_array[15] = document.getElementById('Port_016_used').checked;
+    local_port_used_array[16] = document.getElementById('Port_017_used').checked;
+    local_port_used_array[17] = document.getElementById('Port_018_used').checked;
+    local_port_used_array[18] = document.getElementById('Port_019_used').checked;
+    local_port_used_array[19] = document.getElementById('Port_020_used').checked;
     
     return local_port_used_array;
 
 }
 
+function find_last_used(array_in, nb_elem){
+  var local_var;
+
+  for (let i = 0; i < nb_elem; i++) {
+    if (array_in[i]==true){
+      local_var = i;
+    }
+  }
+  return local_var;
+}
+
+
+// ICI
 function run_generation(){
 
+  var local_string='';
+  var local_libraries_array;
+  var local_space_ids_array;
+
+  local_libraries_array = get_used_libraries();
+  local_space_ids_array = get_space_ids_array();
+  local_port_ids_array = get_port_ids_array();
+  local_port_types_array = get_port_types_array();
+  local_port_range_max_array = get_port_range_max_array();
+  local_port_range_min_array = get_port_range_min_array();
+  local_port_inout_array = get_port_inout_array();
+  local_port_used_array = get_port_used_array();
+
+  //////////////////////////////////////////////////
+  // FILL libraries
+  //////////////////////////////////////////////////
+  if (local_libraries_array[0]==true){
+    local_string = local_string + 'use library IEEE;\n';
+  }
+
+  if (local_libraries_array[1]==true){
+    local_string = local_string + 'use IEEE.std_logic_1164.all;\n';
+  }
+
+  if (local_libraries_array[2]==true){
+    local_string = local_string + 'use IEEE.numeric_std.all;\n';
+  }
+
+  if (local_libraries_array[3]==true){
+    local_string = local_string + 'use STD.textio.all;\n' + 'use ieee.std_logic_textio.all;\n';
+  }
+
+  //////////////////////////////////////////////////
+  // FILL entity
+  //////////////////////////////////////////////////
+  local_string = local_string + '\n';
+  local_string = local_string + 'entity ' +  local_space_ids_array[0] + ' is\n'
+
+  //////////////////////////////////////////////////
+  // FILL ports
+  //////////////////////////////////////////////////
+  local_string = local_string + 'port map(\n';
+
+  //console.log("max used: " + find_last_used(local_port_used_array, 20));
+
+  for (let i = 0; i < 20; i++) {
+
+    //Check if the port is used
+    if (local_port_used_array[i]==true){
+      //console.log("used" + i);
+
+      // Check if it is an STD_LOGIC
+      if (local_port_types_array[i]=='std_logic'){
+        //console.log("std_logic" + i);
+        if (find_last_used(local_port_used_array, 20)==i){ //Check if it is the last item
+          local_string = local_string + '    ' + local_port_ids_array[i] + ' : ' + local_port_inout_array[i] + ' std_logic\n);' + '\n';
+        }else {
+          local_string = local_string + '    ' + local_port_ids_array[i] + ' : ' + local_port_inout_array[i] + ' std_logic;' + '\n';
+        }
+      }
+
+      // Check if it is an STD_LOGIC_VECTOR
+      if (local_port_types_array[i]=='std_logic_vector'){
+        //console.log("std_logic_vector" + i);
+        if (find_last_used(local_port_used_array, 20)==i){ //Check if it is the last item
+          local_string = local_string + '    ' + local_port_ids_array[i] + ' : ' + local_port_inout_array[i] + ' std_logic_vector(' + local_port_range_max_array[i] + ' downto ' + local_port_range_min_array[i] + '\n);'+ '\n';
+        }else{
+          local_string = local_string + '    ' + local_port_ids_array[i] + ' : ' + local_port_inout_array[i] + ' std_logic_vector(' + local_port_range_max_array[i] + ' downto ' + local_port_range_min_array[i] + ');'+ '\n';
+        }
+      }
+    }
+  }
+  local_string = local_string + 'end entity;' +'\n';
+
+  //////////////////////////////////////////////////
+  // architecture
+  //////////////////////////////////////////////////
+  local_string = local_string + '\n';
+  local_string = local_string + 'architecture ' + local_space_ids_array[1] + ' of ' +  local_space_ids_array[0] + ' is\n'
+  local_string = local_string +'begin\n\n\n';
+  local_string = local_string +'end ' + local_space_ids_array[1] + ';\n';
+
+  document.getElementById('result').value=local_string;
 }
 
 function init_default_design(){
     document.getElementById('library_ieee_used').checked = true;
     document.getElementById('ieee_std_logic_1164_all_used').checked = true;
-    document.getElementById('ieee_numeric_std_all_used').checked = true;    
+    document.getElementById('ieee_numeric_std_all_used').checked = true; 
+    document.getElementById('ieee_numeric_std_all_used').checked = true;
+    document.getElementById('use_STD_textio_all').checked = false;  
     document.getElementById('entity_name').value = 'test_design';
     document.getElementById('architecture_name').value = 'rtl'; 
     
@@ -309,7 +407,7 @@ p    {color: red;}
 </tr> 
 <tr>    
   <td>use STD.textio.all;</td>    
-  <td><input type = "checkbox" id = "use_STD_textio_all;" value = "on"> </td>
+  <td><input type = "checkbox" id = "use_STD_textio_all" value = "on"> </td>
 </tr> 
 
 </table> 
@@ -852,7 +950,7 @@ p    {color: red;}
   <td> <input type = "text" id = "architecture_name" /> </td>   
 </tr>  
 <tr>    
-    <td> <button onclick="myFunction()">Run</button>  </td>
+    <td> <button onclick="run_generation()">Run</button>  </td>
 </tr>  
 
 
