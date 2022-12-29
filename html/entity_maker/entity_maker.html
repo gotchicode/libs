@@ -241,6 +241,42 @@ function find_last_used(array_in, nb_elem){
   return local_var;
 }
 
+function get_string_array_max_length(array_in, nb_elem){
+  var local_var=0;
+  for (let i = 0; i < nb_elem; i++) {
+    if (array_in[i].length>local_var){
+      local_var = array_in[i].length;
+    }
+  }
+  return local_var;
+}
+
+function align_items_to_max_length(array_in, nb_elem){
+  var local_var=0;
+  var local_array;
+  var tmp;
+
+  //Find the max length
+  for (let i = 0; i < nb_elem; i++) {
+    if (array_in[i].length>local_var){
+      local_var = array_in[i].length;
+    }
+  }
+
+  local_array = array_in;
+
+  //Fill with spaces
+  for (let i = 0; i < nb_elem; i++) {
+      tmp = array_in[i].length;
+      for (let j = 0; j < local_var-tmp; j++) {
+        local_array[i] = local_array[i] +' ';
+      }
+  }
+
+  return local_array;
+  
+}
+
 
 // ICI
 function run_generation(){
@@ -248,6 +284,8 @@ function run_generation(){
   var local_string='';
   var local_libraries_array;
   var local_space_ids_array;
+  var local_space_ids_array_extended;
+  var local_string_array_max_length;
 
   local_libraries_array = get_used_libraries();
   local_space_ids_array = get_space_ids_array();
@@ -289,6 +327,9 @@ function run_generation(){
   local_string = local_string + 'port map(\n';
 
   //console.log("max used: " + find_last_used(local_port_used_array, 20));
+  console.log("max length: " + get_string_array_max_length(local_port_ids_array, 20));
+  local_space_ids_array_extended = align_items_to_max_length(local_port_ids_array,20);
+  //local_string_array_max_length
 
   for (let i = 0; i < 20; i++) {
 
@@ -300,9 +341,9 @@ function run_generation(){
       if (local_port_types_array[i]=='std_logic'){
         //console.log("std_logic" + i);
         if (find_last_used(local_port_used_array, 20)==i){ //Check if it is the last item
-          local_string = local_string + '    ' + local_port_ids_array[i] + ' : ' + local_port_inout_array[i] + ' std_logic\n);' + '\n';
+          local_string = local_string + '    ' + local_space_ids_array_extended[i] + ' : ' + local_port_inout_array[i] + ' std_logic\n);' + '\n';
         }else {
-          local_string = local_string + '    ' + local_port_ids_array[i] + ' : ' + local_port_inout_array[i] + ' std_logic;' + '\n';
+          local_string = local_string + '    ' + local_space_ids_array_extended[i] + ' : ' + local_port_inout_array[i] + ' std_logic;' + '\n';
         }
       }
 
@@ -310,9 +351,9 @@ function run_generation(){
       if (local_port_types_array[i]=='std_logic_vector'){
         //console.log("std_logic_vector" + i);
         if (find_last_used(local_port_used_array, 20)==i){ //Check if it is the last item
-          local_string = local_string + '    ' + local_port_ids_array[i] + ' : ' + local_port_inout_array[i] + ' std_logic_vector(' + local_port_range_max_array[i] + ' downto ' + local_port_range_min_array[i] + '\n);'+ '\n';
+          local_string = local_string + '    ' + local_space_ids_array_extended[i] + ' : ' + local_port_inout_array[i] + ' std_logic_vector(' + local_port_range_max_array[i] + ' downto ' + local_port_range_min_array[i] + '\n);'+ '\n';
         }else{
-          local_string = local_string + '    ' + local_port_ids_array[i] + ' : ' + local_port_inout_array[i] + ' std_logic_vector(' + local_port_range_max_array[i] + ' downto ' + local_port_range_min_array[i] + ');'+ '\n';
+          local_string = local_string + '    ' + local_space_ids_array_extended[i] + ' : ' + local_port_inout_array[i] + ' std_logic_vector(' + local_port_range_max_array[i] + ' downto ' + local_port_range_min_array[i] + ');'+ '\n';
         }
       }
     }
