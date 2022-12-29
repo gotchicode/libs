@@ -413,6 +413,55 @@ function init_default_design(){
     
 }
 
+function init_axiS_design(){
+    document.getElementById('library_ieee_used').checked = true;
+    document.getElementById('ieee_std_logic_1164_all_used').checked = true;
+    document.getElementById('ieee_numeric_std_all_used').checked = true; 
+    document.getElementById('ieee_numeric_std_all_used').checked = true;
+    document.getElementById('use_STD_textio_all').checked = false;  
+    document.getElementById('entity_name').value = 'axi_test_design';
+    document.getElementById('architecture_name').value = 'rtl'; 
+    
+    document.getElementById('Port_01_text').value = 'clock'; 
+    document.getElementById('Port_01_dropdown_way').value = 'in'; 
+    document.getElementById('Port_01_used').checked = true;
+    
+    document.getElementById('Port_02_text').value = 'reset'; 
+    document.getElementById('Port_02_dropdown_way').value = 'in'; 
+    document.getElementById('Port_02_used').checked = true;
+    
+    document.getElementById('Port_03_text').value = 's_axis_tdata'; 
+    document.getElementById('Port_03_dropdown_way').value = 'in'; 
+    document.getElementById('Port_03_dropdown_type').value = 'std_logic_vector'; 
+    document.getElementById('Port_03_used').checked = true;
+    document.getElementById('Port_03_from_text').value = '15'; 
+    document.getElementById('Port_03_to_text').value = '0'; 
+    
+    document.getElementById('Port_04_text').value = 's_axis_tvalid'; 
+    document.getElementById('Port_04_dropdown_way').value = 'in'; 
+    document.getElementById('Port_04_used').checked = true;
+
+    document.getElementById('Port_05_text').value = 's_axis_tready'; 
+    document.getElementById('Port_05_dropdown_way').value = 'out'; 
+    document.getElementById('Port_05_used').checked = true;
+
+    document.getElementById('Port_06_text').value = 'm_axis_tdata'; 
+    document.getElementById('Port_06_dropdown_way').value = 'out'; 
+    document.getElementById('Port_06_dropdown_type').value = 'std_logic_vector'; 
+    document.getElementById('Port_06_used').checked = true;
+    document.getElementById('Port_06_from_text').value = '15'; 
+    document.getElementById('Port_06_to_text').value = '0'; 
+
+    document.getElementById('Port_07_text').value = 'm_axis_tvalid'; 
+    document.getElementById('Port_07_dropdown_way').value = 'out'; 
+    document.getElementById('Port_07_used').checked = true;
+
+    document.getElementById('Port_08_text').value = 'm_axis_tready'; 
+    document.getElementById('Port_08_dropdown_way').value = 'in'; 
+    document.getElementById('Port_08_used').checked = true;
+    
+}
+
 //console.log(get_used_libraries());
 
 </script>
@@ -427,7 +476,7 @@ p    {color: red;}
 <table border="0" cellpadding="1px" cellspacing="1px" align="center">  
 <tr>    
     <td> <button onclick="init_default_design()">Default design</button>  </td>
-     <td> <button onclick="myFunction()">2</button>  </td>   
+     <td> <button onclick="init_axiS_design()"> Axi Stream master slave</button>  </td>   
       <td> <button onclick="myFunction()">3</button>  </td>  
 </tr> 
 </table> 
