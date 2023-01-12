@@ -83,6 +83,27 @@ void generate_rrc_filter_taps(
 
                               }
 
+void zero_padding(   float *data_in, 
+                     int data_in_size, 
+                     int oversamp_in, 
+                     float *data_out, 
+                     int data_out_size)
+                     {
+                        int k;
+                        int m;
+
+                        //Work out the table out size
+                        data_out_size = data_in_size*oversamp_in;
+
+                        //Init an empty table
+                        for(k=0;k<data_out_size;k++) *(data_out+k)=0;
+
+                        //Zero pad
+                        for(k=0;k<data_out_size;k++){
+                           
+                        } *(data_out+k)=0;
+                     }
+
 int main() {
 
    int debug = DEBUG;
