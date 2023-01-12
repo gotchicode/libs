@@ -7,9 +7,10 @@ close all;
 %Parameters
 nb_sample = 2^10;
 Fsymb = 1;
-Fsamp = 32;
+Fsamp = 4;
 roll_off = 0.5;
 manual_gain=1;
+
 
 %Init
 Ts=1/Fsymb;
@@ -40,13 +41,17 @@ for k=1:length(t)
   endif
 end;
 
+%Compensate gain
+taps_sum = sum(h);
+h = h/taps_sum;
+
+%Compense
+h=h/manual_gain;
+
 %Measure gain
 data_in=zeros(1,nb_sample)+1023;
 data_out=conv(data_in,h);
 measured_gain=data_out(nb_sample/2)/data_in(nb_sample/2);
-
-%Compense
-##h=h/measured_gain*manual_gain;
 
 %Plot the taps
 figure(1);
