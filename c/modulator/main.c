@@ -6,6 +6,9 @@
 #define PAUSE system("pause");
 #define PI 3.141592653589793238462643383279502884
 
+//To compiling on linux:
+// gcc main.c -o main.o -lm
+
  int my_xor(
             int a, 
             int b)
@@ -87,22 +90,58 @@ void zero_padding(   float *data_in,
                      int data_in_size, 
                      int oversamp_in, 
                      float *data_out, 
-                     int data_out_size)
+                     int *data_out_size)
                      {
                         int k;
-                        int m;
+                        int m=0;
 
                         //Work out the table out size
-                        data_out_size = data_in_size*oversamp_in;
+                        *data_out_size = data_in_size*oversamp_in;
 
                         //Init an empty table
-                        for(k=0;k<data_out_size;k++) *(data_out+k)=0;
+                        for(k=0;k<*data_out_size;k++) *(data_out+k)=0;
 
-                        //Zero pad
-                        for(k=0;k<data_out_size;k++){
-                           
-                        } *(data_out+k)=0;
+                        //Fill samples
+                        for(k=0;k<*data_out_size;k=k+oversamp_in){
+                           *(data_out+k)=*(data_in+m);
+                           m=m+1;
+                        } 
                      }
+
+void fir_filter_no_opt (
+                        float *data_in, 
+                        int data_in_size, 
+                        float *data_out, 
+                        int *data_out_size,
+                        float *taps_in,
+                        int *taps_in_size,
+                        float *shift_register_inout)
+                        {
+                           int k;
+                           int m;
+                           int j;
+
+                           // Init j
+                           j=0;
+
+                           // Go through all samples to filter
+                           for(k=0;k<data_in_size-*taps_in_size;k++) {
+                              // Load to a shift register
+                              for(m=0;m<*taps_in_size;m++){
+                                 *(shift_register_inout+m)=*(data_in+k+m);
+                              }
+                              //Filter
+                              *(data_out+k)=0;
+                              for(m=0;m<*taps_in_size;m++){
+                                 *(data_out+k)=*(data_out+k) + *(shift_register_inout+m) * *(taps_in+m);
+                              }
+                              j=j+1;
+                           }
+                           *data_out_size=j;
+
+                           
+
+}
 
 int main() {
 
@@ -112,11 +151,16 @@ int main() {
    int *data_stream_in   = malloc(data_stream_size*sizeof(int));
    int *data_stream_out   = malloc(data_stream_size*sizeof(int));
    int *shift_reg_in  = malloc(1*sizeof(int)); 
-   int *modulated_data_I = malloc(data_stream_size*sizeof(int)); 
+   float *modulated_data_I = malloc(data_stream_size*sizeof(float)); 
    float roll_off_in = 0.5;
    int oversamp_in = 4;
    float *taps_out = malloc(2048*sizeof(float));  
    int *taps_out_size = malloc(1*sizeof(int));  
+   float *zero_padding_data_out = malloc(data_stream_size*oversamp_in*sizeof(float));
+   int *zero_padding_data_out_size= malloc(1*sizeof(int));
+   float *filter_data_out = malloc(data_stream_size*oversamp_in*sizeof(float));
+   int *filter_data_out_size= malloc(1*sizeof(int));
+   float *shift_register_inout = malloc(2048*sizeof(float));  
    int k;
 
    printf("Started modulator\n");
@@ -155,7 +199,7 @@ int main() {
    // Debug write in file
    fp = fopen ("modulated_data_I.txt","w");
    for(k = 0; k < data_stream_size;k++){
-         fprintf (fp, "%d\n",*(modulated_data_I+k));
+         fprintf (fp, "%f\n",*(modulated_data_I+k));
    }
    fclose(fp);
 
@@ -172,6 +216,27 @@ int main() {
          fprintf (fp, "%f\n",*(taps_out+k));
    }
    fclose(fp);
+
+   //Zero padding
+   zero_padding( modulated_data_I, data_stream_size, oversamp_in, zero_padding_data_out, zero_padding_data_out_size);
+
+   // Debug write in file
+   fp = fopen ("zero_padding_out.txt","w");
+   for(k = 0; k < *zero_padding_data_out_size;k++){
+         fprintf (fp, "%f\n",*(zero_padding_data_out+k));
+   }
+   fclose(fp);
+
+   //Filter
+   fir_filter_no_opt(zero_padding_data_out, *zero_padding_data_out_size, filter_data_out, filter_data_out_size, taps_out, taps_out_size, shift_register_inout);
+
+   // Debug write in file
+   fp = fopen ("filter_out.txt","w");
+   for(k = 0; k < *filter_data_out_size;k++){
+         fprintf (fp, "%f\n",*(filter_data_out+k));
+   }
+   fclose(fp);
+   printf("%d\n",*filter_data_out_size);
 
 
    printf("End modulator\n");
