@@ -3,6 +3,7 @@
 #include <math.h>
 
 #define DEBUG 0
+#define DEBUG_FILE 1
 #define PAUSE system("pause");
 #define PI 3.141592653589793238462643383279502884
 
@@ -127,9 +128,13 @@ void fir_filter_no_opt (
                            // Go through all samples to filter
                            for(k=0;k<data_in_size-*taps_in_size;k++) {
                               // Load to a shift register
-                              for(m=0;m<*taps_in_size;m++){
-                                 *(shift_register_inout+m)=*(data_in+k+m);
+                              for(m=0;m<(*taps_in_size)-1;m++){
+                                 *(shift_register_inout+*taps_in_size-1-m)= *(shift_register_inout+*taps_in_size-1-m-1);
+                                 // +44-1-0 +44-1-0-1 43 42
+                                 // +44-1-1 +44-1-1-1 42 41
+                                 // 44-1-42 44-1-42-1 1 0 
                               }
+                              *(shift_register_inout+0)=*(data_in+k+m);
                               //Filter
                               *(data_out+k)=0;
                               for(m=0;m<*taps_in_size;m++){
@@ -146,6 +151,7 @@ void fir_filter_no_opt (
 int main() {
 
    int debug = DEBUG;
+   int debug_file= DEBUG_FILE;
    FILE * fp;
    int data_stream_size = 256*256;
    int *data_stream_in   = malloc(data_stream_size*sizeof(int));
@@ -179,11 +185,13 @@ int main() {
    pn_23_enc_1b(data_stream_in, data_stream_size, shift_reg_in, data_stream_out, debug);
 
    // Debug write in file
-   fp = fopen ("pn_23_enc_1b_out.txt","w");
-   for(k = 0; k < data_stream_size;k++){
-         fprintf (fp, "%d\n",*(data_stream_out+k));
+   if (debug_file){
+      fp = fopen ("pn_23_enc_1b_out.txt","w");
+      for(k = 0; k < data_stream_size;k++){
+            fprintf (fp, "%d\n",*(data_stream_out+k));
+      }
+      fclose(fp);
    }
-   fclose(fp);
 
 
    // -------------------------------------------------
@@ -197,11 +205,13 @@ int main() {
    }
 
    // Debug write in file
-   fp = fopen ("modulated_data_I.txt","w");
-   for(k = 0; k < data_stream_size;k++){
-         fprintf (fp, "%f\n",*(modulated_data_I+k));
+   if (debug_file){
+      fp = fopen ("modulated_data_I.txt","w");
+      for(k = 0; k < data_stream_size;k++){
+            fprintf (fp, "%f\n",*(modulated_data_I+k));
+      }
+      fclose(fp);
    }
-   fclose(fp);
 
    // -------------------------------------------------
    // -- RRC filtering
@@ -211,31 +221,40 @@ int main() {
    generate_rrc_filter_taps( roll_off_in, oversamp_in, taps_out, taps_out_size, 0);
 
    // Debug write in file
-   fp = fopen ("rrc_taps.txt","w");
-   for(k = 0; k < *taps_out_size;k++){
-         fprintf (fp, "%f\n",*(taps_out+k));
+   if (debug_file){
+      fp = fopen ("rrc_taps.txt","w");
+      for(k = 0; k < *taps_out_size;k++){
+            fprintf (fp, "%f\n",*(taps_out+k));
+      }
+      fclose(fp);
    }
-   fclose(fp);
 
    //Zero padding
    zero_padding( modulated_data_I, data_stream_size, oversamp_in, zero_padding_data_out, zero_padding_data_out_size);
 
    // Debug write in file
-   fp = fopen ("zero_padding_out.txt","w");
-   for(k = 0; k < *zero_padding_data_out_size;k++){
-         fprintf (fp, "%f\n",*(zero_padding_data_out+k));
+   if (debug_file){
+      fp = fopen ("zero_padding_out.txt","w");
+      for(k = 0; k < *zero_padding_data_out_size;k++){
+            fprintf (fp, "%f\n",*(zero_padding_data_out+k));
+      }
+      fclose(fp);
    }
-   fclose(fp);
+
+   //Initalize filter shift register at zero
+   for(k=0;k<*taps_out_size;k++) *(shift_register_inout+k)=0;
 
    //Filter
    fir_filter_no_opt(zero_padding_data_out, *zero_padding_data_out_size, filter_data_out, filter_data_out_size, taps_out, taps_out_size, shift_register_inout);
 
    // Debug write in file
-   fp = fopen ("filter_out.txt","w");
-   for(k = 0; k < *filter_data_out_size;k++){
-         fprintf (fp, "%f\n",*(filter_data_out+k));
+   if (debug_file){
+      fp = fopen ("filter_out.txt","w");
+      for(k = 0; k < *filter_data_out_size;k++){
+            fprintf (fp, "%f\n",*(filter_data_out+k));
+      }
+      fclose(fp);
    }
-   fclose(fp);
    printf("%d\n",*filter_data_out_size);
 
 
