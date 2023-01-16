@@ -39,3 +39,18 @@ subplot(413);
 plot(real(mod_signal(1:ovr*16)));
 subplot(414);
 plot(imag(mod_signal(1:ovr*16)));
+
+##Export to file
+fp = fopen("data_mod_I.txt","w");
+for k=1:length(mod_signal)
+  fprintf(fp,"%f\n",real(mod_signal(k)));
+##  fprintf("%f\n",imag(mod_signal(k)));
+end
+fclose(fp);
+
+fp = fopen("data_mod_Q.txt","w");
+for k=1:length(mod_signal)
+##  fprintf("%f\n",real(mod_signal(k)));
+  fprintf(fp,"%f\n",imag(mod_signal(k)));
+end
+fclose(fp);
