@@ -143,8 +143,17 @@ void fir_filter_no_opt (
                               j=j+1;
                            }
                            *data_out_size=j;
+}
 
-                           
+void fir_filter_polyphase (
+                        float *data_in, 
+                        int data_in_size, 
+                        float *data_out, 
+                        int *data_out_size,
+                        float *taps_in,
+                        int *taps_in_size,
+                        float *shift_register_inout)
+                        {                      
 
 }
 
