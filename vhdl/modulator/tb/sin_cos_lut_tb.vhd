@@ -8,18 +8,22 @@ end sin_cos_lut_tb;
 
 architecture rtl of sin_cos_lut_tb is
 
-constant clk_const : time := 5 ns;
-constant rst_const : time := 123 ns;
+constant clk_const                   : time := 5 ns;
+constant rst_const                   : time := 123 ns;
 
-signal clk : std_logic;
-signal rst : std_logic;
-signal phase_in_en : std_logic;
-signal phase_in : std_logic_vector(11 downto 0);
-signal sin_out : std_logic_vector(15 downto 0);
-signal cos_out : std_logic_vector(15 downto 0);
-signal sin_out_en : std_logic;
+constant phase_in_size               : integer:=256;
+constant phase_in_bit_size           : integer:=8;
+constant sin_cos_data_size           : integer:=12;
 
-signal tick_in          : std_logic;
+signal clk                           : std_logic;
+signal rst                           : std_logic;
+signal phase_in_en                   : std_logic;
+signal phase_in                      : std_logic_vector(phase_in_bit_size-1 downto 0);
+signal sin_out                       : std_logic_vector(sin_cos_data_size-1 downto 0);
+signal cos_out                       : std_logic_vector(sin_cos_data_size-1 downto 0);
+signal sin_out_en                    : std_logic;
+
+signal tick_in                       : std_logic;
 
 
 
@@ -94,6 +98,11 @@ begin
     end process;
 
     sin_cos_lut_inst : entity work.sin_cos_lut
+    generic map(
+        phase_in_size       => phase_in_size,
+        phase_in_bit_size   => phase_in_bit_size,
+        sin_cos_data_size   => sin_cos_data_size
+    )
     port map
         (
         clk => clk,

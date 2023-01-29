@@ -6,7 +6,7 @@ use IEEE.math_real.all;
 
 entity sin_cos_lut is
     generic (
-        phase_in_size               : integer:=4096;
+        phase_in_size               : integer:=4096; -- must be a power of 2
         phase_in_bit_size           : integer:=12;
         sin_cos_data_size           : integer:=16
     );
@@ -26,7 +26,7 @@ end entity sin_cos_lut;
 
 architecture rtl of sin_cos_lut is
 
-type sin_cos_table_type                 is array(0 to phase_in_size/4-1) of unsigned(15 downto 0);  
+type sin_cos_table_type                 is array(0 to phase_in_size/4-1) of unsigned(sin_cos_data_size-1 downto 0);  
 signal sin_table                        : sin_cos_table_type;
 
 signal phase_in_for_sin_en              : std_logic; 
@@ -50,7 +50,7 @@ sin_table_generation:
 for I in 0 to phase_in_size/4-1 generate
 
     --sin_table(I) <= std_logic_vector(to_unsigned(I,16));
-    sin_table(I) <= to_unsigned(integer(ROUND(real(65536/2-2) * SIN( real(I) / real(phase_in_size/4) * real(1.5707963267948966192313216916398)))),16);
+    sin_table(I) <= to_unsigned(integer(ROUND(real(2**(sin_cos_data_size-1)-1) * SIN( real(I) / real(phase_in_size/4) * real(1.5707963267948966192313216916398)))),sin_cos_data_size);
 
 end generate sin_table_generation;
 
@@ -82,7 +82,7 @@ begin
     
     
         --First delay the phase
-        -- DELAY 1
+        -- PIPE 1
         phase_in_for_sin     <= phase_in;
         phase_in_for_cos     <= std_logic_vector(unsigned(phase_in)+phase_in_size/4);
         phase_in_for_sin_en  <= phase_in_en;
@@ -92,7 +92,7 @@ begin
         --MSBs: "01" / Table index = phase_max/4-1 - index
         --MSBs: "10" / Table index = index(-2 downto 0) *-1
         --MSBs: "11" / Table index = index(-2 downto 0) *-1
-        -- DELAY 2
+        -- PIPE 2
         v_phase_in_for_sin_cos_case := phase_in_for_sin(phase_in_bit_size-1 downto phase_in_bit_size-2);
         case v_phase_in_for_sin_cos_case is  
             when "00" =>
@@ -123,15 +123,15 @@ begin
         phase_in_for_cos_d1 <= phase_in_for_cos;
 
         -- Data from table is read
-        -- DELAY 3
+        -- PIPE 3
         if phase_recalc_sin_en='1' then
             for I in 0 to phase_in_size/4-1 loop
-                if unsigned(phase_recalc_sin)=to_unsigned(I,10) then
+                if unsigned(phase_recalc_sin)=to_unsigned(I,phase_in_bit_size-2) then
                     sin_table_out <= sin_table(I);
                 end if;
             end loop;
             for I in 0 to phase_in_size/4-1 loop
-                if unsigned(phase_recalc_cos)=to_unsigned(I,10) then
+                if unsigned(phase_recalc_cos)=to_unsigned(I,phase_in_bit_size-2) then
                     cos_table_out <= sin_table(I);
                 end if;
             end loop;
@@ -141,7 +141,7 @@ begin
         sin_table_out_en <= phase_recalc_sin_en;
         
         -- Data polarity from table is reordered
-        -- DELAY 4
+        -- PIPE 4
         v_phase_in_for_sin_cos_case := phase_in_for_sin_d2(phase_in_for_sin_d2'left downto phase_in_for_sin_d2'left-1);
         case v_phase_in_for_sin_cos_case is  
             when "00" =>
