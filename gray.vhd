@@ -1,18 +1,3 @@
-----------------------------------------------------------------------------------------------------
---   Project          : Crypto Core
---   Author           : Jerome Fievet
---   Module           : Gray
---
---   Description      : Gray encoder and decoder
---
---   ----------------------------------------------------------------------------------------------
---   Modifications
---   ---------------------------------------------------------------------------------------------
---   Date             : Version     : Author            : Modification comments
---   ---------------------------------------------------------------------------------------------
---                    :             :                   :
---   13/01/2022       : 1.0         : Jerome Fievet     : First version
---                                                      : Algorithm is based on https://en.wikipedia.org/wiki/Gray_code
 --
 --  Code from wiki page:
 --
@@ -35,14 +20,6 @@
 --          return num;
 --      }
 
-----------------------------------------------------------------------------------------------------
---               Copyright (c) ID-Secure
---
--- This code is confidential and is a proprietary product of ID-Secure.
--- Any unauthorised use, reproduction or transfer of this code is
--- strictly prohibited.
-----------------------------------------------------------------------------------------------------
- 
 
 library ieee;
 use ieee.std_logic_1164.all;
