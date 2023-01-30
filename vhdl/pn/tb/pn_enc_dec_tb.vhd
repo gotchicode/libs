@@ -8,24 +8,24 @@ end pn_enc_dec_tb;
 
 architecture rtl of pn_enc_dec_tb is
 
-constant clk_const      : time := 5 ns;
-constant rst_n_const    : time := 123 ns;
+constant clk_const              : time := 5 ns;
+constant rst_n_const            : time := 123 ns;
 
-constant const_all_ones : std_logic_vector(63 downto 0):=x"FFFFFFFFFFFFFFFF";
-constant const_all_zeros : std_logic_vector(63 downto 0):=x"0000000000000000";
+constant const_all_ones         : std_logic_vector(63 downto 0):=x"FFFFFFFFFFFFFFFF";
+constant const_all_zeros        : std_logic_vector(63 downto 0):=x"0000000000000000";
 
-constant bit_size       : integer:=32;
+constant bit_size               : integer:=32;
 
-signal clk : std_logic;
-signal rst_n : std_logic;
-signal enc_data_in : std_logic_vector(bit_size-1 downto 0);
-signal enc_data_in_en : std_logic;
-signal enc_data_out : std_logic_vector(bit_size-1 downto 0);
-signal enc_data_out_en : std_logic;
-signal dec_data_in : std_logic_vector(bit_size-1 downto 0);
-signal dec_data_in_en : std_logic;
-signal dec_data_out : std_logic_vector(bit_size-1 downto 0);
-signal dec_data_out_en : std_logic;
+signal clk                      : std_logic;
+signal rst_n                    : std_logic;
+signal enc_data_in              : std_logic_vector(bit_size-1 downto 0);
+signal enc_data_in_en           : std_logic;
+signal enc_data_out             : std_logic_vector(bit_size-1 downto 0);
+signal enc_data_out_en          : std_logic;
+signal dec_data_in              : std_logic_vector(bit_size-1 downto 0);
+signal dec_data_in_en           : std_logic;
+signal dec_data_out             : std_logic_vector(bit_size-1 downto 0);
+signal dec_data_out_en          : std_logic;
 
 
 
@@ -102,15 +102,15 @@ begin
         )
     port map
         (
-        clk => clk,
-        rst_n => rst_n,
-        enc_data_in => enc_data_in,
-        enc_data_in_en => enc_data_in_en,
-        enc_data_out => enc_data_out,
+        clk             => clk,
+        rst_n           => rst_n,
+        enc_data_in     => enc_data_in,
+        enc_data_in_en  => enc_data_in_en,
+        enc_data_out    => enc_data_out,
         enc_data_out_en => enc_data_out_en,
-        dec_data_in => dec_data_in,
-        dec_data_in_en => dec_data_in_en,
-        dec_data_out => dec_data_out,
+        dec_data_in     => dec_data_in,
+        dec_data_in_en  => dec_data_in_en,
+        dec_data_out    => dec_data_out,
         dec_data_out_en => dec_data_out_en
 );
 
