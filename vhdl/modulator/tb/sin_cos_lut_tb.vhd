@@ -105,13 +105,13 @@ begin
     )
     port map
         (
-        clk => clk,
-        rst => rst,
-        phase_in_en => phase_in_en,
-        phase_in => phase_in,
-        sin_out => sin_out,
-        cos_out => cos_out,
-        sin_out_en => sin_out_en
+        clk             => clk,
+        rst             => rst,
+        phase_in_en     => phase_in_en,
+        phase_in        => phase_in,
+        sin_out         => sin_out,
+        cos_out         => cos_out,
+        sin_out_en      => sin_out_en
 );
 
 end rtl;
