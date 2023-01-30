@@ -3,7 +3,7 @@ close all;
 clc;
 
 %Parameters
-nb_taps=341;
+nb_taps=20;
 nb_quant=2^14;
 cut_off=0.125;
 
@@ -23,7 +23,7 @@ h_ideal=freqz(taps_ideal,1,512);
 h_ideal_dB=20*log10(abs(h_ideal));
 
 %Quantified
-compensate=71509.769533 / 65536.000000 ; %Here apply value from quant_taps_correct when compensate at 1
+compensate=64139.000000 / 32768.000000 ; %Here apply value from quant_taps_correct when compensate at 1
 taps_quant= round( [ (nb_quant/2-1) / max(taps_ideal) * taps_ideal/compensate] );
 h_quant=freqz(taps_quant,1,512);
 h_quant_dB=20*log10(abs(h_quant));
