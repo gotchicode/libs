@@ -300,7 +300,7 @@ function run_generation(){
   // FILL libraries
   //////////////////////////////////////////////////
   if (local_libraries_array[0]==true){
-    local_string = local_string + 'use library IEEE;\n';
+    local_string = local_string + 'library IEEE;\n';
   }
 
   if (local_libraries_array[1]==true){
@@ -324,7 +324,7 @@ function run_generation(){
   //////////////////////////////////////////////////
   // FILL ports
   //////////////////////////////////////////////////
-  local_string = local_string + 'port map(\n';
+  local_string = local_string + 'port(\n';
 
   //console.log("max used: " + find_last_used(local_port_used_array, 20));
   console.log("max length: " + get_string_array_max_length(local_port_ids_array, 20));
