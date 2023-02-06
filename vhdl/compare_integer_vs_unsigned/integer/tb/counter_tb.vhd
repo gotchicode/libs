@@ -23,9 +23,6 @@ signal flag : std_logic;
 
 begin
 
-    -----------------------------------------
-    -- clk generation
-    -----------------------------------------
     clk_gen_pr: process
     begin
         clk <= '1';
