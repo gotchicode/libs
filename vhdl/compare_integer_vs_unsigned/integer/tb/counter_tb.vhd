@@ -74,9 +74,7 @@ begin
         end if;
    
         check_equal(flag, '1');
-   --check_equal(17, 19);
-   --end if;
-  --check_equal(to_string(17), "17");
+        
     test_runner_cleanup(runner);
 end process;
 
