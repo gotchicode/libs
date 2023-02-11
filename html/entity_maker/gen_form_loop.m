@@ -34,6 +34,26 @@ for k=1:20
   
 end;
 
+for k=1:8
+
+    fprintf(fid, '<tr>                                                                   \n');
+    fprintf(fid, '  <td>Generic_param_0%d</td>                                                     \n',k);
+    fprintf(fid, '  <td> <input type = "text" id = "Generic_param_0%d_text" /> </td>               \n',k);
+    fprintf(fid, '  <td>                                                                 \n');
+    fprintf(fid, '    <select id = "Generic_param_0%d_dropdown_type">                              \n',k);
+    fprintf(fid, '        <option value = "integer" selected>integer</option>   \n');
+    fprintf(fid, '        <option value = "boolean" selected>boolean</option>   \n');
+    fprintf(fid, '    </select>                                                          \n');
+    fprintf(fid, '   </td>                                                               \n');
+    fprintf(fid, '  <td> value </td>                                                      \n');
+    fprintf(fid, '  <td> <input type = "text" id = "Generic_param_0%d_from_text" size="1"/> </td>  \n',k);
+    fprintf(fid, '  <td> used </td>                                                      \n');
+    fprintf(fid, '  <td> <input type = "checkbox" id = "Generic_param_0%d_used" value = "on"> </td>\n',k);
+    fprintf(fid, '</tr>                                                                  \n');
+    fprintf(fid,'\n\n\n');
+  
+end;
+
 fprintf(fid,"///////////////////////////\n");
 
 fclose(fid);
