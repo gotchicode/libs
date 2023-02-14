@@ -43,6 +43,60 @@ function get_space_ids_array(){
     return local_space_ids_array;
 }
 
+function get_generic_ids_array(){
+
+    var local_generic_ids_array = [];
+    
+    local_generic_ids_array[0] = document.getElementById('Generic_param_01_text').value;
+    local_generic_ids_array[1] = document.getElementById('Generic_param_02_text').value;
+    local_generic_ids_array[2] = document.getElementById('Generic_param_03_text').value;
+    local_generic_ids_array[3] = document.getElementById('Generic_param_04_text').value;
+    local_generic_ids_array[4] = document.getElementById('Generic_param_04_text').value;
+    local_generic_ids_array[5] = document.getElementById('Generic_param_05_text').value;
+    local_generic_ids_array[6] = document.getElementById('Generic_param_06_text').value;
+    local_generic_ids_array[7] = document.getElementById('Generic_param_07_text').value;
+
+    
+    return local_generic_ids_array;
+
+}
+
+function get_generic_types_array(){
+
+    var local_generic_types_array = [];
+    
+    local_generic_types_array[0] = document.getElementById('Generic_param_01_dropdown_type').value;
+    local_generic_types_array[1] = document.getElementById('Generic_param_02_dropdown_type').value;
+    local_generic_types_array[2] = document.getElementById('Generic_param_03_dropdown_type').value;
+    local_generic_types_array[3] = document.getElementById('Generic_param_04_dropdown_type').value;
+    local_generic_types_array[4] = document.getElementById('Generic_param_05_dropdown_type').value;
+    local_generic_types_array[5] = document.getElementById('Generic_param_06_dropdown_type').value;
+    local_generic_types_array[6] = document.getElementById('Generic_param_07_dropdown_type').value;
+    local_generic_types_array[7] = document.getElementById('Generic_param_08_dropdown_type').value;
+    
+    
+    return local_generic_types_array;
+
+}
+
+function get_generic_used_array(){
+
+    var local_generic_used_array = [];
+    
+
+    local_generic_used_array[0] = document.getElementById('Generic_param_01_used').checked;
+    local_generic_used_array[1] = document.getElementById('Generic_param_02_used').checked;
+    local_generic_used_array[2] = document.getElementById('Generic_param_03_used').checked;
+    local_generic_used_array[3] = document.getElementById('Generic_param_04_used').checked;
+    local_generic_used_array[4] = document.getElementById('Generic_param_05_used').checked;
+    local_generic_used_array[5] = document.getElementById('Generic_param_06_used').checked;
+    local_generic_used_array[6] = document.getElementById('Generic_param_07_used').checked;
+    local_generic_used_array[7] = document.getElementById('Generic_param_08_used').checked;
+    
+    return local_generic_used_array;
+
+}
+
 function get_port_ids_array(){
 
     var local_port_ids_array = [];
@@ -462,6 +516,49 @@ function init_axiS_design(){
     
 }
 
+function init_reset_design(){
+    document.getElementById('library_ieee_used').checked = true;
+    document.getElementById('ieee_std_logic_1164_all_used').checked = true;
+    document.getElementById('ieee_numeric_std_all_used').checked = true; 
+    document.getElementById('ieee_numeric_std_all_used').checked = true;
+    document.getElementById('use_STD_textio_all').checked = false;  
+    document.getElementById('entity_name').value = 'test_design';
+    document.getElementById('architecture_name').value = 'rtl'; 
+    
+    document.getElementById('Generic_param_01_text').value = 'USE_ASYNC_RESET'; 
+    document.getElementById('Generic_param_01_dropdown_type').value = 'boolean'; 
+    document.getElementById('Generic_param_01_from_text').value = 'TRUE'; 
+    document.getElementById('Generic_param_01_used').checked = true;
+    
+    document.getElementById('Generic_param_02_text').value = 'USE_SYNC_RESET'; 
+    document.getElementById('Generic_param_02_dropdown_type').value = 'boolean'; 
+    document.getElementById('Generic_param_02_from_text').value = 'TRUE'; 
+    document.getElementById('Generic_param_02_used').checked = true;
+    
+    document.getElementById('Generic_param_03_text').value = 'ASYNC_RESET_ACTIVE'; 
+    document.getElementById('Generic_param_03_dropdown_type').value = 'std_logic'; 
+    document.getElementById('Generic_param_03_from_text').value = '1'; 
+    document.getElementById('Generic_param_03_used').checked = true;
+    
+    document.getElementById('Generic_param_04_text').value = 'ASYNC_RESET_ACTIVE'; 
+    document.getElementById('Generic_param_04_dropdown_type').value = 'std_logic'; 
+    document.getElementById('Generic_param_04_from_text').value = '1'; 
+    document.getElementById('Generic_param_04_used').checked = true;
+    
+    document.getElementById('Port_01_text').value = 'clock'; 
+    document.getElementById('Port_01_dropdown_way').value = 'in'; 
+    document.getElementById('Port_01_used').checked = true;
+    
+    document.getElementById('Port_02_text').value = 'async_reset'; 
+    document.getElementById('Port_02_dropdown_way').value = 'in'; 
+    document.getElementById('Port_02_used').checked = true;
+    
+    document.getElementById('Port_03_text').value = 'sync_reset'; 
+    document.getElementById('Port_03_dropdown_way').value = 'in'; 
+    document.getElementById('Port_03_used').checked = true;
+
+}
+
 //console.log(get_used_libraries());
 
 </script>
@@ -477,7 +574,7 @@ p    {color: red;}
 <tr>    
     <td> <button onclick="init_default_design()">Default design</button>  </td>
      <td> <button onclick="init_axiS_design()"> Axi Stream master slave</button>  </td>   
-      <td> <button onclick="myFunction()">3</button>  </td>  
+      <td> <button onclick="init_reset_design()"> Reset design</button>  </td>  
 </tr> 
 </table> 
 
@@ -518,7 +615,156 @@ p    {color: red;}
 <br>
 
 
+<table border="0" cellpadding="1px" cellspacing="1px" align="center"> 
 
+
+
+<tr>                                                                   
+  <td>Generic_param_01</td>                                                     
+  <td> <input type = "text" id = "Generic_param_01_text" /> </td>               
+  <td>                                                                 
+    <select id = "Generic_param_01_dropdown_type">                              
+        <option value = "integer" selected>integer</option>   
+        <option value = "boolean" >boolean</option>   
+        <option value = "std_logic" >std_logic</option>   
+    </select>                                                          
+   </td>                                                               
+  <td> value </td>                                                      
+  <td> <input type = "text" id = "Generic_param_01_from_text" size="1"/> </td>  
+  <td> used </td>                                                      
+  <td> <input type = "checkbox" id = "Generic_param_01_used" value = "on"> </td>
+</tr>                                                                  
+
+
+
+<tr>                                                                   
+  <td>Generic_param_02</td>                                                     
+  <td> <input type = "text" id = "Generic_param_02_text" /> </td>               
+  <td>                                                                 
+    <select id = "Generic_param_02_dropdown_type">                              
+        <option value = "integer" selected>integer</option>   
+        <option value = "boolean" >boolean</option>   
+        <option value = "std_logic" >std_logic</option>   
+    </select>                                                          
+   </td>                                                               
+  <td> value </td>                                                      
+  <td> <input type = "text" id = "Generic_param_02_from_text" size="1"/> </td>  
+  <td> used </td>                                                      
+  <td> <input type = "checkbox" id = "Generic_param_02_used" value = "on"> </td>
+</tr>                                                                  
+
+
+
+<tr>                                                                   
+  <td>Generic_param_03</td>                                                     
+  <td> <input type = "text" id = "Generic_param_03_text" /> </td>               
+  <td>                                                                 
+    <select id = "Generic_param_03_dropdown_type">                              
+        <option value = "integer" selected>integer</option>   
+        <option value = "boolean" >boolean</option>   
+        <option value = "std_logic" >std_logic</option>   
+    </select>                                                          
+   </td>                                                               
+  <td> value </td>                                                      
+  <td> <input type = "text" id = "Generic_param_03_from_text" size="1"/> </td>  
+  <td> used </td>                                                      
+  <td> <input type = "checkbox" id = "Generic_param_03_used" value = "on"> </td>
+</tr>                                                                  
+
+
+
+<tr>                                                                   
+  <td>Generic_param_04</td>                                                     
+  <td> <input type = "text" id = "Generic_param_04_text" /> </td>               
+  <td>                                                                 
+    <select id = "Generic_param_04_dropdown_type">                              
+        <option value = "integer" selected>integer</option>   
+        <option value = "boolean" >boolean</option>   
+        <option value = "std_logic" >std_logic</option>   
+    </select>                                                          
+   </td>                                                               
+  <td> value </td>                                                      
+  <td> <input type = "text" id = "Generic_param_04_from_text" size="1"/> </td>  
+  <td> used </td>                                                      
+  <td> <input type = "checkbox" id = "Generic_param_04_used" value = "on"> </td>
+</tr>                                                                  
+
+
+
+<tr>                                                                   
+  <td>Generic_param_05</td>                                                     
+  <td> <input type = "text" id = "Generic_param_05_text" /> </td>               
+  <td>                                                                 
+    <select id = "Generic_param_05_dropdown_type">                              
+        <option value = "integer" selected>integer</option>   
+        <option value = "boolean" >boolean</option>   
+        <option value = "std_logic" >std_logic</option>   
+    </select>                                                          
+   </td>                                                               
+  <td> value </td>                                                      
+  <td> <input type = "text" id = "Generic_param_05_from_text" size="1"/> </td>  
+  <td> used </td>                                                      
+  <td> <input type = "checkbox" id = "Generic_param_05_used" value = "on"> </td>
+</tr>                                                                  
+
+
+
+<tr>                                                                   
+  <td>Generic_param_06</td>                                                     
+  <td> <input type = "text" id = "Generic_param_06_text" /> </td>               
+  <td>                                                                 
+    <select id = "Generic_param_06_dropdown_type">                              
+        <option value = "integer" selected>integer</option>   
+        <option value = "boolean" >boolean</option>   
+        <option value = "std_logic" >std_logic</option>   
+    </select>                                                          
+   </td>                                                               
+  <td> value </td>                                                      
+  <td> <input type = "text" id = "Generic_param_06_from_text" size="1"/> </td>  
+  <td> used </td>                                                      
+  <td> <input type = "checkbox" id = "Generic_param_06_used" value = "on"> </td>
+</tr>                                                                  
+
+
+
+<tr>                                                                   
+  <td>Generic_param_07</td>                                                     
+  <td> <input type = "text" id = "Generic_param_07_text" /> </td>               
+  <td>                                                                 
+    <select id = "Generic_param_07_dropdown_type">                              
+        <option value = "integer" selected>integer</option>   
+        <option value = "boolean" >boolean</option>   
+        <option value = "std_logic" >std_logic</option>   
+    </select>                                                          
+   </td>                                                               
+  <td> value </td>                                                      
+  <td> <input type = "text" id = "Generic_param_07_from_text" size="1"/> </td>  
+  <td> used </td>                                                      
+  <td> <input type = "checkbox" id = "Generic_param_07_used" value = "on"> </td>
+</tr>                                                                  
+
+
+
+<tr>                                                                   
+  <td>Generic_param_08</td>                                                     
+  <td> <input type = "text" id = "Generic_param_08_text" /> </td>               
+  <td>                                                                 
+    <select id = "Generic_param_08_dropdown_type">                              
+        <option value = "integer" selected>integer</option>   
+        <option value = "boolean" >boolean</option>   
+        <option value = "std_logic" >std_logic</option>   
+    </select>                                                          
+   </td>                                                               
+  <td> value </td>                                                      
+  <td> <input type = "text" id = "Generic_param_08_from_text" size="1"/> </td>  
+  <td> used </td>                                                      
+  <td> <input type = "checkbox" id = "Generic_param_08_used" value = "on"> </td>
+</tr>                                                                 
+ 
+</table>
+
+
+<br>
 
 
 <table border="0" cellpadding="1px" cellspacing="1px" align="center">  

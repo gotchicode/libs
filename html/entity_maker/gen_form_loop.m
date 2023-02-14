@@ -42,7 +42,8 @@ for k=1:8
     fprintf(fid, '  <td>                                                                 \n');
     fprintf(fid, '    <select id = "Generic_param_0%d_dropdown_type">                              \n',k);
     fprintf(fid, '        <option value = "integer" selected>integer</option>   \n');
-    fprintf(fid, '        <option value = "boolean" selected>boolean</option>   \n');
+    fprintf(fid, '        <option value = "boolean" >boolean</option>   \n');
+    fprintf(fid, '        <option value = "std_logic" >std_logic</option>   \n');
     fprintf(fid, '    </select>                                                          \n');
     fprintf(fid, '   </td>                                                               \n');
     fprintf(fid, '  <td> value </td>                                                      \n');
