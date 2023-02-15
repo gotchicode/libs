@@ -97,6 +97,24 @@ function get_generic_used_array(){
 
 }
 
+function get_generic_values_array(){
+
+    var local_generic_values_array = [];
+    
+    local_generic_values_array[0] = document.getElementById('Generic_param_01_from_text').value;
+    local_generic_values_array[1] = document.getElementById('Generic_param_02_from_text').value;
+    local_generic_values_array[2] = document.getElementById('Generic_param_03_from_text').value;
+    local_generic_values_array[3] = document.getElementById('Generic_param_04_from_text').value;
+    local_generic_values_array[4] = document.getElementById('Generic_param_04_from_text').value;
+    local_generic_values_array[5] = document.getElementById('Generic_param_05_from_text').value;
+    local_generic_values_array[6] = document.getElementById('Generic_param_06_from_text').value;
+    local_generic_values_array[7] = document.getElementById('Generic_param_07_from_text').value;
+
+    
+    return local_generic_values_array;
+
+}
+
 function get_port_ids_array(){
 
     var local_port_ids_array = [];
@@ -284,6 +302,17 @@ function get_port_used_array(){
 
 }
 
+function get_fill_template_process(){
+    var local_fill_template_process = [];
+    
+    local_fill_template_process[0] = document.getElementById('insert_template_clk_process').checked;
+    local_fill_template_process[1] = document.getElementById('insert_template_clk_async_process').checked;
+    local_fill_template_process[2] = document.getElementById('insert_template_clk_async_sync_process').checked;
+    local_fill_template_process[3] = document.getElementById('insert_template_clk_sync_process').checked;
+    
+    return local_fill_template_process;
+}
+
 function find_last_used(array_in, nb_elem){
   var local_var;
 
@@ -340,6 +369,7 @@ function run_generation(){
   var local_space_ids_array;
   var local_space_ids_array_extended;
   var local_string_array_max_length;
+  var is_there_a_generic_parameter;
 
   local_libraries_array = get_used_libraries();
   local_space_ids_array = get_space_ids_array();
@@ -349,6 +379,12 @@ function run_generation(){
   local_port_range_min_array = get_port_range_min_array();
   local_port_inout_array = get_port_inout_array();
   local_port_used_array = get_port_used_array();
+  local_generic_used_array = get_generic_used_array();
+  local_generic_ids_array = get_generic_ids_array();
+  local_generic_types_array = get_generic_types_array();
+  local_generic_values_array = get_generic_values_array();
+  local_fill_template_process = get_fill_template_process();
+
 
   //////////////////////////////////////////////////
   // FILL libraries
@@ -374,14 +410,76 @@ function run_generation(){
   //////////////////////////////////////////////////
   local_string = local_string + '\n';
   local_string = local_string + 'entity ' +  local_space_ids_array[0] + ' is\n'
+  
+  //////////////////////////////////////////////////
+  // FILL generic map
+  //////////////////////////////////////////////////
+  local_generic_ids_array_extended = align_items_to_max_length(local_generic_ids_array,8);
+  
+  is_there_a_generic_parameter = 0;
+  for (let i = 0; i < 8; i++) {
+    if (local_generic_used_array[i]==true){
+      is_there_a_generic_parameter = is_there_a_generic_parameter+1;
+      //console.log("used" + i);
+    }
+  }
+  //console.log("is_there_a_generic_parameter=" + is_there_a_generic_parameter);
+  
+  if (is_there_a_generic_parameter>0){
+    local_string = local_string + 'generic(\n';
+    
+      for (let i = 0; i < 8; i++) {
+        // check if used
+        if (local_generic_used_array[i]==true){
+        
+          // Check if it is an STD_LOGIC
+          if (local_generic_types_array[i]=='std_logic'){
+            //console.log("std_logic" + i);
+            if (find_last_used(local_generic_used_array, 8)==i){ //Check if it is the last item
+              //local_string = local_string + '    ' + local_space_ids_array_extended[i] + ' : ' + local_port_inout_array[i] + ' std_logic\n);' + '\n';
+                local_string = local_string + '    ' + local_generic_ids_array_extended[i] + ' : ' +  ' std_logic:=\'' + local_generic_values_array[i] + '\'\n);' + '\n';
+            }else {
+              //local_string = local_string + '    ' + local_space_ids_array_extended[i] + ' : ' + local_port_inout_array[i] + ' std_logic;' + '\n';
+              local_string = local_string + '    ' + local_generic_ids_array_extended[i] + ' : ' +  ' std_logic:=\'' + local_generic_values_array[i] + '\';\n';
+            }
+          }
+          
+          // Check if it is an integer
+          if (local_generic_types_array[i]=='integer'){
+            //console.log("std_logic" + i);
+            if (find_last_used(local_generic_used_array, 8)==i){ //Check if it is the last item
+              //local_string = local_string + '    ' + local_space_ids_array_extended[i] + ' : ' + local_port_inout_array[i] + ' std_logic\n);' + '\n';
+                local_string = local_string + '    ' + local_generic_ids_array_extended[i] + ' : ' +  ' integer:=' + local_generic_values_array[i] + '\n);' + '\n';
+            }else {
+              //local_string = local_string + '    ' + local_space_ids_array_extended[i] + ' : ' + local_port_inout_array[i] + ' std_logic;' + '\n';
+              local_string = local_string + '    ' + local_generic_ids_array_extended[i] + ' : ' +  ' integer:=' + local_generic_values_array[i] + ';\n';
+            }
+          }
+          
+          // Check if it is an boolean
+          if (local_generic_types_array[i]=='boolean'){
+            //console.log("std_logic" + i);
+            if (find_last_used(local_generic_used_array, 8)==i){ //Check if it is the last item
+              //local_string = local_string + '    ' + local_space_ids_array_extended[i] + ' : ' + local_port_inout_array[i] + ' std_logic\n);' + '\n';
+                local_string = local_string + '    ' + local_generic_ids_array_extended[i] + ' : ' +  ' boolean:=' + local_generic_values_array[i] + '\n);' + '\n';
+            }else {
+              //local_string = local_string + '    ' + local_space_ids_array_extended[i] + ' : ' + local_port_inout_array[i] + ' std_logic;' + '\n';
+              local_string = local_string + '    ' + local_generic_ids_array_extended[i] + ' : ' +  ' boolean:=' + local_generic_values_array[i] + ';\n';
+            }
+          }
 
+        } //end if
+      } //end for
+  
+  } //end if
+  
   //////////////////////////////////////////////////
   // FILL ports
   //////////////////////////////////////////////////
   local_string = local_string + 'port(\n';
 
   //console.log("max used: " + find_last_used(local_port_used_array, 20));
-  console.log("max length: " + get_string_array_max_length(local_port_ids_array, 20));
+  //console.log("max length: " + get_string_array_max_length(local_port_ids_array, 20));
   local_space_ids_array_extended = align_items_to_max_length(local_port_ids_array,20);
   //local_string_array_max_length
 
@@ -420,6 +518,55 @@ function run_generation(){
   local_string = local_string + '\n';
   local_string = local_string + 'architecture ' + local_space_ids_array[1] + ' of ' +  local_space_ids_array[0] + ' is\n'
   local_string = local_string +'begin\n\n\n';
+  
+  //////////////////////////////////////////////////
+  // Fill template processes
+  //////////////////////////////////////////////////
+  
+  if (local_fill_template_process[0]==true){
+    local_string = local_string + 'template_pr: process(__CLOCK__)     \n';
+    local_string = local_string + 'begin                               \n';
+    local_string = local_string + '    if rising_edge(__CLOCK__) then  \n';
+    local_string = local_string + '    end if;                         \n';
+    local_string = local_string + 'end process;                        \n\n\n';
+    
+  }
+  
+  if (local_fill_template_process[1]==true){
+    local_string = local_string + 'template_pr: process(__CLOCK__, __ASYNC_RESET__)     \n';
+    local_string = local_string + 'begin                               \n';
+    local_string = local_string + '    if __ASYNC_RESET__=__ASYNC_RESET_ACTIVE__ then\n';
+    local_string = local_string + '    elsif rising_edge(__CLOCK__) then  \n';
+    local_string = local_string + '    end if;                         \n';
+    local_string = local_string + 'end process;                        \n\n\n';
+    
+  }
+  
+  if (local_fill_template_process[2]==true){
+    local_string = local_string + 'template_pr: process(__CLOCK__, __ASYNC_RESET__)     \n';
+    local_string = local_string + 'begin                               \n';
+    local_string = local_string + '    if __ASYNC_RESET__=__ASYNC_RESET_ACTIVE__ then\n';
+    local_string = local_string + '    elsif rising_edge(__CLOCK__) then  \n';
+    local_string = local_string + '        if __SYNC_RESET__=__SYNC_RESET_ACTIVE__\n';
+    local_string = local_string + '        end if;\n';
+    local_string = local_string + '    end if;                         \n';
+    local_string = local_string + 'end process;                        \n\n\n';
+    
+  }
+  
+  if (local_fill_template_process[3]==true){
+    local_string = local_string + 'template_pr: process(__CLOCK__)     \n';
+    local_string = local_string + 'begin                               \n';
+    local_string = local_string + '    if rising_edge(__CLOCK__) then  \n';
+    local_string = local_string + '        if __SYNC_RESET__=__SYNC_RESET_ACTIVE__\n';
+    local_string = local_string + '        end if;\n';
+    local_string = local_string + '    end if;                         \n';
+    local_string = local_string + 'end process;                        \n\n\n';
+    
+  }
+  
+  
+
   local_string = local_string +'end ' + local_space_ids_array[1] + ';\n';
 
   document.getElementById('result').value=local_string;
@@ -540,7 +687,7 @@ function init_reset_design(){
     document.getElementById('Generic_param_03_from_text').value = '1'; 
     document.getElementById('Generic_param_03_used').checked = true;
     
-    document.getElementById('Generic_param_04_text').value = 'ASYNC_RESET_ACTIVE'; 
+    document.getElementById('Generic_param_04_text').value = 'SYNC_RESET_ACTIVE'; 
     document.getElementById('Generic_param_04_dropdown_type').value = 'std_logic'; 
     document.getElementById('Generic_param_04_from_text').value = '1'; 
     document.getElementById('Generic_param_04_used').checked = true;
@@ -1268,16 +1415,24 @@ p    {color: red;}
 </tr>                                                                  
 
 
-
-
-
-
 </table> 
-
-
 
 <br>
 
+<table border="0" cellpadding="1px" cellspacing="1px" align="center">  
+<tr>    
+  <td> Insert a template process (clock only):</td>    
+  <td> <input type = "checkbox" id = "insert_template_clk_process" value = "on"> </td> 
+  <td> Insert a template process (clock and async reset):</td>    
+  <td> <input type = "checkbox" id = "insert_template_clk_async_process" value = "on"> </td> 
+  <td> Insert a template process (clock async and sync reset):</td>    
+  <td> <input type = "checkbox" id = "insert_template_clk_async_sync_process" value = "on"> </td> 
+  <td> Insert a template process (clock sync reset):</td>    
+  <td> <input type = "checkbox" id = "insert_template_clk_sync_process" value = "on"> </td> 
+</tr>  
+</table> 
+
+<br>
 
 <table border="0" cellpadding="1px" cellspacing="1px" align="center">  
 <tr>    
@@ -1287,8 +1442,6 @@ p    {color: red;}
 <tr>    
     <td> <button onclick="run_generation()">Run</button>  </td>
 </tr>  
-
-
 
 </table> 
 
