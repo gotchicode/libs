@@ -706,6 +706,35 @@ function init_reset_design(){
 
 }
 
+function createArray(rows, cols) {
+  var arr = [];
+  for (var i = 0; i < rows; i++) {
+    arr[i] = [];
+    for (var j = 0; j < cols; j++) {
+      arr[i][j] = 0;
+    }
+  }
+  return arr;
+}
+
+function import_vhdl_ports(){
+ var text_values= [];
+ var position= [];
+ text_values = document.getElementById('result').value;
+ 
+ //Lower case
+ text_values = text_values.toLowerCase();
+ 
+ //Remove all comments
+ position=text_values.indexOf("--");
+ 
+ 
+ //Display in console
+ console.log(text_values);
+ console.log(position);
+ 
+}
+
 //console.log(get_used_libraries());
 
 </script>
@@ -1441,6 +1470,7 @@ p    {color: red;}
 </tr>  
 <tr>    
     <td> <button onclick="run_generation()">Run</button>  </td>
+    <td> <button onclick="import_vhdl_ports()">Import</button>  </td>
 </tr>  
 
 </table> 
