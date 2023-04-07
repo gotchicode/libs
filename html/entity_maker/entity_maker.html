@@ -719,20 +719,37 @@ function createArray(rows, cols) {
 
 function import_vhdl_ports(){
  var text_values= [];
- var position= [];
+ var position_start= [];
+ var position_end= [];
+ var tmp= [];
+ var enter_loop[];
  text_values = document.getElementById('result').value;
  
  //Lower case
  text_values = text_values.toLowerCase();
  
  //Remove all comments
- position=text_values.indexOf("--");
+ position_start=text_values.indexOf("--");
+ tmp = text_values.slice(position_start);
+ position_end=text_values.indexOf("\n");
+ tmp = text_values.slice(1,position_start) + "\n" +text_values.slice(position_start+position_end);
  
  
  //Display in console
- console.log(text_values);
- console.log(position);
+ console.log(tmp);
+ console.log(position_start);
+ console.log(position_end);
  
+// // Loop to remove all comments
+// enter_loop=1;
+// while (enter_loop) {
+//    // Check if there is a comment
+//        //If there is a comment remove it
+//            // Let the enter_loop at 1
+//        // If there is no comment enter_loop is set a zero
+//    
+// }
+
 }
 
 //console.log(get_used_libraries());
