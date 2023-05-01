@@ -50,3 +50,8 @@ fprintf("=SOMME(C1:C32)\n");
 fprintf("=SOMME(C1:C32)*8\n");
 fprintf("=SOMME(C1:C32)*0.8\n");
 fprintf("=SOMME(C1:C32)*8*0.8\n");
+
+fprintf("=SOMME(C1:C32)\n");
+fprintf("=SOMME(C1:C32)*8\n");
+fprintf("=SOMME(C1:C32)*0.8\n");
+fprintf("=SOMME(C1:C32)*8*0.8\n");

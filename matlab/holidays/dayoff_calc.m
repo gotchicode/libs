@@ -8,7 +8,7 @@ close all;
 ##is_bisextil_const=0;
 
 year_const=2023;
-day_const=7; %Saturday
+day_const=7;
 is_bisextil_const=0;
 
 %Empty table of days

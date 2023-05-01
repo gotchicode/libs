@@ -2,7 +2,7 @@ clc;
 clear all;
 close all;;
 
-filename = 'counter_002';  % Replace with the name of your binary file
+filename = '131072';  % Replace with the name of your binary file
 
 % Open the file and read in the data
 fid = fopen(filename, 'rb');

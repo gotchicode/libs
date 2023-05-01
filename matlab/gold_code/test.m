@@ -53,12 +53,12 @@ for k=1:N
   tmp_out = mod(register1(1) + register2(1),2);
   data_out(k) = tmp_out;
 
-end;
+end
 
-%Check for redundancy
-##selected = (data_out(1+64:1023+64));
-##result_conv = conv(selected,data_out);
-##plot(result_conv);
+%Check autocorrelation
+cross_in1= [data_out data_out data_out data_out];
+cross_in2= data_out;
+crossresult = abs(conv(cross_in1,cross_in2));
 
 %Print to a file 
 fid = fopen("data_out.txt",'w');

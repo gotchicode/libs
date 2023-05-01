@@ -8,7 +8,7 @@ close all;
 %Parameters
 nb_sample = 2^8-1;
 Fsymb = 1;
-Fsamp = 8;
+Fsamp = 2;
 roll_off = 0.5;
 
 %Init
