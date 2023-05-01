@@ -1,30 +1,36 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
+#include <stdint.h>
+#include <string.h>
 
 int main(int argc, char *argv[]) {
     if (argc != 3) {
-        printf("Usage: %s [file size in bytes] [filename]\n", argv[0]);
+        fprintf(stderr, "Usage: %s <num_bytes> <filename>\n", argv[0]);
         return 1;
     }
-
-    long int size = atol(argv[1]);
-    char* filename = argv[2];
-    FILE* fp = fopen(filename, "wb");
-    
+    if (strcmp(argv[1], "help") == 0) {
+        printf("Usage: %s <num_bytes> <filename>\n", argv[0]);
+        printf("Writes a binary file with the specified number of bytes,\n");
+        printf("incrementing from 0 to num_bytes-1, with the specified filename.\n");
+        return 0;
+    }
+    int num_bytes = atoi(argv[1]);
+    if (num_bytes <= 0) {
+        fprintf(stderr, "Invalid number of bytes: %s\n", argv[1]);
+        return 1;
+    }
+    FILE *fp = fopen(argv[2], "wb");
     if (!fp) {
-        printf("Error: Unable to open file %s\n", filename);
+        perror("Failed to open file");
         return 1;
     }
-
-    // Generate random values and write to file
-    srand(time(NULL));
-    for (long int i = 0; i < size; i += sizeof(int)) {
-        int value = rand();
-        fwrite(&value, sizeof(int), 1, fp);
+    uint16_t counter = 0;
+    int num_words = (num_bytes + 1) / 2;
+    for (int i = 0; i < num_words; i++) {
+        counter = rand();
+        fwrite(&counter, sizeof(counter), 1, fp);
+        //counter++;
     }
-
     fclose(fp);
-    printf("Successfully wrote %ld bytes to %s\n", size, filename);
     return 0;
 }
