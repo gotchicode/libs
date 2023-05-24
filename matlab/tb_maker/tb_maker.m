@@ -462,6 +462,7 @@ if use_vunit==1
     fprintf(fid,'ROOT = Path(__file__).parent / "../"                                  \n');
     fprintf(fid,'                                  \n');
     fprintf(fid,'VU = VUnit.from_argv()                                  \n');
+    fprintf(fid,'VU.add_vhdl_builtins()                                  \n');
     fprintf(fid,'                                  \n');
     fprintf(fid,'LIB = VU.add_library("lib")                                  \n');
     fprintf(fid,'LIB.add_source_files( ROOT / "src" / "*.vhd")                                  \n');
