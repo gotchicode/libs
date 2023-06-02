@@ -3,8 +3,8 @@ clear all;
 close all;
 
 %Parameters
-nb_size=2^15;
-snr_db=15;
+nb_size=2^16;
+snr_db=10;
 snr=10^(snr_db/10);
 modu='QPSK';
 use_seed=0;
@@ -34,7 +34,7 @@ while(1)
   total_errors=total_errors+sum(errors);
   total_bits=total_bits+nb_size;
   total_ber=total_errors/total_bits;
-  fprintf('snr_db=%f \t total_errors=%d \t total_bits=%d\tber=%f\n',snr_db,total_errors,total_bits,total_ber);
+  fprintf('snr_db=%f \t total_errors=%d \t total_bits=%d\tber=%f/%f.10e-%d\n',snr_db,total_errors,total_bits,total_ber,total_ber*10^(-1*floor(log10(total_ber))),-1*floor(log10(total_ber)));
 
 end
 
