@@ -97,11 +97,34 @@ H_12_1k = H;
 ##  fprintf('printing %d row\n',m);
 ##end
 ##fprintf('finished to print\n');
-##
+
+
 ##%Print to a file
 ##print (1, "test.pdf", "-dpdflatexstandalone");
 ##fprintf('finished to print in file\n');
 ##close all;
+
+% Create a blank image of size 200x200 pixels
+width = 2560;
+height =  1536;
+image = zeros(height, width, 3); % 3 for RGB channels
+####% Set a pixel at position (100, 100) to red (255, 0, 0)
+####image(100, 100, :) = [255, 0, 0];
+####% Set a pixel at position (150, 50) to green (0, 255, 0)
+####image(150, 50, :) = [0, 255, 0];
+####% Set a pixel at position (75, 175) to blue (0, 0, 255)
+####image(75, 175, :) = [0, 0, 255];
+for m=1:1536
+  for n=1:2560
+    if H(m,n)==1
+      image(m, n, :) = [255, 0, 0];
+    else
+      image(m, n, :) = [255, 255, 255];
+    end
+  end
+end
+% Save the image as a bitmap
+imwrite(image, 'output.bmp');
 
 
 %------------------------------------------
@@ -128,5 +151,5 @@ G = G(:,1:end-M);
 
 ##P_inv_test = block_inv_modulo_2(P,1);
 
-max_recursion_depth (2048);
-P_inv_test = block_inv_modulo_m_n(P,1)
+##max_recursion_depth (2048);
+##P_inv_test = block_inv_modulo_m_n(P,1)
