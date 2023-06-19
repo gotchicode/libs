@@ -746,8 +746,8 @@ function import_vhdl_ports(){
         enter_loop = 0;
      }else{
         tmp = text_values.slice(position_start);
-        position_end=text_values.indexOf("\n");
-        tmp = text_values.slice(1,position_start) + "\n" +text_values.slice(position_start+position_end);
+        position_end=tmp.indexOf("\n");
+        tmp = text_values.slice(0,position_start) +text_values.slice(position_start+position_end);
         text_values = tmp;
      }
      
