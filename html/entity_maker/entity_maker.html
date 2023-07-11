@@ -717,54 +717,165 @@ function createArray(rows, cols) {
   return arr;
 }
 
-function import_vhdl_ports(){
- var text_values= [];
- var position_start= [];
- var position_end= [];
- var tmp= [];
- var enter_loop=[];
- text_values = document.getElementById('result').value;
- 
- //Lower case
- text_values = text_values.toLowerCase();
- 
-// //Remove all comments
-// position_start=text_values.indexOf("--");
-// tmp = text_values.slice(position_start);
-// position_end=text_values.indexOf("\n");
-// tmp = text_values.slice(1,position_start) + "\n" +text_values.slice(position_start+position_end);
+function listVhdlGenerics(vhdlCode) {
+  // Remove comments from VHDL code
+  vhdlCode = vhdlCode.replace(/--.*$/gm, '');
+
+  // Extract entity name
+  const entityMatch = vhdlCode.match(/entity\s+(\w+)\s+is/i);
+  if (!entityMatch) {
+    console.log('No entity found in the VHDL code.');
+    return;
+  }
+  const entityName = entityMatch[1];
+
+  // Extract generic declarations
+  const genericDeclarationRegex = new RegExp(
+    `entity\\s+${entityName}\\s+is[^;]+?generic\\s*\\((.*?)\\);`,
+    'is'
+  );
+  const genericDeclarationMatch = vhdlCode.match(genericDeclarationRegex);
+  if (!genericDeclarationMatch) {
+    console.log('No generic declarations found in the VHDL code.');
+    return;
+  }
+  const genericDeclaration = genericDeclarationMatch[1];
+
+  // Extract individual generic details
+  const genericRegex = /(\w+)\s*:\s*(?:integer|std_logic_vector\s*\(\s*(\d+)\s+downto\s+(\d+)\s*\))(?:\s*:=\s*(\S+))?/gi;
+  const generics = [];
+  let match;
+  while ((match = genericRegex.exec(genericDeclaration)) !== null) {
+    const genericName = match[1];
+    const type = match[2] ? `std_logic_vector(${match[2]} downto ${match[3]})` : 'integer';
+    const defaultValue = match[4] ? match[4].replace(';', '') : 'Not initialized';
+    generics.push({ genericName, type, defaultValue });
+  }
+
+  // Generate the table
+  console.table(generics);
+}
 
 
- // Loop to remove all comments
- enter_loop=1;
- while (enter_loop) {
- // Check if there is a comment
-    position_start=text_values.indexOf("--");
-     //If there is a comment remove it
-     if (position_start==-1)
-     {
-        enter_loop = 0;
-     }else{
-        tmp = text_values.slice(position_start);
-        position_end=tmp.indexOf("\n");
-        tmp = text_values.slice(0,position_start) +text_values.slice(position_start+position_end);
-        text_values = tmp;
-     }
-     
-         // Let the enter_loop at 1
-     // If there is no comment enter_loop is set a zero
-    console.log(position_start);
-    console.log(position_end);
- 
- }
- 
- //Display in console
- console.log(tmp);
- console.log(position_start);
- console.log(position_end);
- 
+function listVhdlPorts(vhdlCode) {
+  // Remove comments from VHDL code
+  vhdlCode = vhdlCode.replace(/--.*$/gm, '');
+
+  // Extract entity name
+  const entityMatch = vhdlCode.match(/entity\s+(\w+)\s+is/i);
+  if (!entityMatch) {
+    console.log('No entity found in the VHDL code.');
+    return;
+  }
+  const entityName = entityMatch[1];
+
+  // Extract port declarations
+  const portDeclarationRegex = new RegExp(
+    `entity\\s+${entityName}\\s+is[^;]+?port\\s*\\((.*?)\\);`,
+    'is'
+  );
+  const portDeclarationMatch = vhdlCode.match(portDeclarationRegex);
+  if (!portDeclarationMatch) {
+    console.log('No port declarations found in the VHDL code.');
+    return;
+  }
+  const portDeclaration = portDeclarationMatch[1];
+
+  // Extract individual port details
+  const portRegex = /(\w+)\s*:\s*(?:in|out|inout)\s*(?:(std_logic_vector)\s*\(\s*(\d+)\s+downto\s+(\d+)\s*\)|std_logic)/gi;
+  const ports = [];
+  let match;
+  while ((match = portRegex.exec(portDeclaration)) !== null) {
+    const portName = match[1];
+    const type = match[2]
+      ? `std_logic_vector(${match[3]} downto ${match[4]})`
+      : 'std_logic';
+    ports.push({ portName, type });
+  }
+
+  // Generate the table
+  console.table(ports);
+}
+
+
+
+
+
+function import_vhdl(){
+
+  var text_values= [];
+  text_values = document.getElementById('result').value;
+
+  listVhdlGenerics(text_values);
+  listVhdlPorts(text_values);
+
 
 }
+
+// var text_values= [];
+// var position_start= [];
+// var position_end= [];
+// var tmp= [];
+// var enter_loop=[];
+// text_values = document.getElementById('result').value;
+// 
+// //Lower case
+// text_values = text_values.toLowerCase();
+// 
+//// //Remove all comments
+//// position_start=text_values.indexOf("--");
+//// tmp = text_values.slice(position_start);
+//// position_end=text_values.indexOf("\n");
+//// tmp = text_values.slice(1,position_start) + "\n" +text_values.slice(position_start+position_end);
+//
+//
+// // Loop to remove all comments
+// enter_loop=1;
+// while (enter_loop) {
+// // Check if there is a comment
+//    position_start=text_values.indexOf("--");
+//     //If there is a comment remove it
+//     if (position_start==-1)
+//     {
+//        enter_loop = 0;
+//     }else{
+//        tmp = text_values.slice(position_start);
+//        position_end=tmp.indexOf("\n");
+//        tmp = text_values.slice(0,position_start) +text_values.slice(position_start+position_end);
+//        text_values = tmp;
+//     }
+//     
+//         // Let the enter_loop at 1
+//     // If there is no comment enter_loop is set a zero
+//    console.log(position_start);
+//    console.log(position_end);
+// 
+// }
+// 
+// //Display in console
+// console.log(tmp);
+// console.log(position_start);
+// console.log(position_end);
+//
+//  // find generics
+//  var index_entity;
+//  var index_is;
+//  var index_generic;
+//  var index_bracket_first;
+//  var index_bracket_last;
+//
+//  //find entity
+//  index_entity=text_values.indexOf("entity");
+//  index_is=text_values.indexOf("is");
+//  index_generic=text_values.indexOf("generic");
+//  index_bracket_first=text_values.indexOf("(");
+//  index_bracket_first=text_values.indexOf(")");
+
+
+
+ 
+
+//}
 
 //console.log(get_used_libraries());
 
@@ -1501,7 +1612,7 @@ p    {color: red;}
 </tr>  
 <tr>    
     <td> <button onclick="run_generation()">Run</button>  </td>
-    <td> <button onclick="import_vhdl_ports()">Import</button>  </td>
+    <td> <button onclick="import_vhdl()">Import</button>  </td>
 </tr>  
 
 </table> 
