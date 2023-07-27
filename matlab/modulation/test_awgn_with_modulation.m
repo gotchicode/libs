@@ -3,9 +3,10 @@ clear all;
 close all;
 
 %Parameters
-nb_size=2^16;
-snr_db=10;
-snr=10^(snr_db/10);
+nb_size=2^15;
+K=2; %number of bit per symbol
+EbN0_dB = 10; 
+snr_db= EbN0_dB + 10 * log10(K) ;
 modu='QPSK';
 use_seed=0;
 display=0;
@@ -23,8 +24,9 @@ while(1)
   data_modulated=mapper(data_in_sequence,modu);
 
   %Add AWGN
-  data_with_noise=add_awgn(data_modulated,snr,use_seed,display);
-
+##  data_with_noise=add_awgn(data_modulated,snr,use_seed,display);
+  data_with_noise = add_awgn_noise(data_modulated,snr_db);
+  
   %Demodulate
   data_demodulated=demapper(data_with_noise,modu);
 
@@ -34,7 +36,8 @@ while(1)
   total_errors=total_errors+sum(errors);
   total_bits=total_bits+nb_size;
   total_ber=total_errors/total_bits;
-  fprintf('snr_db=%f \t total_errors=%d \t total_bits=%d\tber=%f/%f.10e-%d\n',snr_db,total_errors,total_bits,total_ber,total_ber*10^(-1*floor(log10(total_ber))),-1*floor(log10(total_ber)));
+##  fprintf('snr_db=%f \t total_errors=%d \t total_bits=%d\tber=%f/%f.10e-%d\n',snr_db,total_errors,total_bits,total_ber,total_ber*10^(-1*floor(log10(total_ber))),-1*floor(log10(total_ber)));
+  fprintf('snr_db=%f \t total_errors=%d \t total_bits=%d\tber=%d\n',snr_db,total_errors,total_bits,total_ber);
 
 end
 
