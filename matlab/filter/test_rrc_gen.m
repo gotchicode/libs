@@ -7,7 +7,7 @@ close all;
 %Parameters
 nb_sample = 2^10;
 Fsymb = 1;
-Fsamp = 4;
+Fsamp = 2;
 roll_off = 0.5;
 manual_gain=1;
 
@@ -15,7 +15,7 @@ manual_gain=1;
 %Init
 Ts=1/Fsymb;
 Tsamp=1/Fsamp;
-t=(-4:Tsamp:4);
+t=(-5.5:Tsamp:5.5);
 
 %Filter coefficients
 h_zero = 1/Ts*(1+roll_off*(4/pi-1));
