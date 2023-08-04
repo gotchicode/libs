@@ -4,11 +4,11 @@ close all;
 
 %RRC Parameters
 Fsymb = 1;
-Fsamp = 1024;
+Fsamp = 16;
 roll_off = 1;
 
 %Implementation taps (signed)
-n_bits=8;
+n_bits=16;
 
 %Calculate RRC taps
 h = rrc_function(Fsymb, Fsamp, roll_off);

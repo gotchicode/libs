@@ -4,7 +4,7 @@ close all;
 
 
 %Parameters
-ratio=128;
+ratio=32;
 ntaps=8;
 ntaps=ntaps*ratio+1;
 
