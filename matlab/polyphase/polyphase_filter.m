@@ -1,6 +1,6 @@
 function test_vector_out = polyphase_filter(test_vector_in,h,Fsamp,Fsymb)
 
-    test_vector_out = zeros(1,1024*Fsamp/Fsymb);
+    test_vector_out = zeros(1,length(test_vector_in)*Fsamp/Fsymb);
     kk=1;
 
     %Create table index

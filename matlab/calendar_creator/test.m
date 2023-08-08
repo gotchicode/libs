@@ -5,7 +5,7 @@ close all;
 %disp(first_day_of_month(2023, 4)); % affichera "7" pour un dimanche
 
 %Select the month
-selected_month=4;
+selected_month=7;
 selected_year=2023;
 
 %Work out the first day of the month

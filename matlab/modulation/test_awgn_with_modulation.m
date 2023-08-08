@@ -5,7 +5,7 @@ close all;
 %Parameters
 nb_size=2^15;
 K=2; %number of bit per symbol
-EbN0_dB = 10; 
+EbN0_dB = 11; 
 snr_db= EbN0_dB + 10 * log10(K) ;
 modu='QPSK';
 use_seed=0;
