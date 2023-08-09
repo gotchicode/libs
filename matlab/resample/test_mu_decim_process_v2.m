@@ -5,18 +5,18 @@ clear all;
 close all;
 
 %Parameters
-nb_size = 2^6;
+nb_size = 2^8;
 
 %Interp param
 ovr=16;
 Fin=100e6;
-Fout=10e6;
+Fout=20e6;
 debug=1;
 interp_type=3; %0:Linear %1:Cosine %2:Cubic %3:Cubic Paul Breeuwsma
 
 %Data in generation (sinus)
 t=(1/ovr:1/ovr:nb_size/ovr);
-data_in=sin(2*pi*t);
+data_in=sin(2*pi/9*t);
 data=data_in;
 
 %Interpolate
@@ -44,15 +44,23 @@ data_out_fft=data_out_fft-data_out_fft_max;
 
 ##data_fft=20*log10(abs(fftshift(fft(data))));
 ##data_out_fft=20*log10(abs(fftshift(fft(data_out(end-2^16-1:end)))));
+##
+##figure(1);
+##plot(data_fft);
+##
+##figure(2);
+##plot(data_out_fft);
 
-figure(1);
-plot(data_fft);
+figure(3);
+subplot(2,1,1);
+plot(data_in);
 
-figure(2);
-plot(data_out_fft);
+subplot(2,1,2);
+plot(data_out);
 
 
-%-----------------------------------------
-%-- Display EYE DIAGRAM
-%-----------------------------------------
-eyediagram (data_out(nb_size/2+1:end), ovr*2);
+
+##%-----------------------------------------
+##%-- Display EYE DIAGRAM
+##%-----------------------------------------
+##eyediagram (data_out(nb_size/2+1:end), ovr*2);
