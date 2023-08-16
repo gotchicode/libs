@@ -8,7 +8,7 @@ addpath ("../polyphase");
 addpath ("../resample");
 
 %Parameters
-nb_bits = 2^10; %vector length
+nb_bits = 2^12; %vector length
 modu='QPSK';
 nb_symb=modu_bps(modu);
 n_bits = 16; %quantization tap bits
@@ -21,7 +21,8 @@ debug = 0;
 interp_type=3;
 
 %Generate input signal
-data_in_sequence = (round(rand(1,nb_bits)));
+##data_in_sequence = (round(rand(1,nb_bits)));
+data_in_sequence = repmat([1 0 0 1], 1,nb_bits/4);
 
 %Modulate
 data_modulated=mapper(data_in_sequence,modu);
@@ -31,6 +32,7 @@ data_modulated=mapper(data_in_sequence,modu);
 #%Calculate RRC taps
 h = rrc_function(Fsymb, Fsamp, roll_off);
 [h_quant,h_quant_gain] = filter_tap_quant(h, n_bits);
+h_quant = h_quant/h_quant_gain*Fsamp/Fsymb;
 
 %Filter and upsample with a polyphase
 ##filtered_signal = polyphase_filter(data_modulated,h_quant,Fsamp,Fsymb);
