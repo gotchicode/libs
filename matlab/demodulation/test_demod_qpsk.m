@@ -27,7 +27,7 @@ data_in = data_in_I+j*data_in_Q;
 Fin_detect_flag=0;
 Fsymb_detect_flag=0;
 gardner_ted_store_symbol_y0=0;
-nco_accu_tmp_fsymb=2^32/4*3;
+nco_accu_tmp_fsymb=2^32/8*1;
 nco_accu_tmp_fsymb_xovr=0;
 index_resample=0;
 index_rrc_filter=0;
@@ -40,10 +40,13 @@ filter_kernel=zeros(1,length(h_quant));
 downsample_factor = Fresamp/Fsymb;
 downsample_cnt = 0;
 fsymb_x2_flag=0;
+fsymb_x2_sync_flag=0;
+gardner_ted_store_symbol_y1=0;
 nco_accu_tmp_fsymb_xovr_table = zeros(1,length(data_in)); 
 Fin_detect_flag_table= zeros(1,length(data_in));
 Fsymb_detect_flag_table= zeros(1,length(data_in));
 fsymb_x2_flag_table=zeros(1,length(data_in));
+fsymb_x2_flag_sync_table=zeros(1,length(data_in));
 ted_table= zeros(1,length(data_in));
 ted_table_enable_p = zeros(1,length(data_in));
 ted_table_enable_n = zeros(1,length(data_in));
@@ -56,8 +59,10 @@ for k=1:length(data_in_I)
   
     %Running NCO at Fsymb x ovr
     nco_accu_tmp_fsymb_xovr_r1 = nco_accu_tmp_fsymb_xovr;
-    nco_accu_tmp_fsymb_xovr = mod(nco_accu_tmp_fsymb_xovr+Fsymb/Fin*2^32*(Fresamp/Fsymb),2^32);
-##    nco_accu_tmp_fsymb_xovr = mod(nco_accu_tmp_fsymb_xovr+Fresamp/Fin*2^32,2^32);
+    nco_accu_tmp_fsymb_xovr =  mod(nco_accu_tmp_fsymb * (Fresamp/Fsymb),2^32);
+##    nco_accu_tmp_fsymb_xovr_r1 = nco_accu_tmp_fsymb_xovr;
+##    nco_accu_tmp_fsymb_xovr = mod(nco_accu_tmp_fsymb_xovr+Fsymb/Fin*2^32*(Fresamp/Fsymb),2^32);
+####    nco_accu_tmp_fsymb_xovr = mod(nco_accu_tmp_fsymb_xovr+Fresamp/Fin*2^32,2^32);
 
     %Generate the pulse of the Fsymb
     if (k>1 && k<length(data_in)-1) 
@@ -106,7 +111,12 @@ for k=1:length(data_in_I)
     
     %Downsample to symb rate x2
     if Fin_detect_flag==1
-      downsample_cnt = mod(downsample_cnt + 1, downsample_factor);
+      if Fsymb_detect_flag==1
+        downsample_cnt =0;
+      else
+        downsample_cnt = mod(downsample_cnt + 1, downsample_factor);
+      end
+##      fprintf("Fin_detect_flag=%d Fsymb_detect_flag=%d downsample_cnt=%d \n",Fin_detect_flag ,Fsymb_detect_flag ,downsample_cnt);
       if (downsample_cnt==0 || downsample_cnt==downsample_factor/2)
         index_rrc_filter=index_rrc_filter+1;
         data_rrc_filtered_rate_x2(index_rrc_filter) = data_rrc_filtered(index_resample);
@@ -115,13 +125,20 @@ for k=1:length(data_in_I)
       else
         fsymb_x2_flag =0;
       end
+      if downsample_cnt==0
+        fsymb_x2_sync_flag=1;
+       else
+        fsymb_x2_sync_flag=0;
+      end
+      fsymb_x2_flag_sync_table(index_resample)=fsymb_x2_sync_flag;
     else
       fsymb_x2_flag =0;
     end
     
     %Gardner TED at symb rate x2
     if fsymb_x2_flag==1
-      if downsample_cnt==0
+      
+      if fsymb_x2_sync_flag==1
         
         if ( real(data_rrc_filtered_rate_x2(index_rrc_filter))<0 && real(gardner_ted_store_symbol_y0) >0 )
           ted_table(index_rrc_filter) = real(gardner_ted_store_symbol_y1) * ( real(data_rrc_filtered_rate_x2(index_rrc_filter)) - real(gardner_ted_store_symbol_y0) );
@@ -133,11 +150,28 @@ for k=1:length(data_in_I)
           ted_table_enable_n(index_rrc_filter)=-1;
         end
         
-        gardner_ted_store_symbol_y0 = data_rrc_filtered_rate_x2(index_rrc_filter);
       end;
-      if downsample_cnt==downsample_factor/2
-        gardner_ted_store_symbol_y1 = data_rrc_filtered_rate_x2(index_rrc_filter);
-      end;
+      
+      gardner_ted_store_symbol_y0 = gardner_ted_store_symbol_y1;
+      gardner_ted_store_symbol_y1 = data_rrc_filtered_rate_x2(index_rrc_filter);
+      
+##      if downsample_cnt==0
+##        
+##        if ( real(data_rrc_filtered_rate_x2(index_rrc_filter))<0 && real(gardner_ted_store_symbol_y0) >0 )
+##          ted_table(index_rrc_filter) = real(gardner_ted_store_symbol_y1) * ( real(data_rrc_filtered_rate_x2(index_rrc_filter)) - real(gardner_ted_store_symbol_y0) );
+##          ted_table_enable_p(index_rrc_filter)=1;
+##        end
+##        
+##        if ( real(data_rrc_filtered_rate_x2(index_rrc_filter))>0 && real(gardner_ted_store_symbol_y0) <0 )
+##          ted_table(index_rrc_filter) = real(gardner_ted_store_symbol_y1) * ( real(data_rrc_filtered_rate_x2(index_rrc_filter)) - real(gardner_ted_store_symbol_y0) );
+##          ted_table_enable_n(index_rrc_filter)=-1;
+##        end
+##        
+##        gardner_ted_store_symbol_y0 = data_rrc_filtered_rate_x2(index_rrc_filter);
+##      end;
+##      if downsample_cnt==downsample_factor/2
+##        gardner_ted_store_symbol_y1 = data_rrc_filtered_rate_x2(index_rrc_filter);
+##      end;
     end;
     
     
@@ -148,6 +182,7 @@ data_resample = data_resample(1:index_resample);
 data_rrc_filtered = data_rrc_filtered(1:index_resample);
 data_rrc_filtered_rate_x2 = data_rrc_filtered_rate_x2(1:index_rrc_filter);
 fsymb_x2_flag_table = fsymb_x2_flag_table(1:index_resample);
+fsymb_x2_flag_sync_table = fsymb_x2_flag_sync_table(1:index_resample);
 ted_table = ted_table(1:index_rrc_filter);
 ted_table_enable_p = ted_table_enable_p(1:index_rrc_filter);
 ted_table_enable_n = ted_table_enable_n(1:index_rrc_filter);
@@ -188,19 +223,22 @@ data_resample_Q=imag(data_resample);
 
 ##plot(data_rrc_filtered_rate_x2,'.');
 
-##figure(3)
-##plot(real(data_rrc_filtered_rate_x2));
-##hold on;
-##plot(ted_table,'.');
-##hold on;
-##plot(ted_table_enable_p*0.1);
-##hold on;
-##plot(ted_table_enable_n*0.1);
+figure(3)
+plot(real(data_rrc_filtered_rate_x2));
+hold on;
+plot(ted_table,'.');
+hold on;
+plot(ted_table_enable_p*0.1);
+hold on;
+plot(ted_table_enable_n*0.1);
 
-##figure(3);
-##plot(real(data_rrc_filtered));
-##hold on;
-##plot(fsymb_x2_flag_table);
+figure(4);
+plot(real(data_rrc_filtered));
+hold on;
+plot(fsymb_x2_flag_table);
+hold on;
+plot(fsymb_x2_flag_sync_table*0.5);
+
 
 ##figure(5);
 ##EYE_DIAG_data_in = eye_diag(data_in,8);
@@ -209,23 +247,28 @@ data_resample_Q=imag(data_resample);
 ##figure(6);
 ##EYE_DIAG_data_resample_I = eye_diag(data_resample_I,8);
 ##plot(real(EYE_DIAG_data_resample_I(:,end-256:end)));
-
+##
 ##figure(7);
 ##EYE_DIAG_data_rrc_filtered = eye_diag(data_rrc_filtered,8);
-##plot(real(EYE_DIAG_data_rrc_filtered));
-
-##figure(8);
-##EYE_DIAG_data_rrc_filtered_rate_x2 = eye_diag(data_rrc_filtered_rate_x2,4);
-##plot(real(EYE_DIAG_data_rrc_filtered_rate_x2(:,end-256:end)));
+##plot(real(EYE_DIAG_data_rrc_filtered(:,end-256:end)));
+##
+figure(8);
+EYE_DIAG_data_rrc_filtered_rate_x2 = eye_diag(data_rrc_filtered_rate_x2,4);
+plot(real(EYE_DIAG_data_rrc_filtered_rate_x2(:,end-256:end)));
 
 ##figure(8);
 ##plot(data_in_I);
 ##hold on;
 ##plot(Fin_detect_flag_table*0.1);
 
-figure(9);
-plot(Fin_detect_flag_table(1:32));
-hold on;
-plot(Fsymb_detect_flag_table(1:32)*0.1);
+##figure(9);
+##mm=900;
+##kk=64
+##ll=32;
+##plot(data_in_I(mm-kk:mm-ll));
+##hold on;
+##plot(Fin_detect_flag_table(mm-kk:mm-ll)*0.5);
+##hold on;
+##plot(Fsymb_detect_flag_table(mm-kk:mm-ll)*0.25);
 
 

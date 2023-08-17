@@ -21,8 +21,8 @@ debug = 0;
 interp_type=3;
 
 %Generate input signal
-##data_in_sequence = (round(rand(1,nb_bits)));
-data_in_sequence = repmat([1 0 0 1], 1,nb_bits/4);
+data_in_sequence = (round(rand(1,nb_bits)));
+##data_in_sequence = repmat([1 0 0 1], 1,nb_bits/4);
 
 %Modulate
 data_modulated=mapper(data_in_sequence,modu);
