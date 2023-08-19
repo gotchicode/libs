@@ -38,11 +38,14 @@ data_tx_filtered_signal = conv(data_tx_filtered_signal,h_quant);
 
 %Upsample and RRC filter RX
 data_rx_filtered_signal = conv(data_tx_filtered_signal,h_quant);
+data_rx_filtered_signal = data_rx_filtered_signal(33:end);
 
 
 figure(1);
 EYE_DIAG_data_rx_filtered_signal = eye_diag(data_rx_filtered_signal,Fsamp/Fsymb*2);
 x_axis = linspace(-Fsamp/Fsymb,Fsamp/Fsymb,Fsamp/Fsymb*2);
-plot(x_axis,real(EYE_DIAG_data_rx_filtered_signal(:,end-1024:end-512)));
+plot(x_axis,real(EYE_DIAG_data_rx_filtered_signal(:,end-(1024+1024):end-1024)));
+
+##eyediagram (data_rx_filtered_signal, (Fsamp/Fsymb)*2);
 
 
