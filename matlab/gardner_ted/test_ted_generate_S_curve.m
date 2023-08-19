@@ -40,9 +40,9 @@ data_tx_filtered_signal = conv(data_tx_filtered_signal,h_quant);
 data_rx_filtered_signal = conv(data_tx_filtered_signal,h_quant);
 
 
-##figure(1);
-##EYE_DIAG_data_rx_filtered_signal = eye_diag(data_rx_filtered_signal,Fsamp/Fsymb);
-##plot(real(EYE_DIAG_data_rx_filtered_signal(:,end-256:end)));
+figure(1);
+EYE_DIAG_data_rx_filtered_signal = eye_diag(data_rx_filtered_signal,Fsamp/Fsymb*2);
+x_axis = linspace(-Fsamp/Fsymb,Fsamp/Fsymb,Fsamp/Fsymb*2);
+plot(x_axis,real(EYE_DIAG_data_rx_filtered_signal(:,end-1024:end-512)));
 
-eyediagram(data_rx_filtered_signal,Fsamp/Fsymb*2);
 
