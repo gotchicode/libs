@@ -20,6 +20,7 @@ n_bits = 16; %quantization tap bits
 roll_off = 0.5;
 Fsymb=1;
 Fsamp=32;
+Terror=0;
 
 %Generate input signal
 data_in_sequence = (round(rand(1,nb_bits)));
@@ -38,14 +39,19 @@ data_tx_filtered_signal = conv(data_tx_filtered_signal,h_quant);
 
 %Upsample and RRC filter RX
 data_rx_filtered_signal = conv(data_tx_filtered_signal,h_quant);
-data_rx_filtered_signal = data_rx_filtered_signal(33:end);
+data_rx_filtered_signal = data_rx_filtered_signal(Fsamp/Fsymb+1+Terror:end); %Resync 
+
+%Downsample
+data_rx_filtered_down_signal=data_rx_filtered_signal(1:Fsamp/Fsymb*2:end);
 
 
-figure(1);
-EYE_DIAG_data_rx_filtered_signal = eye_diag(data_rx_filtered_signal,Fsamp/Fsymb*2);
-x_axis = linspace(-Fsamp/Fsymb,Fsamp/Fsymb,Fsamp/Fsymb*2);
-plot(x_axis,real(EYE_DIAG_data_rx_filtered_signal(:,end-(1024+1024):end-1024)));
+##figure(1);
+##EYE_DIAG_data_rx_filtered_signal = eye_diag(data_rx_filtered_signal,Fsamp/Fsymb*2);
+##x_axis = linspace(-Fsamp/Fsymb,Fsamp/Fsymb,Fsamp/Fsymb*2);
+##plot(x_axis,real(EYE_DIAG_data_rx_filtered_signal(:,end-(1024+1024):end-1024)));
 
-##eyediagram (data_rx_filtered_signal, (Fsamp/Fsymb)*2);
+eyediagram (data_rx_filtered_signal, (Fsamp/Fsymb)*2);
+##eyediagram (data_rx_filtered_down_signal, 4);
+
 
 
