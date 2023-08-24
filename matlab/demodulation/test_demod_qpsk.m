@@ -6,7 +6,6 @@ close all;
 addpath ("../resample");
 addpath ("../filter");
 addpath ("../misc");
-
 %Parameters
 Fin = 320e6;
 Fresamp=160e6;
@@ -28,7 +27,7 @@ Fin_detect_flag=0;
 Fsymb_detect_flag=0;
 gardner_ted_store_symbol_y0=0;
 ##nco_accu_tmp_fsymb=2^32/8*1;
-nco_accu_tmp_fsymb=2^32/32*4;
+nco_accu_tmp_fsymb=2^32/32*(4+5);
 nco_accu_tmp_fsymb_xovr=0;
 index_resample=0;
 index_rrc_filter=0;
@@ -48,9 +47,12 @@ Fin_detect_flag_table= zeros(1,length(data_in));
 Fsymb_detect_flag_table= zeros(1,length(data_in));
 fsymb_x2_flag_table=zeros(1,length(data_in));
 fsymb_x2_flag_sync_table=zeros(1,length(data_in));
-ted_table= zeros(1,length(data_in));
-ted_table_enable_p = zeros(1,length(data_in));
-ted_table_enable_n = zeros(1,length(data_in));
+ted_table_real= zeros(1,length(data_in));
+ted_table_real_enable_p = zeros(1,length(data_in));
+ted_table_real_enable_n = zeros(1,length(data_in));
+ted_table_imag= zeros(1,length(data_in));
+ted_table_imag_enable_p = zeros(1,length(data_in));
+ted_table_imag_enable_n = zeros(1,length(data_in));
 
 for k=1:length(data_in_I)
   
@@ -142,14 +144,24 @@ for k=1:length(data_in_I)
       
       if fsymb_x2_sync_flag==1
         
+        %Real
         if ( real(data_rrc_filtered(index_resample))<0 && real(gardner_ted_store_symbol_y0) >0 )
-          ted_table(index_resample) = real(gardner_ted_store_symbol_y1) * ( real(data_rrc_filtered(index_resample)) - real(gardner_ted_store_symbol_y0) );
-          ted_table_enable_p(index_resample)=1;
+          ted_table_real(index_resample) = real(gardner_ted_store_symbol_y1) * ( real(data_rrc_filtered(index_resample)) - real(gardner_ted_store_symbol_y0) );
+          ted_table_real_enable_p(index_resample)=1;
+        end
+        if ( real(data_rrc_filtered(index_resample))>0 && real(gardner_ted_store_symbol_y0) <0 )
+          ted_table_real(index_resample) = real(gardner_ted_store_symbol_y1) * ( real(data_rrc_filtered(index_resample)) - real(gardner_ted_store_symbol_y0) );
+          ted_table_real_enable_n(index_resample)=-1;
         end
         
-        if ( real(data_rrc_filtered(index_resample))>0 && real(gardner_ted_store_symbol_y0) <0 )
-          ted_table(index_resample) = real(gardner_ted_store_symbol_y1) * ( real(data_rrc_filtered(index_resample)) - real(gardner_ted_store_symbol_y0) );
-          ted_table_enable_n(index_resample)=-1;
+        %Imag
+        if ( imag(data_rrc_filtered(index_resample))<0 && imag(gardner_ted_store_symbol_y0) >0 )
+          ted_table_imag(index_resample) = imag(gardner_ted_store_symbol_y1) * ( imag(data_rrc_filtered(index_resample)) - imag(gardner_ted_store_symbol_y0) );
+          ted_table_imag_enable_p(index_resample)=1;
+        end
+        if ( imag(data_rrc_filtered(index_resample))>0 && imag(gardner_ted_store_symbol_y0) <0 )
+          ted_table_imag(index_resample) = imag(gardner_ted_store_symbol_y1) * ( imag(data_rrc_filtered(index_resample)) - imag(gardner_ted_store_symbol_y0) );
+          ted_table_imag_enable_n(index_resample)=-1;
         end
         
       end;
@@ -157,7 +169,8 @@ for k=1:length(data_in_I)
       gardner_ted_store_symbol_y0 = gardner_ted_store_symbol_y1;
       gardner_ted_store_symbol_y1 = data_rrc_filtered(index_resample);
 
-    end;
+    end; %end gardner ted
+  
     
     
 end
@@ -168,12 +181,29 @@ data_rrc_filtered = data_rrc_filtered(1:index_resample);
 data_rrc_filtered_rate_x2 = data_rrc_filtered_rate_x2(1:index_rrc_filter);
 fsymb_x2_flag_table = fsymb_x2_flag_table(1:index_resample);
 fsymb_x2_flag_sync_table = fsymb_x2_flag_sync_table(1:index_resample);
-ted_table = ted_table(1:index_resample);
-ted_table_enable_p = ted_table_enable_p(1:index_resample);
-ted_table_enable_n = ted_table_enable_n(1:index_resample);
+ted_table_real = ted_table_real(1:index_resample);
+ted_table_real_enable_p = ted_table_real_enable_p(1:index_resample);
+ted_table_real_enable_n = ted_table_real_enable_n(1:index_resample);
+ted_table_imag = ted_table_imag(1:index_resample);
+ted_table_imag_enable_p = ted_table_imag_enable_p(1:index_resample);
+ted_table_imag_enable_n = ted_table_imag_enable_n(1:index_resample);
 
 data_resample_I=real(data_resample);
 data_resample_Q=imag(data_resample);
+
+##figure(10);
+##start_val=1007;
+##end_val=start_val+64;
+##plot(Fsymb_detect_flag_table(start_val:end_val)*0.25);
+##hold on;
+##plot(Fin_detect_flag_table(start_val:end_val)*0.125);
+##hold on;
+##plot(data_in_I(start_val:end_val));
+##plot(nco_accu_tmp_fsymb_table(start_val:end_val)/2^32);
+##legend('Fsymb detect flag_table', 'Fin detect flag table', 'data in I', 'nco accu tmp fsymb table' );
+##
+##eyediagram(data_rrc_filtered_rate_x2,2);
+
 
 ##%Resampling /2
 ##data_resampled_I= mu_decim_process(data_in_I,Fin,Fout,debug,interp_type);
@@ -207,20 +237,34 @@ data_resample_Q=imag(data_resample);
 ##plot(imag(data_rrc_filtered_rate_x2))
 
 ##plot(data_rrc_filtered_rate_x2,'.');
-
-figure(3)
+##
+##figure(3)
+##plot(real(data_rrc_filtered));
+##hold on;
+##plot(ted_table_real,'.');
+##hold on;
+##plot(ted_table_real_enable_p*0.1);
+##hold on;
+##plot(ted_table_real_enable_n*0.1);
+##hold on;
+##plot(fsymb_x2_flag_sync_table*0.5);
+##hold on;
+##plot(fsymb_x2_flag_table*0.25);
+##fprintf("mean=%d sum=%f nb_p=%d nb_n=%d\n",sum(ted_table_real)/(sum(ted_table_real_enable_p)-sum(ted_table_real_enable_n)), sum(ted_table_real.*ted_table_real), sum(ted_table_real_enable_p), sum(ted_table_real_enable_n)  )
+##
+figure(4)
 plot(real(data_rrc_filtered));
 hold on;
-plot(ted_table,'.');
+plot(ted_table_imag,'.');
 hold on;
-plot(ted_table_enable_p*0.1);
+plot(ted_table_imag_enable_p*0.1);
 hold on;
-plot(ted_table_enable_n*0.1);
+plot(ted_table_imag_enable_n*0.1);
 hold on;
 plot(fsymb_x2_flag_sync_table*0.5);
 hold on;
 plot(fsymb_x2_flag_table*0.25);
-
+fprintf("mean=%d sum=%f nb_p=%d nb_n=%d\n",sum(ted_table_imag)/(sum(ted_table_imag_enable_p)-sum(ted_table_imag_enable_n)), sum(ted_table_imag.*ted_table_imag), sum(ted_table_imag_enable_p), sum(ted_table_imag_enable_n)  )
 
 ##figure(4);
 ##plot(real(data_rrc_filtered));
@@ -241,7 +285,7 @@ plot(fsymb_x2_flag_table*0.25);
 ##figure(7);
 ##EYE_DIAG_data_rrc_filtered = eye_diag(data_rrc_filtered,8);
 ##plot(real(EYE_DIAG_data_rrc_filtered(:,end-256:end)));
-##
+
 ##figure(8);
 ##EYE_DIAG_data_rrc_filtered_rate_x2 = eye_diag(data_rrc_filtered_rate_x2,4);
 ##plot(real(EYE_DIAG_data_rrc_filtered_rate_x2(:,end-256:end)));
@@ -274,10 +318,11 @@ plot(fsymb_x2_flag_table*0.25);
 ##plot(fsymb_x2_flag_sync_table*0.25);
 
 ##figure(12);
-##plot(real(data_rrc_filtered(3240:3260)));
+##plot(real(data_rrc_filtered(3240:3260+10)));
 ##hold on;
-##plot(fsymb_x2_flag_sync_table(3240:3260)*0.25);
+##plot(fsymb_x2_flag_sync_table(3240:3260+10)*0.25);
 ##hold on;
-##plot(fsymb_x2_flag_table(3240:3260)*0.125);
+##plot(fsymb_x2_flag_table(3240:3260+10)*0.125);
+
 
 
