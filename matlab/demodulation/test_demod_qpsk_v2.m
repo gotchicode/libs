@@ -145,15 +145,17 @@ for k=1:length(data_in_I)
     %%-- Timing Error Detector
     %%-----------------------------------
     %Shift data for TED
-    if (Fsymb_x2_pulse=1 && index_symbols>1)
+    if (Fsymb_x2_pulse=1 && index_resample>1)
       ted_samples(2:3) = ted_samples(1:2);
-      ted_samples(1) = data_symbols(index_symbols);
+      ted_samples(1) = data_rrc_filtered(index_resample);
     end
-    
-    %Gardner TED
-    if (Fsymb_pulse=1 && index_symbols>1)
-      [ted_out(index_symbols), ted_out_en(index_symbols)] = gardner_ted(ted_samples(3), ted_samples(2), ted_samples(1));
-    end
+
+##    %Gardner TED
+##    if (Fsymb_pulse=1 && index_resample>1)
+##      [tmp1 tmp2 ] = gardner_ted(ted_samples(3), ted_samples(2), ted_samples(1));
+##      ted_out(index_resample) = tmp1; 
+##      ted_out_en(index_resample) = tmp2;
+##    end
     
     
     
@@ -197,7 +199,7 @@ plot(ADEBUG_TABLE_data_rrc_filtered_I(start_plot:end_plot),'x');
 hold on;
 plot(ADEBUG_TABLE_data_symbols_I(start_plot:end_plot),'o');
 
-figure(2);
-plot(data_symbols,'o');
+##figure(2);
+##plot(data_symbols,'o');
 ##
 ##eyediagram(data_symbols,Fresamp/Fsymb/2);
