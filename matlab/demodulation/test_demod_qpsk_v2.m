@@ -7,6 +7,7 @@ pkg load communications;
 addpath ("../resample");
 addpath ("../filter");
 addpath ("../misc");
+addpath ("../gardner_ted");
 
 %Parameters
 Fin = 320e6;
@@ -43,6 +44,9 @@ data_resample=zeros(1,length(data_in_I));
 filter_kernel=zeros(1,length(h_quant));
 index_symbols=0;
 data_symbols=zeros(1,length(h_quant));
+ted_samples =zeros(1,3);
+ted_out=zeros(1,length(data_in_I));
+ted_out_en=zeros(1,length(data_in_I));
 
 %Debug init
 ADEBUG_TABLE_Fsymb_pulse=zeros(1,length(data_in_I));
@@ -138,6 +142,22 @@ for k=1:length(data_in_I)
     end
     
     %%-----------------------------------
+    %%-- Timing Error Detector
+    %%-----------------------------------
+    %Shift data for TED
+    if (Fsymb_x2_pulse=1 && index_symbols>1)
+      ted_samples(2:3) = ted_samples(1:2);
+      ted_samples(1) = data_symbols(index_symbols);
+    end
+    
+    %Gardner TED
+    if (Fsymb_pulse=1 && index_symbols>1)
+      [ted_out(index_symbols), ted_out_en(index_symbols)] = gardner_ted(ted_samples(3), ted_samples(2), ted_samples(1));
+    end
+    
+    
+    
+    %%-----------------------------------
     %%-- DEBUG
     %%-----------------------------------
     ADEBUG_TABLE_Fsymb_pulse(k) = Fsymb_pulse;
@@ -154,6 +174,8 @@ end
 %%-----------------------------------
 data_resample = data_resample(1:index_resample);
 data_rrc_filtered = data_rrc_filtered(1:index_resample);
+ted_out = ted_out(1:index_resample);
+ted_out_en = ted_out_en(1:index_resample);
 
 %%-----------------------------------
 %%-- DISPLAY
@@ -175,4 +197,7 @@ plot(ADEBUG_TABLE_data_rrc_filtered_I(start_plot:end_plot),'x');
 hold on;
 plot(ADEBUG_TABLE_data_symbols_I(start_plot:end_plot),'o');
 
-eyediagram(data_symbols,Fresamp/Fsymb/2);
+figure(2);
+plot(data_symbols,'o');
+##
+##eyediagram(data_symbols,Fresamp/Fsymb/2);
