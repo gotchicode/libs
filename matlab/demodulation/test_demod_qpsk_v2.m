@@ -17,7 +17,7 @@ interp_type=3;
 roll_off = 0.5;
 n_bits = 16; %quantization tap bits
 debug = 0;
-init_sample_offset=2^32/8*(1);
+init_sample_offset=2^32/1024*(128);
 
 %Load values form a textfile
 data_in_I = csvread("../modulation/mod_I.txt")';
@@ -145,17 +145,17 @@ for k=1:length(data_in_I)
     %%-- Timing Error Detector
     %%-----------------------------------
     %Shift data for TED
-    if (Fsymb_x2_pulse=1 && index_resample>1)
+    if (Fsymb_x2_pulse==1 && index_resample>1)
       ted_samples(2:3) = ted_samples(1:2);
       ted_samples(1) = data_rrc_filtered(index_resample);
     end
 
-##    %Gardner TED
-##    if (Fsymb_pulse=1 && index_resample>1)
-##      [tmp1 tmp2 ] = gardner_ted(ted_samples(3), ted_samples(2), ted_samples(1));
-##      ted_out(index_resample) = tmp1; 
-##      ted_out_en(index_resample) = tmp2;
-##    end
+    %Gardner TED
+    if (Fsymb_pulse==1 && index_resample>1)
+      [tmp1 tmp2 ] = gardner_ted(ted_samples(3), ted_samples(2), ted_samples(1));
+      ted_out(index_resample) = tmp1; 
+      ted_out_en(index_resample) = tmp2;
+    end
     
     
     
@@ -199,7 +199,11 @@ plot(ADEBUG_TABLE_data_rrc_filtered_I(start_plot:end_plot),'x');
 hold on;
 plot(ADEBUG_TABLE_data_symbols_I(start_plot:end_plot),'o');
 
-##figure(2);
-##plot(data_symbols,'o');
+figure(2);
+plot(data_symbols,'o');
+
+figure(3);
+plot(ted_out,'o');
+
 ##
 ##eyediagram(data_symbols,Fresamp/Fsymb/2);
