@@ -17,7 +17,7 @@ interp_type=3;
 roll_off = 0.5;
 n_bits = 16; %quantization tap bits
 debug = 0;
-init_sample_offset=2^32/1024*(128);
+init_sample_offset=2^32/1024*(127);
 
 %Load values form a textfile
 data_in_I = csvread("../modulation/mod_I.txt")';
@@ -40,6 +40,7 @@ Fsymb_ovr_pulse=0;
 Fsymb_ovr_pulse=0;
 Fsymb_x2_pulse=0;
 index_resample=0;
+nco_accu_tmp_fsymb_xovr_buffer=zeros(1,4);
 data_resample=zeros(1,length(data_in_I));
 filter_kernel=zeros(1,length(h_quant));
 index_symbols=0;
@@ -55,6 +56,8 @@ ADEBUG_TABLE_Fsymb_x2_pulse=zeros(1,length(data_in_I));
 ADEBUG_TABLE_data_resample_I=zeros(1,length(data_in_I));
 ADEBUG_TABLE_data_rrc_filtered_I=zeros(1,length(data_in_I));
 ADEBUG_TABLE_data_symbols_I=zeros(1,length(data_in_I));
+ADEBUG_TABLE_nco_accu_tmp_fsymb=zeros(1,length(data_in_I));
+ADEBUG_TABLE_nco_accu_tmp_fsymb_xovr=zeros(1,length(data_in_I));
 
 
 for k=1:length(data_in_I)
@@ -118,7 +121,7 @@ for k=1:length(data_in_I)
       if Fsymb_ovr_pulse==1
         index_resample = index_resample+1;
         data_resample(index_resample) = mu_direct_interp(decimation_samples, nco_accu_tmp_fsymb_xovr/2^32, interp_type,debug);
-        end;
+      end;
     end;
     
     %%-----------------------------------
@@ -165,10 +168,12 @@ for k=1:length(data_in_I)
     ADEBUG_TABLE_Fsymb_pulse(k) = Fsymb_pulse;
     ADEBUG_TABLE_Fsymb_ovr_pulse(k) = Fsymb_ovr_pulse;
     ADEBUG_TABLE_Fsymb_x2_pulse(k) = Fsymb_x2_pulse;
+    ADEBUG_TABLE_nco_accu_tmp_fsymb(k) = nco_accu_tmp_fsymb;
+    ADEBUG_TABLE_nco_accu_tmp_fsymb_xovr(k) = nco_accu_tmp_fsymb_xovr; 
     if (k>1 && Fsymb_ovr_pulse==1) ADEBUG_TABLE_data_resample_I(k) = real(data_resample(index_resample)); end
     if (k>1 && Fsymb_ovr_pulse==1) ADEBUG_TABLE_data_rrc_filtered_I(k) = real(data_rrc_filtered(index_resample)); end
     if (k>1 && Fsymb_pulse==1) ADEBUG_TABLE_data_symbols_I(k) = real(data_symbols(index_symbols)); end
-
+    
 end
 
 %%-----------------------------------
@@ -182,8 +187,8 @@ ted_out_en = ted_out_en(1:index_resample);
 %%-----------------------------------
 %%-- DISPLAY
 %%-----------------------------------
-start_plot=9340;
-end_plot=9390;
+start_plot=2570;
+end_plot=2640;
 figure(1);
 plot(ADEBUG_TABLE_Fsymb_pulse(start_plot:end_plot));
 hold on;
@@ -198,12 +203,18 @@ hold on;
 plot(ADEBUG_TABLE_data_rrc_filtered_I(start_plot:end_plot),'x');
 hold on;
 plot(ADEBUG_TABLE_data_symbols_I(start_plot:end_plot),'o');
+hold on;
+plot(ADEBUG_TABLE_nco_accu_tmp_fsymb(start_plot:end_plot)/2^32+2);
+hold on;
+plot(ADEBUG_TABLE_nco_accu_tmp_fsymb_xovr(start_plot:end_plot)/2^32+2);
 
-figure(2);
-plot(data_symbols,'o');
-
-figure(3);
-plot(ted_out,'o');
+##figure(2);
+##plot(data_symbols,'o');
+##
+##figure(3);
+##plot(ted_out,'o');
 
 ##
 ##eyediagram(data_symbols,Fresamp/Fsymb/2);
+
+
