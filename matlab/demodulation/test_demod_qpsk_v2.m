@@ -8,8 +8,9 @@ addpath ("../resample");
 addpath ("../filter");
 addpath ("../misc");
 addpath ("../gardner_ted");
+addpath ("../control_loop");
 
-%Parameters
+%Parameters overall
 Fin = 320e6;
 Fresamp=160e6;
 Fsymb=40e6;
@@ -18,6 +19,11 @@ roll_off = 0.5;
 n_bits = 16; %quantization tap bits
 debug = 0;
 init_sample_offset=2^32/1024*(256);
+
+%TED loop parameters
+T_ted = 1;
+Bn_ted = 0.000001;
+ksi_ted = sqrt(2)/2;
 
 %Load values form a textfile
 data_in_I = csvread("../modulation/mod_I.txt")';
@@ -48,6 +54,13 @@ data_symbols=zeros(1,length(h_quant));
 ted_samples =zeros(1,3);
 ted_out=zeros(1,length(data_in_I));
 ted_out_en=zeros(1,length(data_in_I));
+ted_phase_out=zeros(1,length(data_in_I));
+Fsymb_fe_pulse=0;
+add_prev_in_ted = 0;
+loop_integ_in_ted = 0;
+TED_correction=0;
+ted_store_increment=0;
+ted_store_increment_flag=0;
 
 %Debug init
 ADEBUG_TABLE_Fsymb_pulse=zeros(1,length(data_in_I));
@@ -58,7 +71,9 @@ ADEBUG_TABLE_data_rrc_filtered_I=zeros(1,length(data_in_I));
 ADEBUG_TABLE_data_symbols_I=zeros(1,length(data_in_I));
 ADEBUG_TABLE_nco_accu_tmp_fsymb=zeros(1,length(data_in_I));
 ADEBUG_TABLE_nco_accu_tmp_fsymb_xovr=zeros(1,length(data_in_I));
-
+ADEBUG_TABLE_Fsymb_fe_pulse=zeros(1,length(data_in_I));
+ADEBUG_TABLE_ted_phase_out=zeros(1,length(data_in_I));
+ADEBUG_TABLE_loop_out_ted=zeros(1,length(data_in_I));
 
 for k=1:length(data_in_I)
   
@@ -68,7 +83,7 @@ for k=1:length(data_in_I)
   
     %Running NCO at Fsymb
     nco_accu_tmp_fsymb_r1 = nco_accu_tmp_fsymb;
-    nco_accu_tmp_fsymb = mod(nco_accu_tmp_fsymb+Fsymb/Fin*2^32,2^32);
+    nco_accu_tmp_fsymb = mod(nco_accu_tmp_fsymb+Fsymb/Fin*2^32+TED_correction,2^32);
     
     %Running NCO at Fsymb x ovr
     nco_accu_tmp_fsymb_xovr_r1 = nco_accu_tmp_fsymb_xovr;
@@ -102,6 +117,15 @@ for k=1:length(data_in_I)
           Fsymb_x2_pulse=1;
       else
           Fsymb_x2_pulse=0;
+      end;
+    end;
+    
+    %Generate a pulse at Fsymb falling edge
+    if (k>1 && k<length(data_in)-1) 
+      if nco_accu_tmp_fsymb>2147483648 && nco_accu_tmp_fsymb_r1<2147483648+1; %2^31
+          Fsymb_fe_pulse=1;
+      else
+          Fsymb_fe_pulse=0;
       end;
     end;
     
@@ -160,7 +184,45 @@ for k=1:length(data_in_I)
       ted_out_en(index_resample) = tmp2;
     end
     
+    %Convert to samples
+    % +1 is Symbol/4
+    if (Fsymb_pulse==1 && index_resample>1)
+      ted_out(index_resample) = ted_out(index_resample)/4;
+    end
     
+    %Convert samples to phase increment
+    if (Fsymb_pulse==1 && index_resample>1)
+      ted_phase_out(index_resample) = ted_out(index_resample) * 2^32;
+    end
+    
+    %%-----------------------------------
+    %%-- Timing error loop filter
+    %%-----------------------------------
+    if (Fsymb_pulse==1 && index_resample>1)
+      if ted_out_en(index_resample)==1
+        loop_in_ted = ted_phase_out(index_resample);
+        [loop_out_ted, add_prev_out, loop_integ_out] = loop_filter_2nd_order(loop_in_ted, T_ted, Bn_ted, ksi_ted, add_prev_in_ted, loop_integ_in_ted);
+        add_prev_in_ted = add_prev_out;
+        loop_integ_in_ted = loop_integ_out;
+      end
+    end
+    
+    %%-----------------------------------
+    %%-- Timing error sampling control
+    %%-----------------------------------
+    % Detect a new TED value
+    if (index_resample>1  && ted_out_en(index_resample)==1)
+      ted_store_increment = loop_out_ted;
+      ted_store_increment_flag=1;
+    end
+    
+    % Apply value one time to the
+    if (ted_store_increment_flag==1 && Fsymb_fe_pulse==1)
+      ted_store_increment_flag=0;
+      TED_correction= ted_store_increment * (-1);
+    else
+      TED_correction=0;
+    end
     
     %%-----------------------------------
     %%-- DEBUG
@@ -173,7 +235,9 @@ for k=1:length(data_in_I)
     if (k>1 && Fsymb_ovr_pulse==1) ADEBUG_TABLE_data_resample_I(k) = real(data_resample(index_resample)); end
     if (k>1 && Fsymb_ovr_pulse==1) ADEBUG_TABLE_data_rrc_filtered_I(k) = real(data_rrc_filtered(index_resample)); end
     if (k>1 && Fsymb_pulse==1) ADEBUG_TABLE_data_symbols_I(k) = real(data_symbols(index_symbols)); end
-    
+    ADEBUG_TABLE_Fsymb_fe_pulse(k) = Fsymb_fe_pulse;
+    if (Fsymb_pulse==1 && index_resample>1) ADEBUG_TABLE_ted_phase_out(k) = ted_phase_out(index_resample); end
+    if (Fsymb_pulse==1 && index_resample>1 && ted_out_en(index_resample)==1) ADEBUG_TABLE_loop_out_ted(k) = loop_out_ted; end
 end
 
 %%-----------------------------------
@@ -211,9 +275,14 @@ ted_out_en = ted_out_en(1:index_resample);
 ##figure(2);
 ##plot(data_symbols,'o');
 
-figure(3);
+figure(2);
 plot(ted_out,'o');
 
+figure(3);
+plot(ADEBUG_TABLE_ted_phase_out,'o');
+
+figure(4);
+plot(ADEBUG_TABLE_loop_out_ted,'o');
 
 ##eyediagram(data_symbols,Fresamp/Fsymb/2);
 
