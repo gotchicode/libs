@@ -12,6 +12,7 @@ nb_size=2^13;
 T=1;
 Bn=0.001;
 ksi=sqrt(2)/2;
+use_integ=1;
 
 %Intermediate parameters
 A = (Bn*T/(ksi+1/4/ksi));
@@ -60,7 +61,7 @@ if optionu==2
     loop_in=data_in(k)-loop_out;
     add_prev_in = add_prev_out;
     loop_integ_in = loop_integ_out;
-    [loop_out, add_prev_out, loop_integ_out] = loop_filter_2nd_order(loop_in, T, Bn, ksi, add_prev_in, loop_integ_in);
+    [loop_out, add_prev_out, loop_integ_out] = loop_filter_2nd_order(loop_in, T, Bn, ksi, add_prev_in, loop_integ_in, use_integ);
     error_saved=[error_saved data_in(k)-loop_out];
     loop_out_saved = [loop_out_saved loop_out];
   end

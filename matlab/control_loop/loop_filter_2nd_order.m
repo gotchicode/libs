@@ -1,4 +1,4 @@
-function [loop_out, add_prev_out, loop_integ_out] = loop_filter_2nd_order(loop_in, T, Bn, ksi, add_prev_in, loop_integ_in)
+function [loop_out, add_prev_out, loop_integ_out] = loop_filter_2nd_order(loop_in, T, Bn, ksi, add_prev_in, loop_integ_in, use_integrator)
   
   %Intermediate parameters
   A = (Bn*T/(ksi+1/4/ksi));
@@ -9,7 +9,12 @@ function [loop_out, add_prev_out, loop_integ_out] = loop_filter_2nd_order(loop_i
   loop_inter2 = loop_in*K2 + add_prev_in;
   loop_inter = loop_inter1 + loop_inter2;
   add_prev_in = add_prev_in+loop_in * K2;
-  loop_integ_in = loop_integ_in+loop_inter;
+  if use_integrator==1
+    loop_integ_in = loop_integ_in+loop_inter;
+  end
+  if use_integrator==0
+    loop_integ_in = loop_inter;
+  end
   loop_out = loop_integ_in;
   
   add_prev_out = add_prev_in;

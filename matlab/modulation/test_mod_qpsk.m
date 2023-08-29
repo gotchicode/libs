@@ -9,7 +9,7 @@ addpath ("../polyphase");
 addpath ("../resample");
 
 %Parameters
-nb_bits = 2^12; %vector length
+nb_bits = 2^14; %vector length
 modu='QPSK';
 nb_symb=modu_bps(modu);
 n_bits = 16; %quantization tap bits

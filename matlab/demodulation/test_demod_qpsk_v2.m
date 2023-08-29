@@ -18,12 +18,14 @@ interp_type=3;
 roll_off = 0.5;
 n_bits = 16; %quantization tap bits
 debug = 0;
-init_sample_offset=2^32/1024*(256);
+init_sample_offset=2^32/1024*(256-0);
 
 %TED loop parameters
 T_ted = 1;
-Bn_ted = 0.000001;
+Bn_ted = 0.005/8;
 ksi_ted = sqrt(2)/2;
+enable_ted_loop=1;
+sign_ted_loop=-1;
 
 %Load values form a textfile
 data_in_I = csvread("../modulation/mod_I.txt")';
@@ -74,6 +76,8 @@ ADEBUG_TABLE_nco_accu_tmp_fsymb_xovr=zeros(1,length(data_in_I));
 ADEBUG_TABLE_Fsymb_fe_pulse=zeros(1,length(data_in_I));
 ADEBUG_TABLE_ted_phase_out=zeros(1,length(data_in_I));
 ADEBUG_TABLE_loop_out_ted=zeros(1,length(data_in_I));
+ted_store_increment_sum=0;
+ADEBUG_TABLE_sum_corrections_ted=zeros(1,length(data_in_I));
 
 for k=1:length(data_in_I)
   
@@ -83,7 +87,7 @@ for k=1:length(data_in_I)
   
     %Running NCO at Fsymb
     nco_accu_tmp_fsymb_r1 = nco_accu_tmp_fsymb;
-    nco_accu_tmp_fsymb = mod(nco_accu_tmp_fsymb+Fsymb/Fin*2^32+TED_correction,2^32);
+    nco_accu_tmp_fsymb = mod(nco_accu_tmp_fsymb+Fsymb/Fin*2^32+TED_correction*enable_ted_loop,2^32);
     
     %Running NCO at Fsymb x ovr
     nco_accu_tmp_fsymb_xovr_r1 = nco_accu_tmp_fsymb_xovr;
@@ -184,16 +188,30 @@ for k=1:length(data_in_I)
       ted_out_en(index_resample) = tmp2;
     end
     
+      %%
+      %% This part tries to convert TED values to different levels one
+      %%
     %Convert to samples
     % +1 is Symbol/4
     if (Fsymb_pulse==1 && index_resample>1)
-      ted_out(index_resample) = ted_out(index_resample)/4;
+      if ted_out(index_resample)>1
+        ted_out(index_resample) = 1;
+      endif
+      if ted_out(index_resample)<-1
+        ted_out(index_resample) = -1;
+      endif
     end
     
     %Convert samples to phase increment
     if (Fsymb_pulse==1 && index_resample>1)
-      ted_phase_out(index_resample) = ted_out(index_resample) * 2^32;
+      ted_phase_out(index_resample) = ted_out(index_resample)/4 * 2^32;
     end
+
+##    %% This part only use the sign of the TED
+##    if (Fsymb_pulse==1 && index_resample>1)
+##      ted_out(index_resample) = sign(ted_out(index_resample)) * 2^32/(4);
+##    end
+
     
     %%-----------------------------------
     %%-- Timing error loop filter
@@ -201,7 +219,7 @@ for k=1:length(data_in_I)
     if (Fsymb_pulse==1 && index_resample>1)
       if ted_out_en(index_resample)==1
         loop_in_ted = ted_phase_out(index_resample);
-        [loop_out_ted, add_prev_out, loop_integ_out] = loop_filter_2nd_order(loop_in_ted, T_ted, Bn_ted, ksi_ted, add_prev_in_ted, loop_integ_in_ted);
+        [loop_out_ted, add_prev_out, loop_integ_out] = loop_filter_2nd_order(loop_in_ted, T_ted, Bn_ted, ksi_ted, add_prev_in_ted, loop_integ_in_ted,0);
         add_prev_in_ted = add_prev_out;
         loop_integ_in_ted = loop_integ_out;
       end
@@ -216,10 +234,16 @@ for k=1:length(data_in_I)
       ted_store_increment_flag=1;
     end
     
+    % This is debug
+    if (k>1 &&  ted_store_increment_flag==1 && Fsymb_fe_pulse==1 ) 
+      ted_store_increment_sum = ted_store_increment_sum + ted_store_increment * (sign_ted_loop);
+      ADEBUG_TABLE_sum_corrections_ted(k) = ted_store_increment_sum;
+    end
+    
     % Apply value one time to the
     if (ted_store_increment_flag==1 && Fsymb_fe_pulse==1)
       ted_store_increment_flag=0;
-      TED_correction= ted_store_increment * (-1);
+      TED_correction= ted_store_increment * (sign_ted_loop);
     else
       TED_correction=0;
     end
@@ -238,6 +262,7 @@ for k=1:length(data_in_I)
     ADEBUG_TABLE_Fsymb_fe_pulse(k) = Fsymb_fe_pulse;
     if (Fsymb_pulse==1 && index_resample>1) ADEBUG_TABLE_ted_phase_out(k) = ted_phase_out(index_resample); end
     if (Fsymb_pulse==1 && index_resample>1 && ted_out_en(index_resample)==1) ADEBUG_TABLE_loop_out_ted(k) = loop_out_ted; end
+
 end
 
 %%-----------------------------------
@@ -272,17 +297,26 @@ ted_out_en = ted_out_en(1:index_resample);
 ##hold on;
 ##plot(ADEBUG_TABLE_nco_accu_tmp_fsymb_xovr(start_plot:end_plot)/2^32+2);
 ##
-##figure(2);
-##plot(data_symbols,'o');
+
+figure(1);
+plot(data_symbols,'o');
 
 figure(2);
 plot(ted_out,'o');
+title ("ted out");
 
 figure(3);
 plot(ADEBUG_TABLE_ted_phase_out,'o');
+title ("ted phase_out");
 
 figure(4);
 plot(ADEBUG_TABLE_loop_out_ted,'o');
+title ("loop out ted");
+
+figure(5);
+plot(ADEBUG_TABLE_sum_corrections_ted,'o');
+title ("sum corrections ted");
+
 
 ##eyediagram(data_symbols,Fresamp/Fsymb/2);
 
