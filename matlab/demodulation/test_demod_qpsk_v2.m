@@ -18,11 +18,11 @@ interp_type=3;
 roll_off = 0.5;
 n_bits = 16; %quantization tap bits
 debug = 0;
-init_sample_offset=2^32/1024*(256-0);
+init_sample_offset=2^32/1024*(128*7);
 
 %TED loop parameters
 T_ted = 1;
-Bn_ted = 0.005/8;
+Bn_ted = 0.005/2;
 ksi_ted = sqrt(2)/2;
 enable_ted_loop=1;
 sign_ted_loop=-1;
@@ -298,12 +298,13 @@ ted_out_en = ted_out_en(1:index_resample);
 ##plot(ADEBUG_TABLE_nco_accu_tmp_fsymb_xovr(start_plot:end_plot)/2^32+2);
 ##
 
-figure(1);
-plot(data_symbols,'o');
+##figure(1);
+##plot(data_symbols,'o');
+##title ("data symbols");
 
-figure(2);
-plot(ted_out,'o');
-title ("ted out");
+##figure(2);
+##plot(ted_out,'o');
+##title ("ted out");
 
 figure(3);
 plot(ADEBUG_TABLE_ted_phase_out,'o');
@@ -317,7 +318,14 @@ figure(5);
 plot(ADEBUG_TABLE_sum_corrections_ted,'o');
 title ("sum corrections ted");
 
+figure(6);
+plot(ADEBUG_TABLE_sum_corrections_ted/2^32,'o');
+title ("sum corrections ted in symbol");
 
-##eyediagram(data_symbols,Fresamp/Fsymb/2);
+figure(7);
+plot(data_symbols(end-1024:end),'o');
+title ("last 1024 data symbols");
+
+eyediagram(data_symbols(end-1024:end),Fresamp/Fsymb/2);
 
 
