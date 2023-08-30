@@ -18,11 +18,11 @@ interp_type=3;
 roll_off = 0.5;
 n_bits = 16; %quantization tap bits
 debug = 0;
-init_sample_offset=2^32/1024*(128*7);
+init_sample_offset=2^32/1024*(128*1);
 
 %TED loop parameters
 T_ted = 1;
-Bn_ted = 0.005/2;
+Bn_ted = 0.005/8;
 ksi_ted = sqrt(2)/2;
 enable_ted_loop=1;
 sign_ted_loop=-1;
@@ -43,6 +43,8 @@ nco_accu_tmp_fsymb_xovr=0;
 nco_accu_tmp_fsymb_xovr_r1=0;
 nco_accu_tmp_fsymb_x2=0;
 nco_accu_tmp_fsymb_x2_r1=0;
+nco_accu_tmp_fsymb_50_delay=0;
+nco_accu_tmp_fsymb_50_delay_r1=0;
 Fsymb_pulse=0;
 Fsymb_ovr_pulse=0;
 Fsymb_ovr_pulse=0;
@@ -84,7 +86,7 @@ for k=1:length(data_in_I)
     %%-----------------------------------
     %%-- Pulses generation
     %%-----------------------------------
-  
+
     %Running NCO at Fsymb
     nco_accu_tmp_fsymb_r1 = nco_accu_tmp_fsymb;
     nco_accu_tmp_fsymb = mod(nco_accu_tmp_fsymb+Fsymb/Fin*2^32+TED_correction*enable_ted_loop,2^32);
@@ -167,7 +169,8 @@ for k=1:length(data_in_I)
     %%-----------------------------------
     %%-- Decimation by 2 to Fsymb
     %%-----------------------------------
-    if Fsymb_pulse==1 
+##    if Fsymb_pulse==1 %on rising edge of Fsymb
+    if Fsymb_fe_pulse==1 %on falling edge of Fsymb
       index_symbols = index_symbols+1;
       data_symbols(index_symbols) = data_rrc_filtered(index_resample);
     end
@@ -262,7 +265,8 @@ for k=1:length(data_in_I)
     ADEBUG_TABLE_Fsymb_fe_pulse(k) = Fsymb_fe_pulse;
     if (Fsymb_pulse==1 && index_resample>1) ADEBUG_TABLE_ted_phase_out(k) = ted_phase_out(index_resample); end
     if (Fsymb_pulse==1 && index_resample>1 && ted_out_en(index_resample)==1) ADEBUG_TABLE_loop_out_ted(k) = loop_out_ted; end
-
+    
+    
 end
 
 %%-----------------------------------
@@ -276,27 +280,29 @@ ted_out_en = ted_out_en(1:index_resample);
 %%-----------------------------------
 %%-- DISPLAY
 %%-----------------------------------
-##start_plot=2570;
-##end_plot=2640;
-##figure(1);
-##plot(ADEBUG_TABLE_Fsymb_pulse(start_plot:end_plot));
-##hold on;
-##plot(ADEBUG_TABLE_Fsymb_ovr_pulse(start_plot:end_plot)*0.5);
-##hold on;
-##plot(ADEBUG_TABLE_Fsymb_x2_pulse(start_plot:end_plot)*0.25);
-##hold on;
-##plot(data_in_I(start_plot:end_plot));
-##hold on;
-##plot(ADEBUG_TABLE_data_resample_I(start_plot:end_plot),'+');
-##hold on;
-##plot(ADEBUG_TABLE_data_rrc_filtered_I(start_plot:end_plot),'x');
-##hold on;
-##plot(ADEBUG_TABLE_data_symbols_I(start_plot:end_plot),'o');
-##hold on;
-##plot(ADEBUG_TABLE_nco_accu_tmp_fsymb(start_plot:end_plot)/2^32+2);
-##hold on;
-##plot(ADEBUG_TABLE_nco_accu_tmp_fsymb_xovr(start_plot:end_plot)/2^32+2);
-##
+start_plot=30000+256;
+end_plot=30000+256*2;
+figure(1);
+plot(ADEBUG_TABLE_Fsymb_pulse(start_plot:end_plot));
+hold on;
+plot(ADEBUG_TABLE_Fsymb_ovr_pulse(start_plot:end_plot)*0.5);
+hold on;
+plot(ADEBUG_TABLE_Fsymb_x2_pulse(start_plot:end_plot)*0.25);
+hold on;
+plot(data_in_I(start_plot:end_plot));
+hold on;
+plot(ADEBUG_TABLE_data_resample_I(start_plot:end_plot),'+');
+hold on;
+plot(ADEBUG_TABLE_data_rrc_filtered_I(start_plot:end_plot),'x');
+hold on;
+plot(ADEBUG_TABLE_data_symbols_I(start_plot:end_plot),'o');
+hold on;
+plot(ADEBUG_TABLE_nco_accu_tmp_fsymb(start_plot:end_plot)/2^32+2);
+hold on;
+plot(ADEBUG_TABLE_nco_accu_tmp_fsymb_xovr(start_plot:end_plot)/2^32+2);
+plot(ADEBUG_TABLE_Fsymb_fe_pulse(start_plot:end_plot),'.-');
+
+
 
 ##figure(1);
 ##plot(data_symbols,'o');
