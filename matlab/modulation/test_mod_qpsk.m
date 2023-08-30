@@ -9,15 +9,16 @@ addpath ("../polyphase");
 addpath ("../resample");
 
 %Parameters
-nb_bits = 2^13; %vector length
+nb_bits = 2^14; %vector length
 modu='QPSK';
 nb_symb=modu_bps(modu);
 n_bits = 16; %quantization tap bits
 roll_off = 0.5;
+T_PPM=100;
 Fsymb=1;
 Fsamp=4;
 Fin = 1;
-Fout = 2;
+Fout = 2*(1e6+T_PPM)/1e6;
 debug = 0;
 interp_type=3;
 
@@ -65,4 +66,4 @@ fclose(fid);
 ##plot(imag(data_out));
 
 % Eye diagram
-eyediagram (filtered_signal, (Fsamp/Fsymb)*(Fout/Fin)*2);
+##eyediagram (filtered_signal, (Fsamp/Fsymb)*(Fout/Fin)*2);

@@ -18,11 +18,11 @@ interp_type=3;
 roll_off = 0.5;
 n_bits = 16; %quantization tap bits
 debug = 0;
-init_sample_offset=2^32/1024*(128*1);
+init_sample_offset=2^32/1024*(128*2);
 
 %TED loop parameters
 T_ted = 1;
-Bn_ted = 0.005/8;
+Bn_ted = 0.005/4;
 ksi_ted = sqrt(2)/2;
 enable_ted_loop=1;
 sign_ted_loop=-1;
