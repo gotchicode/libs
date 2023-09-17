@@ -9,18 +9,19 @@ addpath ("../polyphase");
 addpath ("../resample");
 
 %Parameters
-nb_bits = 2^14; %vector length
+nb_bits = 2^13; %vector length
 modu='QPSK';
 nb_symb=modu_bps(modu);
 n_bits = 16; %quantization tap bits
 roll_off = 0.5;
-T_PPM=100;
+T_PPM=0;
 Fsymb=1;
 Fsamp=4;
 Fin = 1;
 Fout = 2*(1e6+T_PPM)/1e6;
 debug = 0;
 interp_type=3;
+phase_offset= 1 * pi/8;
 
 %Generate input signal
 data_in_sequence = (round(rand(1,nb_bits)));
@@ -43,6 +44,9 @@ filtered_signal = conv(filtered_signal,h_quant);
 
 %Fractional resampling
 data_out = mu_interp_process(filtered_signal,Fin,Fout,debug,interp_type);
+
+%Apply a phase offset
+data_out = data_out .* exp(j*phase_offset);
 
 %% Save to file
 fid=fopen("mod_I.txt",'w');

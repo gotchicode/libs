@@ -29,10 +29,11 @@ sign_ted_loop=-1;
 
 %PED loop parameters
 T_ped = 1;
-Bn_ped = 0.01;
+Bn_ped = 0.001;
 ksi_ped = sqrt(2)/2;
 enable_ped_loop=1;
-sign_ped_loop=1;
+sign_ped_loop=-1;
+ped_use_integ=0;
 
 %Load values form a textfile
 data_in_I = csvread("../modulation/mod_I.txt")';
@@ -94,6 +95,8 @@ ted_store_increment_sum=0;
 ADEBUG_TABLE_sum_corrections_ted=zeros(1,length(data_in_I));
 ADEBUG_TABLE_loop_out_ted=zeros(1,length(data_in_I));
 ADEBUG_TABLE_loop_out_ped=zeros(1,length(data_in_I));
+ADEBUG_TABLE_data_symbols_angle=zeros(1,length(data_in_I));
+
 
 for k=1:length(data_in_I)
   
@@ -101,8 +104,10 @@ for k=1:length(data_in_I)
     %%-- Phase offset compensation
     %%-----------------------------------
     if enable_ped_loop==1
-        data_in(k) = data_in(k) * exp(j*PED_correction);
+        data_in = data_in .* exp(j*PED_correction);
     end
+##    dtmp = data_in(k) .* exp(j*PED_correction)
+##    pause;
    
     %%-----------------------------------
     %%-- Pulses generation
@@ -281,10 +286,12 @@ for k=1:length(data_in_I)
     %%-----------------------------------
     if (data_symbols_en==1 )
       loop_in_ped = data_symbols_angle(index_symbols);
-      [loop_out_ped, add_prev_out_ped, loop_integ_out_ped] = loop_filter_2nd_order(loop_in_ped, T_ped, Bn_ped, ksi_ped, add_prev_in_ped, loop_integ_in_ped,1);
+      [loop_out_ped, add_prev_out_ped, loop_integ_out_ped] = loop_filter_2nd_order(loop_in_ped, T_ped, Bn_ped, ksi_ped, add_prev_in_ped, loop_integ_in_ped,ped_use_integ);
       add_prev_in_ped = add_prev_out_ped;
       loop_integ_in_ped = loop_integ_out_ped;
       PED_correction =  loop_out_ped * (sign_ped_loop);
+##      PED_correction
+##      pause;
     end
 
     %%-----------------------------------
@@ -302,6 +309,8 @@ for k=1:length(data_in_I)
     if (Fsymb_pulse==1 && index_resample>1) ADEBUG_TABLE_ted_phase_out(k) = ted_phase_out(index_resample); end
     if (Fsymb_pulse==1 && index_resample>1 && ted_out_en(index_resample)==1) ADEBUG_TABLE_loop_out_ted(k) = loop_out_ted; end
     if (data_symbols_en==1) ADEBUG_TABLE_loop_out_ped(k)=loop_out_ped; end
+    if (data_symbols_en==1) ADEBUG_TABLE_data_symbols_angle(k)=data_symbols_angle(index_symbols); end
+
 end
 
 %%-----------------------------------
@@ -372,6 +381,11 @@ title ("last 1024 data symbols");
 figure(8);
 plot(ADEBUG_TABLE_loop_out_ped,'o');
 title ("loop out ped");
+
+figure(9);
+plot(ADEBUG_TABLE_data_symbols_angle,'o');
+title ("data symbols angle");
+
 
 
 eyediagram(data_symbols(end-1024:end),Fresamp/Fsymb/2);
