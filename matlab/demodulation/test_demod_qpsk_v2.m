@@ -29,7 +29,7 @@ sign_ted_loop=-1;
 
 %PED loop parameters
 T_ped = 1;
-Bn_ped = 0.001;
+Bn_ped = 0.005/4;
 ksi_ped = sqrt(2)/2;
 enable_ped_loop=1;
 sign_ped_loop=-1;
@@ -278,7 +278,7 @@ for k=1:length(data_in_I)
     %%-- Phase Error Detector
     %%-----------------------------------
     if (data_symbols_en==1 )
-      data_symbols_angle(index_symbols) = mod(angle(data_symbols(index_symbols)),pi/2) - pi /2 ;
+      data_symbols_angle(index_symbols) = mod(angle(data_symbols(index_symbols)),pi/2) - pi /4 ;
     end
     
     %%-----------------------------------
@@ -290,9 +290,13 @@ for k=1:length(data_in_I)
       add_prev_in_ped = add_prev_out_ped;
       loop_integ_in_ped = loop_integ_out_ped;
       PED_correction =  loop_out_ped * (sign_ped_loop);
-##      PED_correction
-##      pause;
     end
+    
+##    if (k>1000)
+##      data_symbols_angle(index_symbols)
+##      loop_out_ped
+##      pause;
+##    end
 
     %%-----------------------------------
     %%-- DEBUG
