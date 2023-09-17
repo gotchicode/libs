@@ -24,16 +24,16 @@ init_sample_offset=2^32/1024*(256);
 T_ted = 1;
 Bn_ted = 0.005/4;
 ksi_ted = sqrt(2)/2;
-enable_ted_loop=0;
-sign_ted_loop=-1;
+enable_ted_loop=0;  
+sign_ted_loop=-1; %working param
 
 %PED loop parameters
 T_ped = 1;
 Bn_ped = 0.005/4;
 ksi_ped = sqrt(2)/2;
-enable_ped_loop=1;
-sign_ped_loop=-1;
-ped_use_integ=0;
+enable_ped_loop=1; 
+sign_ped_loop=-1; %working param
+ped_use_integ=0; %working param
 
 %Load values form a textfile
 data_in_I = csvread("../modulation/mod_I.txt")';
@@ -360,6 +360,9 @@ ted_out_en = ted_out_en(1:index_resample);
 ##plot(ted_out,'o');
 ##title ("ted out");
 
+##%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+##%% DEBUG TED
+##%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ##
 ##figure(3);
 ##plot(ADEBUG_TABLE_ted_phase_out,'o');
@@ -376,6 +379,11 @@ ted_out_en = ted_out_en(1:index_resample);
 ##figure(6);
 ##plot(ADEBUG_TABLE_sum_corrections_ted/2^32,'o');
 ##title ("sum corrections ted in symbol");
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% DEBUG PED
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 figure(7);
 ##plot(data_symbols(end-1024:end),'o');
