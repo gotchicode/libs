@@ -22,7 +22,7 @@ init_sample_offset=2^32/1024*(256);
 
 %TED loop parameters
 T_ted = 1;
-Bn_ted = 0.002;
+Bn_ted = 0.001;
 ksi_ted = sqrt(2)/2;
 enable_ted_loop=1;  
 sign_ted_loop=-1; %working param
@@ -31,7 +31,7 @@ sign_ted_loop=-1; %working param
 T_ped = 1;
 Bn_ped = 0.001;
 ksi_ped = sqrt(2)/2;
-enable_ped_loop=0; 
+enable_ped_loop=1; 
 sign_ped_loop=-1; %working param
 ped_use_integ=0; %working param
 
@@ -94,6 +94,10 @@ ped_mean_accu=0;
 ped_rms_accu=0;
 ped_mean=0;
 ped_rms=0;
+control_loop_sm=0;
+control_loop_sm_cnt=0;
+clear_ted_loop=0;
+clear_ped_loop=0;
 
 %Debug init
 ADEBUG_TABLE_Fsymb_pulse=zeros(1,length(data_in_I));
@@ -265,12 +269,19 @@ for k=1:length(data_in_I)
     %%-----------------------------------
     %%-- Timing error loop filter
     %%-----------------------------------
-    if (Fsymb_pulse==1 && index_resample>1)
-      if ted_out_en(index_resample)==1
-        loop_in_ted = ted_phase_out(index_resample);
-        [loop_out_ted, add_prev_out_ted, loop_integ_out_ted] = loop_filter_2nd_order(loop_in_ted, T_ted, Bn_ted, ksi_ted, add_prev_in_ted, loop_integ_in_ted,0);
-        add_prev_in_ted = add_prev_out_ted;
-        loop_integ_in_ted = loop_integ_out_ted;
+    if clear_ted_loop==1
+      loop_in_ted=0;
+      add_prev_in_ted=0;
+      loop_integ_in_ted=0;
+      loop_out_ted=0;
+    else
+      if (Fsymb_pulse==1 && index_resample>1)
+        if ted_out_en(index_resample)==1
+          loop_in_ted = ted_phase_out(index_resample);
+          [loop_out_ted, add_prev_out_ted, loop_integ_out_ted] = loop_filter_2nd_order(loop_in_ted, T_ted, Bn_ted, ksi_ted, add_prev_in_ted, loop_integ_in_ted,0);
+          add_prev_in_ted = add_prev_out_ted;
+          loop_integ_in_ted = loop_integ_out_ted;
+        end
       end
     end
     
@@ -307,12 +318,19 @@ for k=1:length(data_in_I)
     %%-----------------------------------
     %%-- Phase error loop filter
     %%-----------------------------------
-    if (data_symbols_en==1 )
-      loop_in_ped = data_symbols_angle(index_symbols);
-      [loop_out_ped, add_prev_out_ped, loop_integ_out_ped] = loop_filter_2nd_order(loop_in_ped, T_ped, Bn_ped, ksi_ped, add_prev_in_ped, loop_integ_in_ped,ped_use_integ);
-      add_prev_in_ped = add_prev_out_ped;
-      loop_integ_in_ped = loop_integ_out_ped;
-      PED_correction =  loop_out_ped * (sign_ped_loop);
+    if clear_ped_loop==1
+      loop_in_ped=0;
+      add_prev_in_ped=0;
+      loop_integ_in_ped=0;
+      loop_out_ped=0;
+    else
+      if (data_symbols_en==1 )
+        loop_in_ped = data_symbols_angle(index_symbols);
+        [loop_out_ped, add_prev_out_ped, loop_integ_out_ped] = loop_filter_2nd_order(loop_in_ped, T_ped, Bn_ped, ksi_ped, add_prev_in_ped, loop_integ_in_ped,ped_use_integ);
+        add_prev_in_ped = add_prev_out_ped;
+        loop_integ_in_ped = loop_integ_out_ped;
+        PED_correction =  loop_out_ped * (sign_ped_loop);
+      end
     end
     
     %%-----------------------------------
@@ -322,8 +340,8 @@ for k=1:length(data_in_I)
       if (ted_loop_accu_counter==ted_loop_accu_counter_max)
         ted_loop_accu_counter=0;
         ted_loop_accu_pulse=1;
-        ted_mean = ted_mean_accu;
-        ted_rms = ted_rms_accu;
+        ted_mean = ted_mean_accu/ted_loop_accu_counter_max;
+        ted_rms = ted_rms_accu/ted_loop_accu_counter_max;
         ted_mean_accu= ted_phase_out(index_resample);
         ted_rms_accu= ted_phase_out(index_resample).*ted_phase_out(index_resample);
       else
@@ -341,8 +359,8 @@ for k=1:length(data_in_I)
       if (ped_loop_accu_counter==ped_loop_accu_counter_max)
         ped_loop_accu_counter=0;
         ped_loop_accu_pulse=1;
-        ped_mean = ped_mean_accu;
-        ped_rms = ped_rms_accu;
+        ped_mean = ped_mean_accu/ped_loop_accu_counter_max;
+        ped_rms = ped_rms_accu/ped_loop_accu_counter_max;
         ped_mean_accu= data_symbols_angle(index_symbols);
         ped_rms_accu= data_symbols_angle(index_symbols).*data_symbols_angle(index_symbols);
       else
@@ -351,6 +369,58 @@ for k=1:length(data_in_I)
         ped_mean_accu= ped_mean_accu +data_symbols_angle(index_symbols);
         ped_rms_accu= ped_rms_accu +data_symbols_angle(index_symbols).*data_symbols_angle(index_symbols);
       end
+    end
+    
+    %%-----------------------------------
+    %%-- Control loop state machine
+    %%-----------------------------------
+    switch (control_loop_sm)
+      case 0 %% idle
+        if (index_resample>1  && ted_out_en(index_resample)==1)
+          if ted_loop_accu_pulse==1
+            control_loop_sm = 1;
+            control_loop_sm_cnt=0;
+            fprintf("sm idle go to control ted - control_loop_sm_cnt=%d index=%d, ted_mean=%d\n",control_loop_sm_cnt, index_resample, ted_mean);
+          end
+        end
+        %maintain the ped loop in clear
+        %maintain the ted loop active
+        clear_ted_loop=0;
+        clear_ped_loop=1;
+      case 1 %% control ted only
+        %maintain the ped loop in clear
+        %maintain the ted loop active
+        if (index_resample>1  && ted_out_en(index_resample)==1)
+          if ted_loop_accu_pulse==1
+            control_loop_sm = 1;
+            control_loop_sm_cnt=control_loop_sm_cnt+1;
+            fprintf("sm control ted stay in - control_loop_sm_cnt=%d index=%d, ted_mean=%d\n",control_loop_sm_cnt, index_resample, ted_mean);
+            if (control_loop_sm_cnt==4 &&  abs(ted_mean)<2e8)
+              control_loop_sm = 2;
+              clear_ted_loop=0;
+              clear_ped_loop=0;
+            else
+              if control_loop_sm_cnt==4
+                clear_ted_loop=1;
+                clear_ped_loop=1;
+                control_loop_sm = 0;
+               end
+            end
+          end
+        end
+      case 2 %% control ped + ted
+        if (index_resample>1  && ted_out_en(index_resample)==1)
+          if ted_loop_accu_pulse==1
+            fprintf("sm control ped + ted stay in (1) - control_loop_sm_cnt=%d index=%d, ted_mean=%d\n",control_loop_sm_cnt, index_resample, ted_mean);
+          end
+        end
+        if data_symbols_en==1
+          if (ped_loop_accu_pulse==1)
+            fprintf("sm control ped + ted stay in (2) - control_loop_sm_cnt=%d index=%d, ped_mean=%d\n",control_loop_sm_cnt, index_resample, ped_mean);
+          end
+        end
+      case 3 %% locked
+      otherwise
     end
     
     %%-----------------------------------
@@ -460,48 +530,48 @@ ted_out_en = ted_out_en(1:index_resample);
 ##plot(ADEBUG_TABLE_data_symbols_angle,'o');
 ##title ("data symbols angle");
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% DEBUG SUBPLOT TED and PED
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subplot(3,3,1);
-plot(ADEBUG_TABLE_ted_phase_out,'o');
-title ("ted phase out");
-
-subplot(3,3,2);
-plot(ADEBUG_TABLE_loop_out_ted,'o');
-title ("loop out ted");
-
-subplot(3,3,3);
-plot(ADEBUG_TABLE_sum_corrections_ted,'o');
-title ("sum corrections ted");
-
-subplot(3,3,4);
-plot(ADEBUG_TABLE_data_symbols_angle,'o');
-title ("data symbols angle");
-
-subplot(3,3,5);
-plot(ADEBUG_TABLE_loop_out_ped,'o');
-title ("loop out ped");
-
-subplot(3,3,6);
-plot(data_symbols(end-1024:end),'o');
-title ("data symbols");
-
-subplot(3,3,7);
-##plot(ADEBUG_TABLE_ted_loop_accu_pulse);
-##hold on;
-plot(ADEBUG_TABLE_ted_mean,'o');
-##hold on;
-##plot(ADEBUG_TABLE_ted_rms, 'x');
-title ("ted mean and rms");
-
-subplot(3,3,8);
-##plot(ADEBUG_TABLE_ped_loop_accu_pulse);
-##hold on;
-plot(ADEBUG_TABLE_ped_mean,'o');
-##hold on;
-##plot(ADEBUG_TABLE_ped_rms, 'x');
-title ("ped mean and rms");
+##%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+##%% DEBUG SUBPLOT TED and PED
+##%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+##subplot(3,3,1);
+##plot(ADEBUG_TABLE_ted_phase_out,'o');
+##title ("ted phase out");
+##
+##subplot(3,3,2);
+##plot(ADEBUG_TABLE_loop_out_ted,'o');
+##title ("loop out ted");
+##
+##subplot(3,3,3);
+##plot(ADEBUG_TABLE_sum_corrections_ted,'o');
+##title ("sum corrections ted");
+##
+##subplot(3,3,4);
+##plot(ADEBUG_TABLE_data_symbols_angle,'o');
+##title ("data symbols angle");
+##
+##subplot(3,3,5);
+##plot(ADEBUG_TABLE_loop_out_ped,'o');
+##title ("loop out ped");
+##
+##subplot(3,3,6);
+##plot(data_symbols(end-1024:end),'o');
+##title ("data symbols");
+##
+##subplot(3,3,7);
+####plot(ADEBUG_TABLE_ted_loop_accu_pulse);
+####hold on;
+##plot(ADEBUG_TABLE_ted_mean,'o');
+####hold on;
+####plot(ADEBUG_TABLE_ted_rms, 'x');
+##title ("ted mean and rms");
+##
+##subplot(3,3,8);
+####plot(ADEBUG_TABLE_ped_loop_accu_pulse);
+####hold on;
+##plot(ADEBUG_TABLE_ped_mean,'o');
+####hold on;
+####plot(ADEBUG_TABLE_ped_rms, 'x');
+##title ("ped mean and rms");
 
 
 

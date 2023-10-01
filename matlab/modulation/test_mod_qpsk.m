@@ -9,13 +9,13 @@ addpath ("../polyphase");
 addpath ("../resample");
 
 %Parameters
-nb_bits = 2^13; %vector length
+nb_bits = 2^15; %vector length
 modu='QPSK';
 nb_symb=modu_bps(modu);
 n_bits = 16; %quantization tap bits
 roll_off = 0.5;
-T_PPM=0;
-Delta_f=0.1; % percentage of symb rate
+T_PPM=5;
+Delta_f=1; % percentage of symb rate
 Fsymb=1;
 Fsamp=4;
 Fin = 1;
