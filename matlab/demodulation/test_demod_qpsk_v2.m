@@ -395,7 +395,7 @@ for k=1:length(data_in_I)
             control_loop_sm = 1;
             control_loop_sm_cnt=control_loop_sm_cnt+1;
             fprintf("sm control ted stay in - control_loop_sm_cnt=%d index=%d, ted_mean=%d\n",control_loop_sm_cnt, index_resample, ted_mean);
-            if (control_loop_sm_cnt==4 &&  abs(ted_mean)<2e8)
+            if (control_loop_sm_cnt==4 &&  abs(ted_mean)<5e8)
               control_loop_sm = 2;
               clear_ted_loop=0;
               clear_ped_loop=0;
@@ -416,10 +416,29 @@ for k=1:length(data_in_I)
         end
         if data_symbols_en==1
           if (ped_loop_accu_pulse==1)
+            control_loop_sm_cnt =  control_loop_sm_cnt+1;
+            fprintf("sm control ped + ted stay in (2) - control_loop_sm_cnt=%d index=%d, ped_mean=%d\n",control_loop_sm_cnt, index_resample, ped_mean);
+            if control_loop_sm_cnt>(4+4)
+              if abs(ped_mean)<0.1
+                control_loop_sm = 3;
+              else
+                control_loop_sm = 0;
+              end
+            end
+          end
+        end
+       case 3
+        if (index_resample>1  && ted_out_en(index_resample)==1)
+          if ted_loop_accu_pulse==1
+            fprintf("sm locked ped + ted stay in (1) - control_loop_sm_cnt=%d index=%d, ted_mean=%d\n",control_loop_sm_cnt, index_resample, ted_mean);
+          end
+        end
+        if data_symbols_en==1
+          if (ped_loop_accu_pulse==1)
+            control_loop_sm_cnt =  control_loop_sm_cnt+1;
             fprintf("sm control ped + ted stay in (2) - control_loop_sm_cnt=%d index=%d, ped_mean=%d\n",control_loop_sm_cnt, index_resample, ped_mean);
           end
         end
-      case 3 %% locked
       otherwise
     end
     

@@ -15,14 +15,14 @@ nb_symb=modu_bps(modu);
 n_bits = 16; %quantization tap bits
 roll_off = 0.5;
 T_PPM=5;
-Delta_f=1; % percentage of symb rate
+Delta_f=0.1; % percentage of symb rate
 Fsymb=1;
 Fsamp=4;
 Fin = 1;
 Fout = 2*(1e6+T_PPM)/1e6;
 debug = 0;
 interp_type=3;
-phase_offset= 1 * 0* pi/8;
+phase_offset= 1 * pi/8;
 carrier_offset=Delta_f/(Fsamp/Fsymb) / 100; % percentage of symb rate
 
 %Generate input signal
