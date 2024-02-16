@@ -45,7 +45,7 @@ else
 	const_270_val     =   round((quant-1) * const_270_val  / 2 / pi);   
 	const_315_val     =   round((quant-1) * const_315_val  / 2 / pi);   
 	const_360_val     =   round((quant-1) * const_360_val  / 2 / pi);   
-	const_K           =   round((quant-1) * const_K        / 2 / pi);   
+	const_K           =   round((quant-1) * const_K        );   
 
 	atan_const        =   round((quant-1) * atan_const     / 2 / pi); 
 	

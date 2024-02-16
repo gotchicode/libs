@@ -19,17 +19,48 @@ function [x_out,y_out] = cordic_cos_sin(input_rad,iterations,debug, quant)
     if debug==1
       fprintf("input_rad_recalc ==%f\n", input_rad_recalc);
     end
+    
+if quant==1   
 
-  for i=0:n
-    s = sign(distance);
-    tmp = x -( s*(y/2^i));
-    y = y +( s*(x/2^i));
-    x = tmp;
-    distance = distance - (s*atan_const(i+1));
-    if debug==1
-      fprintf("n=%d distance=%d\n",i, distance);
-    end
-  end
+      for i=0:n
+        s = sign(distance);
+        tmp = x -( s*(y/2^i)); y_saved=y;
+        y = y +( s*(x/2^i));
+        x = tmp;
+        distance = distance - (s*atan_const(i+1));
+        if debug==1
+            fprintf("----i=%d----\n",i);
+            fprintf("y_saved=%d\n",y_saved);
+            fprintf("y_saved/2^i=%d\n",(y_saved/2^i));
+            fprintf("tmp=%d\n",tmp);
+            fprintf("y=%d\n",y);
+            fprintf("x=%d\n",x);
+            fprintf("atan_const(i+1)=%d\n",atan_const(i+1));
+            fprintf("n=%d distance=%d\n",i, distance);
+        end
+      end
+      
+else
+
+      for i=0:n
+        s = sign(distance);
+        tmp = x -round( s*(y/2^i)); y_saved=y;
+        y = y +round( s*(x/2^i));
+        x = tmp;
+        distance = distance - (s*atan_const(i+1));
+        if debug==1
+            fprintf("----i=%d----\n",i);
+            fprintf("y_saved=%d\n",y_saved);
+            fprintf("y_saved/2^i=%d\n",(y_saved/2^i));
+            fprintf("tmp=%d\n",tmp);
+            fprintf("y=%d\n",y);
+            fprintf("x=%d\n",x);
+            fprintf("atan_const(i+1)=%d\n",atan_const(i+1));
+            fprintf("n=%d distance=%d\n",i, distance);
+        end
+      end
+      
+end
 
   %Replace
   

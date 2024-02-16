@@ -2,7 +2,7 @@ clc;
 clear all;
 close all;
 
-n=27;
+n=25;
 
 result_cordic=[];
 result_real=[];
