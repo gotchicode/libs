@@ -26,10 +26,11 @@ if quant==1
         s = sign(distance);
         tmp = x -( s*(y/2^i)); y_saved=y;
         y = y +( s*(x/2^i));
-        x = tmp;
+        x = tmp; distance_save=distance;
         distance = distance - (s*atan_const(i+1));
         if debug==1
             fprintf("----i=%d----\n",i);
+            fprintf("distance_begin=%d\n",distance_save);
             fprintf("y_saved=%d\n",y_saved);
             fprintf("y_saved/2^i=%d\n",(y_saved/2^i));
             fprintf("tmp=%d\n",tmp);
@@ -46,10 +47,14 @@ else
         s = sign(distance);
         tmp = x -round( s*(y/2^i)); y_saved=y;
         y = y +round( s*(x/2^i));
-        x = tmp;
+        x = tmp; distance_save=distance;
         distance = distance - (s*atan_const(i+1));
+        if distance==0
+            distance=1;
+        end
         if debug==1
             fprintf("----i=%d----\n",i);
+            fprintf("distance_begin=%d\n",distance_save);
             fprintf("y_saved=%d\n",y_saved);
             fprintf("y_saved/2^i=%d\n",(y_saved/2^i));
             fprintf("tmp=%d\n",tmp);
