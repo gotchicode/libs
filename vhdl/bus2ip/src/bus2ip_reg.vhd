@@ -55,31 +55,31 @@ IP2Bus_RdAck_Slave <= IP2Bus_RdAck_Slave_t;
 IP2Bus_WrCE_Master <= IP2Bus_WrCE_Master_t;
 IP2Bus_RdCE_Master <= IP2Bus_RdCE_Master_t;
 
-main_pr: process(clock, async_reset)     
-begin                               
+main_pr: process(clock, async_reset)
+begin
     if (async_reset=ASYNC_RESET_ACTIVE) and (USE_ASYNC_RESET=true) then
         sm <= IDLE_STATE;
-        IP2Bus_WrAck_Slave_t    <= '0';             --: out std_logic;
-        IP2Bus_RdAck_Slave_t    <= '0';             --: out std_logic;
-        IP2Bus_Data_Slave       <= (others=>'0');   --: out std_logic_vector(31 downto 0);
-        IP2Bus_Error_Slave      <= '0';             --: out std_logic;
-        IP2Bus_CS_Master        <= '0';             --: out std_logic;
-        IP2Bus_addr_Master      <= (others=>'0');   --: out std_logic_vector(31 downto 0);
-        IP2Bus_WrCE_Master_t    <= '0';             --: out std_logic;
-        IP2Bus_RdCE_Master_t    <= '0';             --: out std_logic;
-        IP2Bus_Data_Master      <= (others=>'0');   --: out std_logic_vector(31 downto 0);
-    elsif rising_edge(clock) then  
+        IP2Bus_WrAck_Slave_t    <= '0';
+        IP2Bus_RdAck_Slave_t    <= '0';
+        IP2Bus_Data_Slave       <= (others=>'0');
+        IP2Bus_Error_Slave      <= '0';
+        IP2Bus_CS_Master        <= '0';
+        IP2Bus_addr_Master      <= (others=>'0');
+        IP2Bus_WrCE_Master_t    <= '0';
+        IP2Bus_RdCE_Master_t    <= '0';
+        IP2Bus_Data_Master      <= (others=>'0');
+    elsif rising_edge(clock) then
         if (sync_reset=SYNC_RESET_ACTIVE) and (USE_SYNC_RESET=true) then
             sm <= IDLE_STATE;
-            IP2Bus_WrAck_Slave_t    <= '0';             --: out std_logic;
-            IP2Bus_RdAck_Slave_t    <= '0';             --: out std_logic;
-            IP2Bus_Data_Slave       <= (others=>'0');   --: out std_logic_vector(31 downto 0);
-            IP2Bus_Error_Slave      <= '0';             --: out std_logic;
-            IP2Bus_CS_Master        <= '0';             --: out std_logic;
-            IP2Bus_addr_Master      <= (others=>'0');   --: out std_logic_vector(31 downto 0);
-            IP2Bus_WrCE_Master_t    <= '0';             --: out std_logic;
-            IP2Bus_RdCE_Master_t    <= '0';             --: out std_logic;
-            IP2Bus_Data_Master      <= (others=>'0');   --: out std_logic_vector(31 downto 0);
+            IP2Bus_WrAck_Slave_t    <= '0';
+            IP2Bus_RdAck_Slave_t    <= '0';
+            IP2Bus_Data_Slave       <= (others=>'0');
+            IP2Bus_Error_Slave      <= '0';
+            IP2Bus_CS_Master        <= '0';
+            IP2Bus_addr_Master      <= (others=>'0');
+            IP2Bus_WrCE_Master_t    <= '0';
+            IP2Bus_RdCE_Master_t    <= '0';
+            IP2Bus_Data_Master      <= (others=>'0');
         else
             case sm is
                 when IDLE_STATE     =>
@@ -98,32 +98,32 @@ begin
                     end if;
                 when WR_STATE       =>
                     if Bus2IP_CS_Slave='0' or Bus2IP_WrCE_Slave='0' then
-                        sm <= IDLE_STATE;                                    
-                        IP2Bus_addr_Master      <= (others=>'0');   
-                        IP2Bus_WrCE_Master_t    <= '0';                       
+                        sm <= IDLE_STATE;
+                        IP2Bus_addr_Master      <= (others=>'0');
+                        IP2Bus_WrCE_Master_t    <= '0';
                     elsif IP2Bus_WrCE_Master_t='1' and Bus2IP_WrAck_Master='1' then
                         sm <= WR_ACK_STATE;
                         IP2Bus_WrCE_Master_t <= '0';
                         IP2Bus_WrAck_Slave_t <= '1';
                         IP2Bus_Error_Slave   <= Bus2IP_Error_Master;
                     end if;
-                when WR_ACK_STATE   => 
+                when WR_ACK_STATE   =>
                     if Bus2IP_WrCE_Slave='1' and IP2Bus_WrAck_Slave_t='1' then
                         sm <= IDLE_STATE;
                         IP2Bus_WrAck_Slave_t <= '0';
                     end if;
-                when RD_STATE       => 
+                when RD_STATE       =>
                     if Bus2IP_CS_Slave='0' or Bus2IP_RdCE_Slave='0' then
-                        sm <= IDLE_STATE; 
-                        IP2Bus_addr_Master      <= (others=>'0');   
-                        IP2Bus_RdCE_Master_t    <= '0';    
+                        sm <= IDLE_STATE;
+                        IP2Bus_addr_Master      <= (others=>'0');
+                        IP2Bus_RdCE_Master_t    <= '0';
                     elsif IP2Bus_RdCE_Master_t='1' and Bus2IP_RdAck_Master='1' then
                         sm <= RD_ACK_STATE;
                         IP2Bus_RdCE_Master_t <= '0';
                         IP2Bus_RdAck_Slave_t <= '1';
                         IP2Bus_Data_Slave <= Bus2IP_Data_Master;
                     end if;
-                when RD_ACK_STATE   =>    
+                when RD_ACK_STATE   =>
                     if Bus2IP_RdCE_Slave='1' and IP2Bus_RdAck_Slave_t='1' then
                         sm <= IDLE_STATE;
                         IP2Bus_RdAck_Slave_t <= '0';

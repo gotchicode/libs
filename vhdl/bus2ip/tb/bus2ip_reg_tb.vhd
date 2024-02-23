@@ -104,7 +104,7 @@ begin
         bus2ip_error_master => bus2ip_error_master
 );
 
- 
+
 
 ------------------------------------------------------
 -- test runner process
@@ -114,7 +114,7 @@ test_runner : process
 
 begin
   test_runner_setup(runner, runner_cfg);
-  
+
     if run("test_reset_only") then
         sync_reset <= '0';
         wait until falling_edge(async_reset);
@@ -127,15 +127,15 @@ begin
         wait for 1 us;
         check_equal(18, 18);
     end if;
-    
+
     if run("test_write") then
-    
+
         sync_reset <= '0';
         bus2ip_error_master <= '0';
         wait until falling_edge(async_reset);
         wait for 1 us;
         wait until rising_edge(clock);
-        
+
         --------------------------------------
         -- Write
         --------------------------------------
@@ -144,34 +144,34 @@ begin
         bus2ip_wrce_slave   <= '1';
         bus2ip_cs_slave     <= '1';
         wait until rising_edge(clock);
-        
+
         wait until rising_edge(ip2bus_wrce_master);
         wait until rising_edge(clock);
         bus2ip_wrack_master <='1';
         wait until rising_edge(clock);
         bus2ip_wrack_master <='0';
-        
+
         wait until rising_edge(ip2bus_wrack_slave);
         wait until rising_edge(clock);
         bus2ip_wrce_slave   <= '0';
         bus2ip_cs_slave     <= '0';
 
         wait for 1 us;
-        
+
         check_equal(ip2bus_addr_master, std_logic_vector'(x"00000001"), "check ip2bus_addr_master failed");
         check_equal(ip2bus_data_master, std_logic_vector'(x"12345678"), "check ip2bus_data_master failed");
-        
+
     end if;
-    
+
     if run("test_read") then
-    
+
         sync_reset <= '0';
         bus2ip_error_master <= '0';
         wait until falling_edge(async_reset);
         wait for 1 us;
         wait until rising_edge(clock);
-        
-        
+
+
         --------------------------------------
         -- Read
         --------------------------------------
@@ -180,33 +180,33 @@ begin
         bus2ip_rdce_slave   <= '1';
         bus2ip_cs_slave     <= '1';
         wait until rising_edge(clock);
-        
+
         wait until rising_edge(ip2bus_rdce_master);
         wait until rising_edge(clock);
         bus2ip_rdack_master <='1';
         wait until rising_edge(clock);
         bus2ip_rdack_master <='0';
-        
+
         wait until rising_edge(ip2bus_rdack_slave);
         wait until rising_edge(clock);
         bus2ip_rdce_slave   <= '0';
         bus2ip_cs_slave     <= '0';
-        
+
         wait for 1 us;
         check_equal(ip2bus_addr_master, std_logic_vector'(x"00000001"), "check ip2bus_addr_master failed");
         check_equal(ip2bus_data_slave, std_logic_vector'(x"87654321"), "check ip2bus_data_master failed");
-        
+
     end if;
-    
-    
+
+
     if run("test_both") then
-    
+
         sync_reset <= '0';
         bus2ip_error_master <= '0';
         wait until falling_edge(async_reset);
         wait for 1 us;
         wait until rising_edge(clock);
-        
+
         --------------------------------------
         -- Write
         --------------------------------------
@@ -215,23 +215,23 @@ begin
         bus2ip_wrce_slave   <= '1';
         bus2ip_cs_slave     <= '1';
         wait until rising_edge(clock);
-        
+
         wait until rising_edge(ip2bus_wrce_master);
         wait until rising_edge(clock);
         bus2ip_wrack_master <='1';
         wait until rising_edge(clock);
         bus2ip_wrack_master <='0';
-        
+
         wait until rising_edge(ip2bus_wrack_slave);
         wait until rising_edge(clock);
         bus2ip_wrce_slave   <= '0';
         bus2ip_cs_slave     <= '0';
 
         wait for 1 us;
-        
+
         check_equal(ip2bus_addr_master, std_logic_vector'(x"00000001"), "check ip2bus_addr_master failed");
         check_equal(ip2bus_data_master, std_logic_vector'(x"12345678"), "check ip2bus_data_master failed");
-        
+
         --------------------------------------
         -- Read
         --------------------------------------
@@ -240,34 +240,34 @@ begin
         bus2ip_rdce_slave   <= '1';
         bus2ip_cs_slave     <= '1';
         wait until rising_edge(clock);
-        
+
         wait until rising_edge(ip2bus_rdce_master);
         wait until rising_edge(clock);
         bus2ip_rdack_master <='1';
         wait until rising_edge(clock);
         bus2ip_rdack_master <='0';
-        
+
         wait until rising_edge(ip2bus_rdack_slave);
         wait until rising_edge(clock);
         bus2ip_rdce_slave   <= '0';
         bus2ip_cs_slave     <= '0';
-        
+
         wait for 1 us;
         check_equal(ip2bus_addr_master, std_logic_vector'(x"00000001"), "check ip2bus_addr_master failed");
         check_equal(ip2bus_data_slave, std_logic_vector'(x"87654321"), "check ip2bus_data_master failed");
-        
-        
-    
+
+
+
     end if;
-    
+
     if run("test_cancel") then
-    
+
         sync_reset <= '0';
         bus2ip_error_master <= '0';
         wait until falling_edge(async_reset);
         wait for 1 us;
         wait until rising_edge(clock);
-        
+
         --------------------------------------
         -- CANCEL Write
         --------------------------------------
@@ -276,17 +276,17 @@ begin
         bus2ip_wrce_slave   <= '1';
         bus2ip_cs_slave     <= '1';
         wait until rising_edge(clock);
-        
+
         bus2ip_wrce_slave   <= '0';
         wait until rising_edge(clock);
-        
+
         wait for 1 us;
         check_equal(ip2bus_addr_master, std_logic_vector'(x"00000000"), "check ip2bus_addr_master failed");
         check_equal(ip2bus_wrce_master, std_logic'('0'), "check ip2bus_wrce_master failed");
-        
+
         wait for 1us;
         wait until rising_edge(clock);
-        
+
         --------------------------------------
         -- CANCEL Read
         --------------------------------------
@@ -294,19 +294,19 @@ begin
         bus2ip_rdce_slave   <= '1';
         bus2ip_cs_slave     <= '1';
         wait until rising_edge(clock);
-        
+
         bus2ip_rdce_slave   <= '0';
         wait until rising_edge(clock);
-        
+
         wait for 1 us;
         check_equal(ip2bus_addr_master, std_logic_vector'(x"00000000"), "check ip2bus_addr_master failed");
         check_equal(ip2bus_rdce_master, std_logic'('0'), "check ip2bus_rdce_master failed");
-        
-        
+
+
     end if;
-    
+
     test_runner_cleanup(runner);
-    
+
 end process;
 
 
