@@ -7,7 +7,8 @@ generic(
     USE_ASYNC_RESET    :  boolean:=TRUE;
     USE_SYNC_RESET     :  boolean:=TRUE;
     ASYNC_RESET_ACTIVE :  std_logic:='1';
-    SYNC_RESET_ACTIVE  :  std_logic:='1'
+    SYNC_RESET_ACTIVE  :  std_logic:='1';
+    WRCE_RDCE_DELAY    :  integer:=5 -- 0: no delay so multicycle set to 0 else the multicycle on addr shoud be WRCE_RDCE_DELAY+1 (setup), WRCE_RDCE_DELAY (hold)
 );
 port(
     clock               : in std_logic;
@@ -40,11 +41,15 @@ constant WR_STATE           : std_logic_vector(2 downto 0):="001";
 constant WR_ACK_STATE       : std_logic_vector(2 downto 0):="010";
 constant RD_STATE           : std_logic_vector(2 downto 0):="011";
 constant RD_ACK_STATE       : std_logic_vector(2 downto 0):="100";
+constant WR_DELAY_STATE     : std_logic_vector(2 downto 0):="101";
+constant RD_DELAY_STATE     : std_logic_vector(2 downto 0):="110";
+
 
 signal IP2Bus_WrCE_Master_t : std_logic;
 signal IP2Bus_RdCE_Master_t : std_logic;
 signal IP2Bus_WrAck_Slave_t : std_logic;
 signal IP2Bus_RdAck_Slave_t : std_logic;
+signal delay_cnt            : unsigned(3 downto 0);
 
 
 signal sm : std_logic_vector(2 downto 0);
@@ -68,6 +73,7 @@ begin
         IP2Bus_WrCE_Master_t    <= '0';
         IP2Bus_RdCE_Master_t    <= '0';
         IP2Bus_Data_Master      <= (others=>'0');
+        delay_cnt               <= (others=>'0');
     elsif rising_edge(clock) then
         if (sync_reset=SYNC_RESET_ACTIVE) and (USE_SYNC_RESET=true) then
             sm <= IDLE_STATE;
@@ -80,26 +86,40 @@ begin
             IP2Bus_WrCE_Master_t    <= '0';
             IP2Bus_RdCE_Master_t    <= '0';
             IP2Bus_Data_Master      <= (others=>'0');
+            delay_cnt               <= (others=>'0');
         else
             case sm is
                 when IDLE_STATE     =>
                     if Bus2IP_CS_Slave='1' then
-                        if Bus2IP_WrCE_Slave='1' then
-                            sm <= WR_STATE;
-                            IP2Bus_WrCE_Master_t <= '1';
-                            IP2Bus_addr_Master <= Bus2IP_addr_Slave;
-                            IP2Bus_data_Master <= Bus2IP_data_Slave;
-                        end if;
-                        if Bus2IP_RdCE_Slave='1' then
-                            sm <= RD_STATE;
-                            IP2Bus_RdCE_Master_t <= '1';
-                            IP2Bus_addr_Master <= Bus2IP_addr_Slave;
+                    
+                        if WRCE_RDCE_DELAY=0 then
+                            if Bus2IP_WrCE_Slave='1' then
+                                sm <= WR_STATE;
+                                IP2Bus_WrCE_Master_t <= '1';
+                                IP2Bus_addr_Master <= Bus2IP_addr_Slave;
+                                IP2Bus_data_Master <= Bus2IP_data_Slave;
+                            end if;
+                            if Bus2IP_RdCE_Slave='1' then
+                                sm <= RD_STATE;
+                                IP2Bus_RdCE_Master_t <= '1';
+                                IP2Bus_addr_Master <= Bus2IP_addr_Slave;
+                            end if;
+                        else -- WRCE_RDCE_DELAY/=0
+                            if Bus2IP_WrCE_Slave='1' then
+                                sm <= WR_DELAY_STATE;
+                                IP2Bus_addr_Master <= Bus2IP_addr_Slave;
+                                IP2Bus_data_Master <= Bus2IP_data_Slave;
+                            end if;
+                            if Bus2IP_RdCE_Slave='1' then
+                                sm <= RD_DELAY_STATE;
+                                IP2Bus_addr_Master <= Bus2IP_addr_Slave;
+                            end if;
+                            delay_cnt <= to_unsigned(WRCE_RDCE_DELAY-1,4);
                         end if;
                     end if;
                 when WR_STATE       =>
                     if Bus2IP_CS_Slave='0' or Bus2IP_WrCE_Slave='0' then
                         sm <= IDLE_STATE;
-                        IP2Bus_addr_Master      <= (others=>'0');
                         IP2Bus_WrCE_Master_t    <= '0';
                     elsif IP2Bus_WrCE_Master_t='1' and Bus2IP_WrAck_Master='1' then
                         sm <= WR_ACK_STATE;
@@ -115,7 +135,6 @@ begin
                 when RD_STATE       =>
                     if Bus2IP_CS_Slave='0' or Bus2IP_RdCE_Slave='0' then
                         sm <= IDLE_STATE;
-                        IP2Bus_addr_Master      <= (others=>'0');
                         IP2Bus_RdCE_Master_t    <= '0';
                     elsif IP2Bus_RdCE_Master_t='1' and Bus2IP_RdAck_Master='1' then
                         sm <= RD_ACK_STATE;
@@ -126,7 +145,21 @@ begin
                 when RD_ACK_STATE   =>
                     if Bus2IP_RdCE_Slave='1' and IP2Bus_RdAck_Slave_t='1' then
                         sm <= IDLE_STATE;
-                        IP2Bus_RdAck_Slave_t <= '0';
+                        IP2Bus_RdAck_Slave_t <= '0'; 
+                    end if;
+                when WR_DELAY_STATE =>
+                    if delay_cnt=to_unsigned(0,4) then
+                        sm <= WR_STATE;
+                        IP2Bus_WrCE_Master_t <= '1';
+                    else
+                        delay_cnt <= delay_cnt-1;
+                    end if;
+                when RD_DELAY_STATE =>
+                    if delay_cnt=to_unsigned(0,4) then
+                        sm <= RD_STATE;
+                        IP2Bus_RdCE_Master_t <= '1';
+                    else
+                        delay_cnt <= delay_cnt-1;
                     end if;
                 when others         =>
                     sm <= IDLE_STATE;

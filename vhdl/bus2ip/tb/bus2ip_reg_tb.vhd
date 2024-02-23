@@ -235,7 +235,7 @@ begin
         --------------------------------------
         -- Read
         --------------------------------------
-        bus2ip_addr_slave   <= x"00000001";
+        bus2ip_addr_slave   <= x"00000002";
         bus2ip_data_master  <= x"87654321";
         bus2ip_rdce_slave   <= '1';
         bus2ip_cs_slave     <= '1';
@@ -253,7 +253,7 @@ begin
         bus2ip_cs_slave     <= '0';
 
         wait for 1 us;
-        check_equal(ip2bus_addr_master, std_logic_vector'(x"00000001"), "check ip2bus_addr_master failed");
+        check_equal(ip2bus_addr_master, std_logic_vector'(x"00000002"), "check ip2bus_addr_master failed");
         check_equal(ip2bus_data_slave, std_logic_vector'(x"87654321"), "check ip2bus_data_master failed");
 
 
@@ -281,7 +281,7 @@ begin
         wait until rising_edge(clock);
 
         wait for 1 us;
-        check_equal(ip2bus_addr_master, std_logic_vector'(x"00000000"), "check ip2bus_addr_master failed");
+        check_equal(ip2bus_addr_master, std_logic_vector'(x"00000001"), "check ip2bus_addr_master failed");
         check_equal(ip2bus_wrce_master, std_logic'('0'), "check ip2bus_wrce_master failed");
 
         wait for 1us;
@@ -299,7 +299,7 @@ begin
         wait until rising_edge(clock);
 
         wait for 1 us;
-        check_equal(ip2bus_addr_master, std_logic_vector'(x"00000000"), "check ip2bus_addr_master failed");
+        check_equal(ip2bus_addr_master, std_logic_vector'(x"00000002"), "check ip2bus_addr_master failed");
         check_equal(ip2bus_rdce_master, std_logic'('0'), "check ip2bus_rdce_master failed");
 
 
