@@ -42,7 +42,7 @@ begin
     -- internal signals to out
     s_tready <= s_tready_int;
     m_tvalid <= m_tvalid_int;
-    
+
 
     GEN_MODE_OFF: if MODE=0 generate
         s_tready_int <= '0';
@@ -59,7 +59,7 @@ begin
                 overflow_data_reg   <= (others=>'0');
                 overflow_valid_reg  <= '0';
             elsif rising_edge(clk) then
-                
+
                 if s_tready_int='1' then
                     main_valid_reg    <= s_tvalid;
                     main_data_reg     <= s_tdata;
@@ -99,6 +99,6 @@ begin
         s_tready_int <= m_tready or not(m_tvalid_int);
 
     end generate GEN_MODE_COMBI_BACKPRESSURE;
-    
+
 
 end rtl;

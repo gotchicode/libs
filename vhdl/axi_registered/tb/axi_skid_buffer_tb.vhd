@@ -197,13 +197,13 @@ begin
         push_stream(net, master_stream, x"08", true);
         pop_stream(net, slave_stream, data, last_bool); rx_data <= data; rx_last_bool <= last_bool;
         pop_stream(net, slave_stream, data, last_bool); rx_data <= data; rx_last_bool <= last_bool;
-        
+
         wait for 1 us;
-        
+
         --push_stream(net, slave_stream, data, '0','1','1',"00","00","00");
-        
+
         wait for 1 us;
-        
+
 -- procedure push_axi_stream(
 --     signal net : inout network_t;
 --     axi_stream : axi_stream_master_t;
@@ -215,8 +215,8 @@ begin
 --     tdest      : std_logic_vector := "";
 --     tuser      : std_logic_vector := ""
 --   );
-        
-        
+
+
 
     end if;
     --check_equal(to_string(17), "17");
