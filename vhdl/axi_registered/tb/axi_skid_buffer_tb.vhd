@@ -54,9 +54,11 @@ signal areset_n             : std_logic := '0';
 signal s_tdata              : std_logic_vector(7 downto 0);
 signal s_tvalid             : std_logic;
 signal s_tready             : std_logic;
+signal s_tlast              : std_logic;
 signal m_tdata              : std_logic_vector(7 downto 0);
 signal m_tvalid             : std_logic;
 signal m_tready             : std_logic;
+signal m_tlast              : std_logic;
 
 signal master_axis_tvalid   : std_logic;
 signal master_axis_tready   : std_logic;
@@ -121,16 +123,18 @@ begin
         s_tvalid => s_tvalid,
         s_tdata => s_tdata,
         s_tready => s_tready,
+        s_tlast => s_tlast,
         m_tvalid => m_tvalid,
         m_tdata => m_tdata,
-        m_tready => m_tready
+        m_tready => m_tready,
+        m_tlast => m_tlast
 );
 
 -- AXI master push signals
 s_tvalid <= master_axis_tvalid;
 master_axis_tready <= s_tready;
 s_tdata <= master_axis_tdata;
--- unused xxxx <= master_axis_tlast;
+s_tlast <= master_axis_tlast;
 -- unused xxxx <= master_axis_tkeep;
 -- unused xxxx <= master_axis_tstrb;
 -- unused xxxx <= master_axis_tid;
@@ -141,7 +145,7 @@ s_tdata <= master_axis_tdata;
 slave_axis_tvalid <= m_tvalid;
 m_tready <= slave_axis_tready;
 slave_axis_tdata <= m_tdata;
-slave_axis_tlast <= '0';
+slave_axis_tlast <= m_tlast;
 slave_axis_tkeep <= "1";
 slave_axis_tstrb <= "0";
 slave_axis_tid <= x"00";
@@ -163,15 +167,15 @@ begin
         wait until rising_edge(areset_n);
 
         -- Push x1 Pop x1
-        push_stream(net, master_stream, x"01", true);
+        push_stream(net, master_stream, x"01", false);
         pop_stream(net, slave_stream, data, last_bool); rx_data <= data; rx_last_bool <= last_bool;
         check_equal(data, std_logic_vector'(x"01"));
         wait for 50 ns;
 
         -- Push x3 Pop x1
-        push_stream(net, master_stream, x"01", true);
-        push_stream(net, master_stream, x"02", true);
-        push_stream(net, master_stream, x"03", true);
+        push_stream(net, master_stream, x"01", false);
+        push_stream(net, master_stream, x"02", false);
+        push_stream(net, master_stream, x"03", false);
         pop_stream(net, slave_stream, data, last_bool); rx_data <= data; rx_last_bool <= last_bool;
         wait for 50 ns;
 
@@ -181,22 +185,44 @@ begin
         wait for 50 ns;
 
         -- Push x8 Pop x8
-        push_stream(net, master_stream, x"01", true);
-        push_stream(net, master_stream, x"02", true);
+        push_stream(net, master_stream, x"01", false);
+        push_stream(net, master_stream, x"02", false);
         pop_stream(net, slave_stream, data, last_bool); rx_data <= data; rx_last_bool <= last_bool;
+        push_stream(net, master_stream, x"03", false);
+        pop_stream(net, slave_stream, data, last_bool); rx_data <= data; rx_last_bool <= last_bool;
+        push_stream(net, master_stream, x"04", false);
+        pop_stream(net, slave_stream, data, last_bool); rx_data <= data; rx_last_bool <= last_bool;
+        push_stream(net, master_stream, x"05", false);
+        pop_stream(net, slave_stream, data, last_bool); rx_data <= data; rx_last_bool <= last_bool;
+        push_stream(net, master_stream, x"06", false);
+        pop_stream(net, slave_stream, data, last_bool); rx_data <= data; rx_last_bool <= last_bool;
+        push_stream(net, master_stream, x"07", false);
+        pop_stream(net, slave_stream, data, last_bool); rx_data <= data; rx_last_bool <= last_bool;
+        push_stream(net, master_stream, x"08", false);
+        pop_stream(net, slave_stream, data, last_bool); rx_data <= data; rx_last_bool <= last_bool;
+        pop_stream(net, slave_stream, data, last_bool); rx_data <= data; rx_last_bool <= last_bool;
+        
+        wait for 300 ns;
+        
+        -- Push x1 Pop x1 , with Tlast
+        push_stream(net, master_stream, x"01", true);
+        pop_stream(net, slave_stream, data, last_bool); rx_data <= data; rx_last_bool <= last_bool;
+        check_equal(data, std_logic_vector'(x"01"));
+        
+        
+        wait for 300 ns;
+        
+        -- Push x3 Pop x1 - with tlast
+        push_stream(net, master_stream, x"01", false);
+        push_stream(net, master_stream, x"02", false);
         push_stream(net, master_stream, x"03", true);
         pop_stream(net, slave_stream, data, last_bool); rx_data <= data; rx_last_bool <= last_bool;
-        push_stream(net, master_stream, x"04", true);
-        pop_stream(net, slave_stream, data, last_bool); rx_data <= data; rx_last_bool <= last_bool;
-        push_stream(net, master_stream, x"05", true);
-        pop_stream(net, slave_stream, data, last_bool); rx_data <= data; rx_last_bool <= last_bool;
-        push_stream(net, master_stream, x"06", true);
-        pop_stream(net, slave_stream, data, last_bool); rx_data <= data; rx_last_bool <= last_bool;
-        push_stream(net, master_stream, x"07", true);
-        pop_stream(net, slave_stream, data, last_bool); rx_data <= data; rx_last_bool <= last_bool;
-        push_stream(net, master_stream, x"08", true);
+        wait for 50 ns;
+
+        -- Pop x2 the remaining - with tlast
         pop_stream(net, slave_stream, data, last_bool); rx_data <= data; rx_last_bool <= last_bool;
         pop_stream(net, slave_stream, data, last_bool); rx_data <= data; rx_last_bool <= last_bool;
+        wait for 50 ns;
 
         wait for 1 us;
 
