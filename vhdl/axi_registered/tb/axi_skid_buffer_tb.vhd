@@ -51,11 +51,11 @@ constant clk_const : time := 5 ns;
 signal aclk                 : std_logic := '0';
 signal areset_n             : std_logic := '0';
 
-signal s_tvalid             : std_logic;
 signal s_tdata              : std_logic_vector(7 downto 0);
+signal s_tvalid             : std_logic;
 signal s_tready             : std_logic;
-signal m_tvalid             : std_logic;
 signal m_tdata              : std_logic_vector(7 downto 0);
+signal m_tvalid             : std_logic;
 signal m_tready             : std_logic;
 
 signal master_axis_tvalid   : std_logic;
@@ -197,9 +197,26 @@ begin
         push_stream(net, master_stream, x"08", true);
         pop_stream(net, slave_stream, data, last_bool); rx_data <= data; rx_last_bool <= last_bool;
         pop_stream(net, slave_stream, data, last_bool); rx_data <= data; rx_last_bool <= last_bool;
-
-
-
+        
+        wait for 1 us;
+        
+        --push_stream(net, slave_stream, data, '0','1','1',"00","00","00");
+        
+        wait for 1 us;
+        
+-- procedure push_axi_stream(
+--     signal net : inout network_t;
+--     axi_stream : axi_stream_master_t;
+--     tdata      : std_logic_vector;
+--     tlast      : std_logic        := '1';
+--     tkeep      : std_logic_vector := "";
+--     tstrb      : std_logic_vector := "";
+--     tid        : std_logic_vector := "";
+--     tdest      : std_logic_vector := "";
+--     tuser      : std_logic_vector := ""
+--   );
+        
+        
 
     end if;
     --check_equal(to_string(17), "17");

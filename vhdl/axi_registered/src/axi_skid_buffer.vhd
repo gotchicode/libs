@@ -25,6 +25,10 @@ end axi_skid_buffer;
 
 architecture rtl of axi_skid_buffer is
 
+    -- internal signals
+    signal s_tready_int         : std_logic;
+    signal m_tvalid_int         : std_logic;
+
     -- overflow registers
     signal overflow_data_reg    : std_logic_vector(DATA_WIDTH-1 downto 0);
     signal overflow_valid_reg   : std_logic:='0';
@@ -35,9 +39,14 @@ architecture rtl of axi_skid_buffer is
 
 begin
 
+    -- internal signals to out
+    s_tready <= s_tready_int;
+    m_tvalid <= m_tvalid_int;
+    
+
     GEN_MODE_OFF: if MODE=0 generate
-        s_tready <= '0';
-        m_tvalid <= '0';
+        s_tready_int <= '0';
+        m_tvalid_int <= '0';
         m_tdata <= (others=>'0');
     end generate GEN_MODE_OFF;
 
@@ -51,7 +60,7 @@ begin
                 overflow_valid_reg  <= '0';
             elsif rising_edge(clk) then
                 
-                if s_tready='1' then
+                if s_tready_int='1' then
                     main_valid_reg    <= s_tvalid;
                     main_data_reg     <= s_tdata;
                     if m_tready='0' then
@@ -67,8 +76,8 @@ begin
             end if;
         end process;
 
-        s_tready <= not overflow_valid_reg;
-        m_tvalid <= overflow_valid_reg or main_valid_reg;
+        s_tready_int <= not overflow_valid_reg;
+        m_tvalid_int <= overflow_valid_reg or main_valid_reg;
         m_tdata  <= overflow_data_reg when overflow_valid_reg else main_data_reg;
     end generate GEN_MODE_SKID_BUFFER;
 
@@ -77,17 +86,17 @@ begin
         process(clk, rst_n) is
         begin
             if rst_n='0' then
-                m_tvalid <= '0';
+                m_tvalid_int <= '0';
                 m_tdata  <= (others=>'0');
             elsif rising_edge(clk) then
-                if s_tready='1' then
-                    m_tvalid    <= s_tvalid;
+                if s_tready_int='1' then
+                    m_tvalid_int    <= s_tvalid;
                     m_tdata     <= s_tdata;
                 end if;
             end if;
         end process;
 
-        s_tready <= m_tready or not(m_tvalid);
+        s_tready_int <= m_tready or not(m_tvalid_int);
 
     end generate GEN_MODE_COMBI_BACKPRESSURE;
     
