@@ -439,6 +439,7 @@ fprintf(fid,'add wave -noupdate -divider {%s_tb}\n',strtrim(value_entity_name));
 fprintf(fid,'add wave -position insertpoint sim:/%s_tb/*\n',strtrim(value_entity_name));
 fprintf(fid,'add wave -noupdate -divider {%s_inst}\n',strtrim(value_entity_name));
 fprintf(fid,'add wave -position insertpoint sim:/%s_tb/%s_inst/*\n',strtrim(value_entity_name),strtrim(value_entity_name));
+fprintf(fid,'config wave -signalnamewidth 1\n');
 fprintf(fid,'\n');
 
 fclose(fid);
