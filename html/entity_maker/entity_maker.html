@@ -541,7 +541,7 @@
     if (local_fill_template_process[1]==true){
       local_string = local_string + 'template_pr: process(__CLOCK__, __ASYNC_RESET__)     \n';
       local_string = local_string + 'begin                               \n';
-      local_string = local_string + '    if (__ASYNC_RESET__=__ASYNC_RESET_ACTIVE__) and (__ASYNC_RESET_USED__=true) then\n';
+      local_string = local_string + '    if (__ASYNC_RESET__=__ASYNC_RESET_ACTIVE__) and (__USE_ASYNC_RESET__=true) then\n';
       local_string = local_string + '    elsif rising_edge(__CLOCK__) then  \n';
       local_string = local_string + '    end if;                         \n';
       local_string = local_string + 'end process;                        \n\n\n';
@@ -551,9 +551,9 @@
     if (local_fill_template_process[2]==true){
       local_string = local_string + 'template_pr: process(__CLOCK__, __ASYNC_RESET__)     \n';
       local_string = local_string + 'begin                               \n';
-      local_string = local_string + '    if (__ASYNC_RESET__=__ASYNC_RESET_ACTIVE__) and (__ASYNC_RESET_USED__=true) then\n';
+      local_string = local_string + '    if (__ASYNC_RESET__=__ASYNC_RESET_ACTIVE__) and (__USE_ASYNC_RESET__=true) then\n';
       local_string = local_string + '    elsif rising_edge(__CLOCK__) then  \n';
-      local_string = local_string + '        if (__SYNC_RESET__=__SYNC_RESET_ACTIVE__) and (__SYNC_RESET_USED__=true) then\n';
+      local_string = local_string + '        if (__SYNC_RESET__=__SYNC_RESET_ACTIVE__) and (__USE_SYNC_RESET__=true) then\n';
       local_string = local_string + '        end if;\n';
       local_string = local_string + '    end if;                         \n';
       local_string = local_string + 'end process;                        \n\n\n';
@@ -564,7 +564,7 @@
       local_string = local_string + 'template_pr: process(__CLOCK__)     \n';
       local_string = local_string + 'begin                               \n';
       local_string = local_string + '    if rising_edge(__CLOCK__) then  \n';
-      local_string = local_string + '        if (__SYNC_RESET__=__SYNC_RESET_ACTIVE__) and (__SYNC_RESET_USED__=true) then\n';
+      local_string = local_string + '        if (__SYNC_RESET__=__SYNC_RESET_ACTIVE__) and (__USE_SYNC_RESET__=true) then\n';
       local_string = local_string + '        end if;\n';
       local_string = local_string + '    end if;                         \n';
       local_string = local_string + 'end process;                        \n\n\n';
