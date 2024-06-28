@@ -1,3 +1,19 @@
+// -----------------------------------------------------------------------------
+// File Name: axis_rotate.sv
+// Author: Jerome F.
+// Date: 28-June-2024
+// -----------------------------------------------------------------------------
+// Description: AXI Stream left and right data rotation
+//
+// s_axis_tuser[USER_WIDTH-1:0]:
+//      - s_axis_tuser[USER_WIDTH-1 : log2(DATA_WIDTH/8)+1]: Unused
+//      - s_axis_tuser[log2(DATA_WIDTH/8)]: 1'b0 rotate left; 1'b1 rotate right;
+//      - s_axis_tuser[log2(DATA_WIDTH/8)-1:0]: Number of rotations in bytes 
+//
+// Example:     - To rotate left by 3 : s_axis_tuser=3;
+//              - To rotate right by 3 : s_axis_tuser=DATA_WIDTH/8+3 = 8+3 = 11
+//
+
 module axis_rotate
 #(
     parameter   DATA_WIDTH          = 64,
@@ -27,7 +43,6 @@ module axis_rotate
 
 logic s_axis_tready_int;
 logic m_axis_tvalid_int;
-
 integer i;
 
 //Main process
@@ -43,6 +58,7 @@ begin
         
     end
     else begin
+    
         if (s_axis_tready_int==1'b1) begin
         
             m_axis_tvalid_int   <= s_axis_tvalid;
@@ -74,13 +90,10 @@ begin
 end
 
 // Backpressure
-assign s_axis_tready_int = m_axis_tready || ~m_axis_tvalid_int;
+assign s_axis_tready_int = m_axis_tready | ~m_axis_tvalid_int;
 
 // Internal signals to outputs
 assign s_axis_tready = s_axis_tready_int;
 assign m_axis_tvalid = m_axis_tvalid_int;
-
-
-
 
 endmodule
