@@ -92,7 +92,6 @@ begin
             end if;
             
             phase_in_en <=  tick_in;
-            
 
         end if;
     end process;
