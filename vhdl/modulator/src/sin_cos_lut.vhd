@@ -101,7 +101,7 @@ begin
         ------------------------------------------                                                           
         -- PIPE 2                                                
         ------------------------------------------ 
-        --The phase input is split into 4 quadran for sin
+        --The phase input is split into 4 quadrans for sin
         --MSBs: "00" / Use directly the value from table for sinus
         --MSBs: "01" / Table index = phase_max/4-1 - index
         --MSBs: "10" / Table index = index(-2 downto 0) *-1
