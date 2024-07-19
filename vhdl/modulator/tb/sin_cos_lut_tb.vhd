@@ -2,6 +2,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use std.env.stop;
 
 entity sin_cos_lut_tb is
 end sin_cos_lut_tb;
@@ -11,8 +12,8 @@ architecture rtl of sin_cos_lut_tb is
 constant clk_const                   : time := 5 ns;
 constant rst_const                   : time := 123 ns;
 
-constant phase_in_size               : integer:=256;
-constant phase_in_bit_size           : integer:=8;
+constant phase_in_size               : integer:=4096;
+constant phase_in_bit_size           : integer:=12;
 constant sin_cos_data_size           : integer:=12;
 
 signal clk                           : std_logic;
@@ -60,40 +61,40 @@ begin
     end process;
     
     -----------------------------------------
-    -- Input tick generation
-    -----------------------------------------
-    tick_gen_pr:process
-    begin
-
-    tick_in     <= '0';
-    wait for 1 us;
-    wait until rising_edge(clk);
-    tick_in     <= '1';
-    wait until rising_edge(clk);
-    tick_in     <= '0';
-
-    end process;
-    
-    -----------------------------------------
     -- Input  generation
     -----------------------------------------
-    input_pr: process(clk, rst)
-    begin    
-        if rst='1' then  
+    input_pr:process
+    variable I : integer:=0;
+    begin
+        -- init
+        phase_in_en     <= '0';
+        phase_in        <= (others=>'0');
 
-            phase_in_en     <= '0';
-            phase_in        <= (others=>'0');
+        -- wait for reset
+        wait until falling_edge(rst);
+        wait until rising_edge(clk);
 
-        elsif rising_edge(clk) then   
-        
-            --Pattern shifter
-            if tick_in='1' then
-                phase_in <= std_logic_vector(unsigned(phase_in)+1);
-            end if;
-            
-            phase_in_en <=  tick_in;
 
-        end if;
+        --for I in 1 to (2**n_bits_phase)-1 loop 
+        while (I<phase_in_size) loop
+
+            wait until rising_edge(clk);
+            phase_in_en <='1';
+            phase_in <= std_logic_vector(to_unsigned(I,phase_in_bit_size));
+            wait until rising_edge(clk);
+            phase_in_en <='0';
+
+            --wait
+            wait for 0.1 us;
+
+            --step
+            I := I + 1;
+
+        end loop;
+
+        wait for 1 us;
+        stop;
+
     end process;
 
     sin_cos_lut_inst : entity work.sin_cos_lut

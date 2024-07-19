@@ -14,4 +14,4 @@ add wave -position insertpoint sim:/sin_cos_lut_tb/*
 add wave -noupdate -divider {sin_cos_lut_inst}
 add wave -position insertpoint sim:/sin_cos_lut_tb/sin_cos_lut_inst/*
 
-run 5 ms
+run 1 ms
