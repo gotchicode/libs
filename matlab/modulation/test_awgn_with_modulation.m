@@ -5,7 +5,7 @@ close all;
 %Parameters
 nb_size=2^15;
 K=2; %number of bit per symbol
-EbN0_dB = 11; 
+EbN0_dB = 8; 
 snr_db= EbN0_dB + 10 * log10(K) ;
 modu='QPSK';
 use_seed=0;
@@ -14,32 +14,50 @@ display=0;
 %Init
 total_errors=0;
 total_bits=0;
+ber_table=[];
 
-while(1)
-
-  %Generate input signal
-  data_in_sequence = (round(rand(1,nb_size)));
-
-  %Modulate
-  data_modulated=mapper(data_in_sequence,modu);
-
-  %Add AWGN
-##  data_with_noise=add_awgn(data_modulated,snr,use_seed,display);
-  data_with_noise = add_awgn_noise(data_modulated,snr_db);
+for EbN0_dB=0:0.2:10
   
-  %Demodulate
-  data_demodulated=demapper(data_with_noise,modu);
-
-  %BER
-  errors=abs(data_in_sequence-data_demodulated);
+  snr_db= EbN0_dB + 10 * log10(K) ;
+  total_errors=0;
+  total_bits=0;
   
-  total_errors=total_errors+sum(errors);
-  total_bits=total_bits+nb_size;
-  total_ber=total_errors/total_bits;
-##  fprintf('snr_db=%f \t total_errors=%d \t total_bits=%d\tber=%f/%f.10e-%d\n',snr_db,total_errors,total_bits,total_ber,total_ber*10^(-1*floor(log10(total_ber))),-1*floor(log10(total_ber)));
-  fprintf('snr_db=%f \t total_errors=%d \t total_bits=%d\tber=%d\n',snr_db,total_errors,total_bits,total_ber);
+  fprintf('--------------------------------------------------\n');
+  fprintf('------------------ EbN0_dB = %f ------------------\n',EbN0_dB);
+  fprintf('--------------------------------------------------\n');
 
-end
+  while(total_errors<100)
+##  while(1)
+
+      %Generate input signal
+      data_in_sequence = (round(rand(1,nb_size)));
+
+      %Modulate
+      data_modulated=mapper(data_in_sequence,modu);
+
+      %Add AWGN
+    ##  data_with_noise=add_awgn(data_modulated,snr,use_seed,display);
+      data_with_noise = add_awgn_noise(data_modulated,snr_db);
+      
+      %Demodulate
+      data_demodulated=demapper(data_with_noise,modu);
+
+      %BER
+      errors=abs(data_in_sequence-data_demodulated);
+      
+      total_errors=total_errors+sum(errors);
+      total_bits=total_bits+nb_size;
+      total_ber=total_errors/total_bits;
+    ##  fprintf('snr_db=%f \t total_errors=%d \t total_bits=%d\tber=%f/%f.10e-%d\n',snr_db,total_errors,total_bits,total_ber,total_ber*10^(-1*floor(log10(total_ber))),-1*floor(log10(total_ber)));
+      fprintf('snr_db=%f \t total_errors=%d \t total_bits=%d\tber=%d\n',snr_db,total_errors,total_bits,total_ber);
+
+  end
+
+  %fill the ber table
+  ber_table = [ber_table ; [EbN0_dB , total_ber , total_errors, total_bits,]];
+
+end %end for
+
 
 %Plot
 ##plot(real(errors),'.');
