@@ -2,14 +2,14 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
---library vunit_lib;
---context vunit_lib.vunit_context;
+library vunit_lib;
+context vunit_lib.vunit_context;
 
 library work;
 use work.wavedrom_gen_pkg.all;
 
 entity wavedrom_gen_tb is
-    --generic (runner_cfg : string := runner_cfg_default);
+    generic (runner_cfg : string := runner_cfg_default);
 end wavedrom_gen_tb;
 
 architecture rtl of wavedrom_gen_tb is
@@ -51,8 +51,8 @@ end process;
 test_runner : process
 begin
 
-    --test_runner_setup(runner, runner_cfg);
-    --    if run("Main_test") then
+    test_runner_setup(runner, runner_cfg);
+        if run("Main_test") then
 
             test_counter_enable <= '0';
 
@@ -81,11 +81,11 @@ begin
 
             end loop;
 
-    --        check_equal(background_cnt, 1060);
+            check_equal(background_cnt, 1060);
 
-    --    end if;
+        end if;
 
-    --test_runner_cleanup(runner);
+    test_runner_cleanup(runner);
 end process;
 
 -----------------------------------------
@@ -116,13 +116,13 @@ data_bus_in(1)             <= (others=>'0');        -- xxxxx ;
 data_en_in(1)              <= test_counter_enable;
 data_type_in(1)            <= '1';                  -- xxxxx ;
 data_en_in_used(1)         <= '1';                  -- xxxxx ;
-names_in(1)                <= (others=>'0');
+names_in(1)                <= "test_counter_enable             ";
 
 data_bus_in(2)             <= (others=>'0');        -- xxxxx ;
 data_en_in(2)              <= test_enable_start;
 data_type_in(2)            <= '1';                  -- xxxxx ;
 data_en_in_used(2)         <= '1';                  -- xxxxx ;
-names_in(2)                <= (others=>'0');        -- xxxxx ;
+names_in(2)                <= "test_enable_start               ";        -- xxxxx ;
 
 data_bus_in(3)             <= (others=>'0');        -- xxxxx ;
 data_en_in(3)              <= '0';                  -- xxxxx ;
@@ -206,7 +206,7 @@ process(clk)
 begin
     if rising_edge(clk) then
         background_cnt <= background_cnt+1;
-        if background_cnt=to_unsigned(281,16) then
+        if background_cnt=to_unsigned(285,16) then
             enable_in <= '1';
         end if;
         if background_cnt=to_unsigned(328,16) then

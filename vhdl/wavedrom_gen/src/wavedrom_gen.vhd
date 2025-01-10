@@ -28,8 +28,6 @@ file fd : text;
 
 signal data_bus_buffer              : array_data_bus;
 signal data_en_buffer               : array_data_enable;
-signal data_type_in                 : std_logic_vector(G_NB_ELEMENTS-1 downto 0);
-signal data_en_used                 : std_logic_vector(G_NB_ELEMENTS-1 downto 0);
 
 signal enable_in_d1                 : std_logic:='0';
 signal counter                      : unsigned(15 downto 0);
@@ -55,28 +53,22 @@ begin
                 for I in 0 to G_NB_ELEMENTS-1 loop
                     data_bus_buffer(I) <= (others=>(others=>'0'));
                     data_en_buffer(I) <= (others=>'0');
-                    data_type_in_buffer(I) <= (others=>'0');
-                    data_en_used_buffer(I) <= (others=>'0');
                 end loop;
                 data_bus_buffer(0) <= data_bus_in;
                 data_en_buffer(0) <= data_en_in;
-                data_type_in_buffer(0) <= data_type_in;
-                data_en_used_buffer(0) <= data_en_in_used;
             end if;
 
             if enable_in='1' and enable_in_d1='1' then
                 counter <= counter+1;
-                data_bus_buffer(to_integer(counter)) <= data_bus_in;
-                data_en_buffer(to_integer(counter)) <= data_en_in;
-                data_type_in_buffer(to_integer(counter)) <= data_type_in;
-                data_en_used_buffer(to_integer(counter)) <= data_en_in_used;
+                for I in 0 to G_NB_ELEMENTS-1 loop
+                    data_bus_buffer(I)(to_integer(counter)) <= data_bus_in(I);
+                    data_en_buffer(I)(to_integer(counter)) <= data_en_in(I);
+                end loop;
             end if;
             
             if enable_in='0' and enable_in_d1='1' then
                 data_bus_buffer(to_integer(counter)) <= data_bus_in;
                 data_en_buffer(to_integer(counter)) <= data_en_in;
-                data_type_in_buffer(to_integer(counter)) <= data_type_in;
-                data_en_used_buffer(to_integer(counter)) <= data_en_in_used;
 
                 -- open the file
                 file_open(fd, G_FILENAME, write_mode);
@@ -86,32 +78,78 @@ begin
                 writeline(fd, v_line);
 
                 -- Fill the clock
-                write(v_line,string'("  {name: 'clk', wave:   'p"));
+                write(v_line,string'("  {name: ""clk"", wave:   ""p"));
                 for K in 0 to to_integer(counter-1) loop
                     write(v_line,string'("."));
                 end loop;
-                write(v_line,string'("'},"));
+                write(v_line,string'("""},"));
                 writeline(fd, v_line);
                 
                 -- Fill all others signals
                 -- Check if it is used
                 for K in 0 to G_NB_ELEMENTS-1 loop
                     -- start to write the line
-                    if data_en_used_buffer(K)(0)='1' and data_type_in_buffer(K)(0)='1' then
-                        write(v_line,string'("{ name: "));
+                    if data_en_in_used(K)='1' and data_type_in(K)='1' then -- When it is an std_logic
+                        write(v_line,string'("{ name: """));
                         write(v_line,names_in(K));
+                        write(v_line,string'(""", wave: """));
+                        for L in 0 to array_depth-1 loop
+
+                            if L=0 then --first
+                                if data_en_buffer(K)(L)='1' then
+                                    write(v_line,string'("1"));
+                                else
+                                    write(v_line,string'("0"));
+                                end if;
+                            else --check with previous ones
+                                if data_en_buffer(K)(L)='1' and data_en_buffer(K)(L-1)='0' then
+                                    write(v_line,string'("1"));
+                                elsif data_en_buffer(K)(L)='0' and data_en_buffer(K)(L-1)='1' then
+                                    write(v_line,string'("0"));
+                                else
+                                    write(v_line,string'("."));
+                                end if;
+                            end if;
+
+                        end loop;
+                        write(v_line,string'(""" },"));
                         writeline(fd, v_line);
                     end if;
-                    for L in 0 to array_depth-1 loop
-                        if data_en_used_buffer(K)(L)='1' then -- check only the first item
-                            -- Check the type
-                            --  1) Is it a bus
-                            if data_type_in_buffer(K)(L)='1' then
+                    if data_en_in_used(K)='1' and data_type_in(K)='0' then -- When it is an std_logic_vector
+                        write(v_line,string'("{ name: """));
+                        write(v_line,names_in(K));
+                        write(v_line,string'(""", wave: """));
+
+                        for L in 0 to array_depth-1 loop
+                            if L=0 then --first
+                                write(v_line,string'("="));
+                            elsif data_bus_buffer(K)(L)/=data_bus_buffer(K)(L-1) then
+                                write(v_line,string'("="));
+                            else
+                                write(v_line,string'("."));
                             end if;
-                        --  2) Is it a wire
-                        end if;
-                    end loop;
+                        end loop;
+                        write(v_line,string'(""" , data: """));
+
+                        for L in 0 to array_depth-1 loop
+                            if L=0 then --first
+                                write(v_line,integer'(to_integer(unsigned(data_bus_buffer(K)(L)))));
+                                write(v_line,string'(" ")); 
+                            elsif data_bus_buffer(K)(L)/=data_bus_buffer(K)(L-1) then
+                                write(v_line,integer'(to_integer(unsigned(data_bus_buffer(K)(L)))));
+                                write(v_line,string'(" ")); 
+                            else
+                                -- dont write
+                            end if;
+                        end loop;
+                        write(v_line,string'("""},"));    
+
+
+                        writeline(fd, v_line);
+                    end if;
                 end loop;
+                write(v_line,string'("]}"));
+                writeline(fd, v_line);
                 -- Finish the file
 
 

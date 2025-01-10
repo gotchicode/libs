@@ -7,7 +7,7 @@ package wavedrom_gen_pkg is
     constant depth : integer:=64;
     constant data_width : integer:=32;
     constant name_width : integer:=32;
-    constant array_depth : integer:=64;
+    constant array_depth : integer:=48;
 
     type data_bus is array (depth-1 downto 0) of std_logic_vector(data_width-1 downto 0);
     type  data_enable is array (depth-1 downto 0) of std_logic;
