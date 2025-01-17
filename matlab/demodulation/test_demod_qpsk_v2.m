@@ -436,7 +436,7 @@ for k=1:length(data_in_I)
         if data_symbols_en==1
           if (ped_loop_accu_pulse==1)
             control_loop_sm_cnt =  control_loop_sm_cnt+1;
-            fprintf("sm control ped + ted stay in (2) - control_loop_sm_cnt=%d index=%d, ped_mean=%d\n",control_loop_sm_cnt, index_resample, ped_mean);
+            fprintf("sm locked ped + ted stay in (2) - control_loop_sm_cnt=%d index=%d, ped_mean=%d\n",control_loop_sm_cnt, index_resample, ped_mean);
           end
         end
       otherwise
@@ -537,8 +537,8 @@ ted_out_en = ted_out_en(1:index_resample);
 ##%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ##
 ##figure(7);
-####plot(data_symbols(end-1024:end),'o');
-##plot(data_symbols,'o');
+##plot(data_symbols(end-1024:end),'o');
+####plot(data_symbols,'o');
 ##title ("last 1024 data symbols");
 ##
 ##figure(8);
@@ -549,51 +549,57 @@ ted_out_en = ted_out_en(1:index_resample);
 ##plot(ADEBUG_TABLE_data_symbols_angle,'o');
 ##title ("data symbols angle");
 
-##%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-##%% DEBUG SUBPLOT TED and PED
-##%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-##subplot(3,3,1);
-##plot(ADEBUG_TABLE_ted_phase_out,'o');
-##title ("ted phase out");
-##
-##subplot(3,3,2);
-##plot(ADEBUG_TABLE_loop_out_ted,'o');
-##title ("loop out ted");
-##
-##subplot(3,3,3);
-##plot(ADEBUG_TABLE_sum_corrections_ted,'o');
-##title ("sum corrections ted");
-##
-##subplot(3,3,4);
-##plot(ADEBUG_TABLE_data_symbols_angle,'o');
-##title ("data symbols angle");
-##
-##subplot(3,3,5);
-##plot(ADEBUG_TABLE_loop_out_ped,'o');
-##title ("loop out ped");
-##
-##subplot(3,3,6);
-##plot(data_symbols(end-1024:end),'o');
-##title ("data symbols");
-##
-##subplot(3,3,7);
-####plot(ADEBUG_TABLE_ted_loop_accu_pulse);
-####hold on;
-##plot(ADEBUG_TABLE_ted_mean,'o');
-####hold on;
-####plot(ADEBUG_TABLE_ted_rms, 'x');
-##title ("ted mean and rms");
-##
-##subplot(3,3,8);
-####plot(ADEBUG_TABLE_ped_loop_accu_pulse);
-####hold on;
-##plot(ADEBUG_TABLE_ped_mean,'o');
-####hold on;
-####plot(ADEBUG_TABLE_ped_rms, 'x');
-##title ("ped mean and rms");
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% DEBUG SUBPLOT TED and PED
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subplot(3,3,1);
+plot(ADEBUG_TABLE_ted_phase_out,'o');
+title ("ted phase out");
+
+subplot(3,3,2);
+plot(ADEBUG_TABLE_loop_out_ted,'o');
+title ("loop out ted");
+
+subplot(3,3,3);
+plot(ADEBUG_TABLE_sum_corrections_ted,'o');
+title ("sum corrections ted");
+
+subplot(3,3,4);
+plot(ADEBUG_TABLE_data_symbols_angle,'o');
+title ("data symbols angle");
+
+subplot(3,3,5);
+plot(ADEBUG_TABLE_loop_out_ped,'o');
+title ("loop out ped");
+
+subplot(3,3,6);
+plot(data_symbols(end-1024:end),'o');
+title ("data symbols");
+
+subplot(3,3,7);
+##plot(ADEBUG_TABLE_ted_loop_accu_pulse);
+##hold on;
+plot(ADEBUG_TABLE_ted_mean,'o');
+##hold on;
+##plot(ADEBUG_TABLE_ted_rms, 'x');
+title ("ted mean and rms");
+
+subplot(3,3,8);
+##plot(ADEBUG_TABLE_ped_loop_accu_pulse);
+##hold on;
+plot(ADEBUG_TABLE_ped_mean,'o');
+##hold on;
+##plot(ADEBUG_TABLE_ped_rms, 'x');
+title ("ped mean and rms");
 
 
+%Save to a file
+print('large_subplot_image.png', '-dpng', '-r300');
 
-##eyediagram(data_symbols(end-1024:end),Fresamp/Fsymb/2);
+%close to release memory
+close all;
+
+fprintf("Finished\n");
+
 
 
