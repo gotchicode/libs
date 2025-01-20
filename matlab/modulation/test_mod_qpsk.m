@@ -14,8 +14,8 @@ modu='QPSK';
 nb_symb=modu_bps(modu);
 n_bits = 16; %quantization tap bits
 roll_off = 0.5;
-T_PPM=5;
-Delta_f=0.1; % percentage of symb rate
+T_PPM=0;
+Delta_f=0.0; % percentage of symb rate
 Fsymb=1;
 Fsamp=4;
 Fin = 1;
@@ -26,8 +26,8 @@ phase_offset= 1 * pi/8;
 carrier_offset=Delta_f/(Fsamp/Fsymb) / 100; % percentage of symb rate
 
 %Generate input signal
-data_in_sequence = (round(rand(1,nb_bits)));
-##data_in_sequence = repmat([1 0 0 1], 1,nb_bits/4);
+##data_in_sequence = (round(rand(1,nb_bits)));
+data_in_sequence = repmat([1 0 0 1], 1,nb_bits/4);
 
 %Modulate
 data_modulated=mapper(data_in_sequence,modu);
