@@ -21,7 +21,7 @@ M = 1;
 N = 5;  % number of stages
 
 %Fir params
-nb_taps=51;
+nb_taps=11;
 
 %Sampling Parameters
 nb_points = 2^12*(8/R)*2; %Depending on R, so final size is always 2^15
@@ -51,8 +51,10 @@ hold on;
 plot(x_fsamp,h_calc_fir_log_unfold,'g--');
 hold on;
 plot(x_fsamp,h_cic_comp_resp_log,'r');
-legend('cic','fir','cic + fir')
-axis([0 fsamp/2 -400 50])
+axis([0 fsamp/2 -200 20])
+x_vertical=fsamp/R/2;
+plot([x_vertical,x_vertical],[-200,20],'--');
+legend('cic','fir','cic + fir','low fsamp')
 xlabel('Hz')
 ylabel('dB')
 hold on;
@@ -60,7 +62,7 @@ description=[' R=' num2str(R) ' N=' num2str(N) ' Cut Off Freq=' num2str((cut_off
 title(description);
 
 %Export image
-filename=['image' 'R_' num2str(R) '_N_' num2str(N) '_cut_off_freq_' num2str(round(cut_off_freq)) '.bmp'];
+filename=['image_top_' 'R_' num2str(R) '_N_' num2str(N) '_cut_off_freq_' num2str(round(cut_off_freq)) '.bmp'];
 saveas(fig,filename);
 
 %Export image of taps

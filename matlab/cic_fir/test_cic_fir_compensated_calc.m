@@ -8,7 +8,7 @@ R = 2;  % decimation or interpolation ratio
 N = 5;  % number of stages
 
 %Fir params
-nb_taps=51;
+nb_taps=11;
 
 %Sampling Parameters
 nb_points = 2^12*(8/R); %Depending on R, so final size is always 2^15
