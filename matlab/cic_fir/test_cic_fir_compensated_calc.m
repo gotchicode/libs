@@ -4,7 +4,7 @@ close all;
 
 %CIC Parameters
 M = 1;
-R = 8;  % decimation or interpolation ratio
+R = 2;  % decimation or interpolation ratio
 N = 5;  % number of stages
 
 %Fir params
@@ -38,8 +38,10 @@ hold on;
 plot(x_fsamp,h_calc_fir_log_unfold,'g--');
 hold on;
 plot(x_fsamp,h_cic_comp_resp_log,'r');
-legend('cic','fir','cic + fir')
-axis([0 fsamp/2 -400 50])
+axis([0 fsamp/2 -200 20])
+x_vertical=fsamp/R/2;
+plot([x_vertical,x_vertical],[-200,20],'--');
+legend('cic','fir','cic + fir','low fsamp')
 xlabel('Hz')
 ylabel('dB')
 hold on;
