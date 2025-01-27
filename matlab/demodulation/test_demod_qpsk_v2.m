@@ -13,25 +13,25 @@ addpath ("../control_loop");
 %Parameters overall
 Fin = 320e6;
 Fresamp=160e6;
-Fsymb=40e6;
+Fsymb=20e6;
 interp_type=3;
 roll_off = 0.5;
 n_bits = 16; %quantization tap bits
 debug = 0;
-init_sample_offset=2^32/1024*(256);
+init_sample_offset=2^32/1024*(256+128);
 
 %TED loop parameters
 T_ted = 1;
 Bn_ted = 0.001;
 ksi_ted = sqrt(2)/2;
-enable_ted_loop=1;  
+enable_ted_loop=0;  
 sign_ted_loop=-1; %working param
 
 %PED loop parameters
 T_ped = 1;
 Bn_ped = 0.001;
 ksi_ped = sqrt(2)/2;
-enable_ped_loop=1; 
+enable_ped_loop=0; 
 sign_ped_loop=-1; %working param
 ped_use_integ=0; %working param
 
@@ -549,57 +549,57 @@ ted_out_en = ted_out_en(1:index_resample);
 ##plot(ADEBUG_TABLE_data_symbols_angle,'o');
 ##title ("data symbols angle");
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% DEBUG SUBPLOT TED and PED
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subplot(3,3,1);
-plot(ADEBUG_TABLE_ted_phase_out,'o');
-title ("ted phase out");
-
-subplot(3,3,2);
-plot(ADEBUG_TABLE_loop_out_ted,'o');
-title ("loop out ted");
-
-subplot(3,3,3);
-plot(ADEBUG_TABLE_sum_corrections_ted,'o');
-title ("sum corrections ted");
-
-subplot(3,3,4);
-plot(ADEBUG_TABLE_data_symbols_angle,'o');
-title ("data symbols angle");
-
-subplot(3,3,5);
-plot(ADEBUG_TABLE_loop_out_ped,'o');
-title ("loop out ped");
-
-subplot(3,3,6);
-plot(data_symbols(end-1024:end),'o');
-title ("data symbols");
-
-subplot(3,3,7);
-##plot(ADEBUG_TABLE_ted_loop_accu_pulse);
-##hold on;
-plot(ADEBUG_TABLE_ted_mean,'o');
-##hold on;
-##plot(ADEBUG_TABLE_ted_rms, 'x');
-title ("ted mean and rms");
-
-subplot(3,3,8);
-##plot(ADEBUG_TABLE_ped_loop_accu_pulse);
-##hold on;
-plot(ADEBUG_TABLE_ped_mean,'o');
-##hold on;
-##plot(ADEBUG_TABLE_ped_rms, 'x');
-title ("ped mean and rms");
-
-
-%Save to a file
-print('large_subplot_image.png', '-dpng', '-r300');
-
-%close to release memory
-close all;
-
-fprintf("Finished\n");
+##%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+##%% DEBUG SUBPLOT TED and PED
+##%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+##subplot(3,3,1);
+##plot(ADEBUG_TABLE_ted_phase_out,'o');
+##title ("ted phase out");
+##
+##subplot(3,3,2);
+##plot(ADEBUG_TABLE_loop_out_ted,'o');
+##title ("loop out ted");
+##
+##subplot(3,3,3);
+##plot(ADEBUG_TABLE_sum_corrections_ted,'o');
+##title ("sum corrections ted");
+##
+##subplot(3,3,4);
+##plot(ADEBUG_TABLE_data_symbols_angle,'o');
+##title ("data symbols angle");
+##
+##subplot(3,3,5);
+##plot(ADEBUG_TABLE_loop_out_ped,'o');
+##title ("loop out ped");
+##
+##subplot(3,3,6);
+##plot(data_symbols(end-1024:end),'o');
+##title ("data symbols");
+##
+##subplot(3,3,7);
+####plot(ADEBUG_TABLE_ted_loop_accu_pulse);
+####hold on;
+##plot(ADEBUG_TABLE_ted_mean,'o');
+####hold on;
+####plot(ADEBUG_TABLE_ted_rms, 'x');
+##title ("ted mean and rms");
+##
+##subplot(3,3,8);
+####plot(ADEBUG_TABLE_ped_loop_accu_pulse);
+####hold on;
+##plot(ADEBUG_TABLE_ped_mean,'o');
+####hold on;
+####plot(ADEBUG_TABLE_ped_rms, 'x');
+##title ("ped mean and rms");
+##
+##
+##%Save to a file
+##print('large_subplot_image.png', '-dpng', '-r300');
+##
+##%close to release memory
+##close all;
+##
+##fprintf("Finished\n");
 
 
 

@@ -4,18 +4,18 @@ close all;
 
 %CIC Parameters
 M = 1;
-R = 2;  % decimation or interpolation ratio
-N = 5;  % number of stages
+R = 16;  % decimation or interpolation ratio
+N = 6;  % number of stages
 
 %Fir params
-nb_taps=11;
+nb_taps=21;
 
 %Sampling Parameters
 nb_points = 2^12*(8/R); %Depending on R, so final size is always 2^15
 fsamp = 100e6;
 
 %Specify the response
-passband_freq=fsamp/R*0.5;
+passband_freq=fsamp/R*0.65;
 cut_off_freq=passband_freq/2;
 
 %Run the cic compensation 
@@ -47,6 +47,7 @@ ylabel('dB')
 hold on;
 description=[' R=' num2str(R) ' N=' num2str(N) ' Cut Off Freq=' num2str((cut_off_freq/1e6)) ' MHz' ' Slow samp Freq=' num2str((fsamp/R/1e6)) ' MHz'  ' -6dB @' num2str(min_6dB_freq/1e6)];
 title(description);
+grid on;
 
 %Export image of cic
 filename=['image_' 'R_' num2str(R) '_N_' num2str(N) '_cut_off_freq_' num2str(round(cut_off_freq)) '.bmp'];

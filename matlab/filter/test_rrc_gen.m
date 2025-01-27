@@ -8,7 +8,7 @@ close all;
 nb_sample = 2^10;
 Fsymb = 1;
 Fsamp = 2;
-roll_off = 0.5;
+roll_off = 0.4;
 manual_gain=1;
 
 

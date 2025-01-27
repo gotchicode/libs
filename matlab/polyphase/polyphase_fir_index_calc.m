@@ -4,9 +4,9 @@ close all;
 
 
 %Parameters
-ratio=32;
-ntaps=8;
-ntaps=ntaps*ratio+1;
+ratio=4;
+ntaps=45;
+##ntaps=ntaps*ratio+1;
 
 
 %Create table index
