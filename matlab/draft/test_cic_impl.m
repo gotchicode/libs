@@ -8,8 +8,8 @@ fsamp_in = 50e6;
 
 %CIC Parameters
 M = 1;
-R = 20;  % decimation or interpolation ratio
-N = 5;  % number of stages
+R = 2;  % decimation or interpolation ratio
+N = 6;  % number of stages
 interp_decim= -1; %+1 interp and -1 decim
 
 %Inits
@@ -19,8 +19,8 @@ if interp_decim==-1 fsamp_out = fsamp_in/R; end;
 
 
 %Test vector generation
-##data_in = randn(1,nb_sample); %random data
-data_in = sin(2*pi*fsamp_in/100.*t); %sin
+data_in = randn(1,nb_sample); %random data
+##data_in = sin(2*pi*fsamp_in/100.*t); %sin
 ##data_in = [zeros(1,nb_sample/2) ones(1,nb_sample/2)]; %step
 ##data_in =  (1:nb_sample);%ramp
 ##data_in = [(1:64) (1:64)]; data_in = repmat(data_in,1,8); data_in = data_in-32; %saw
