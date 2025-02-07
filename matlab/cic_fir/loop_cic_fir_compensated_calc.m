@@ -21,7 +21,7 @@ M = 1;
 N = 5;  % number of stages
 
 %Fir params
-nb_taps=11;
+nb_taps=21;
 
 %Sampling Parameters
 nb_points = 2^12*(8/R)*2; %Depending on R, so final size is always 2^15
@@ -60,6 +60,7 @@ ylabel('dB')
 hold on;
 description=[' R=' num2str(R) ' N=' num2str(N) ' Cut Off Freq=' num2str((cut_off_freq/1e6)) ' MHz' ' Slow samp Freq=' num2str((fsamp/R/1e6)) ' MHz'  ' -6dB @' num2str(min_6dB_freq/1e6)];
 title(description);
+grid on;
 
 %Export image
 filename=['image_top_' 'R_' num2str(R) '_N_' num2str(N) '_cut_off_freq_' num2str(round(cut_off_freq)) '.bmp'];
