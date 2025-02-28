@@ -35,3 +35,5 @@ figure(2);
 plot(real(data_recovered));
 figure(3);
 plot(real(data_recovered_shift));
+
+%%On the figure, DC is seen in the position 32
