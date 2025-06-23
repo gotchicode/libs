@@ -6,8 +6,27 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <windows.h>
+#include <math.h>
+#define PI 3.14159265358979323846
+#define SAMPLE_RATE 44800.0
+#define SINE_FREQ 1000.0
 
 #pragma comment(lib, "ws2_32.lib")
+
+static double sine_phase = 0.0;
+
+void generate_sine_wave(uint8_t *buffer, int length) {
+    double phase_step = 2.0 * PI * SINE_FREQ / SAMPLE_RATE;
+
+    for (int i = 0; i < length; ++i) {
+        double sample = sin(sine_phase);
+        buffer[i] = (uint8_t)(128 + sample * 127);  // convert to unsigned 8-bit
+        sine_phase += phase_step;
+        if (sine_phase >= 2.0 * PI)
+            sine_phase -= 2.0 * PI;
+    }
+}
+
 
 void generate_prbs23(uint8_t *buffer, int length) {
     uint32_t reg = 0x7FFFFF;
@@ -126,6 +145,47 @@ void handle_mode3_loop(SOCKET client) {
     }
 }
 
+void handle_mode4_audio_stream(SOCKET client) {
+    printf("[C] Entering mode 4 (audio sine wave streaming)...\n");
+
+    while (1) {
+        uint8_t header[5];
+        int received = 0;
+
+        while (received < 5) {
+            int r = recv(client, (char*)&header[received], 5 - received, 0);
+            if (r <= 0) {
+                printf("[C] Client disconnected or error.\n");
+                return;
+            }
+            received += r;
+        }
+
+        if (header[0] != 0xAA) {
+            printf("[C] Invalid header prefix: 0x%02X\n", header[0]);
+            continue;
+        }
+
+        uint32_t length = (header[1] << 24) | (header[2] << 16) | (header[3] << 8) | header[4];
+        if (length == 0 || length > 8192) {
+            printf("[C] Invalid requested length: %u\n", length);
+            continue;
+        }
+
+        printf("[C] Mode 4: Generating %u bytes of sine wave\n", length);
+
+        uint8_t *response = (uint8_t*)malloc(length);
+        if (!response) {
+            printf("[C] Memory allocation failed.\n");
+            return;
+        }
+
+        generate_sine_wave(response, length);
+        send(client, (char*)response, length, 0);
+        free(response);
+    }
+}
+
 void run_server(int mode) {
     WSADATA wsa;
     SOCKET server, client;
@@ -175,6 +235,9 @@ void run_server(int mode) {
         handle_mode2_once(client);
     else if (mode == 3)
         handle_mode3_loop(client);
+    else if (mode == 4)
+        handle_mode4_audio_stream(client);
+
 
     closesocket(client);
     closesocket(server);
@@ -189,6 +252,7 @@ int main() {
         printf("1: Start PRBS15/23 Test\n");
         printf("2: Respond to PRBS23 request (once)\n");
         printf("3: Respond to PRBS23 requests in loop\n");
+        printf("4: Stream 1000Hz sine wave (audio test)\n");
         printf("0: Exit\n");
         printf("Enter choice: ");
         fgets(choice, sizeof(choice), stdin);
@@ -199,6 +263,8 @@ int main() {
             run_server(2);
         } else if (choice[0] == '3') {
             run_server(3);
+        } else if (choice[0] == '4') {
+            run_server(4);
         } else if (choice[0] == '0') {
             printf("Exiting.\n");
             break;

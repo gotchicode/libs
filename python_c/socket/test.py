@@ -2,6 +2,18 @@
 import socket
 import time
 import struct
+import numpy as np
+import threading
+import sounddevice as sd
+from collections import deque
+
+SAMPLE_RATE = 44800  # Hz
+BUFFER_SIZE = 4096   # Total size of FIFO buffer
+REFILL_THRESHOLD = 1024  # Refill when buffer drops below this
+CHUNK_SIZE = 512     # Bytes to stream per audio callback
+FIFO = deque()
+FIFO_LOCK = threading.Lock()
+STOP_PLAYBACK = threading.Event()
 
 def prbs15(seed=0x7FFF, length=255):
     data = bytearray()
@@ -112,6 +124,83 @@ def run_mode_3_loop():
         print(f"[Python] Connection error: {e}")
         time.sleep(2)
 
+def run_audio_mode_4():
+    global FIFO
+    FIFO.clear()
+    STOP_PLAYBACK.clear()
+
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect((HOST, PORT))
+            print("[Python] Connected to C server for audio streaming.")
+
+            # Start fetcher thread
+            fetcher = threading.Thread(target=fill_buffer_loop, args=(s,))
+            fetcher.start()
+
+            # Start audio playback
+            with sd.OutputStream(
+                samplerate=SAMPLE_RATE,
+                blocksize=CHUNK_SIZE,
+                dtype='int16',
+                channels=1,
+                callback=audio_callback
+            ):
+                print("[Python] Audio stream started. Press Ctrl+C to stop.")
+                try:
+                    while not STOP_PLAYBACK.is_set():
+                        time.sleep(0.1)
+                except KeyboardInterrupt:
+                    print("[Python] Stopping audio stream.")
+                    STOP_PLAYBACK.set()
+
+            fetcher.join()
+    except Exception as e:
+        print(f"[Python] Audio mode connection error: {e}")
+        STOP_PLAYBACK.set()
+
+def fill_buffer_loop(sock):
+    try:
+        while not STOP_PLAYBACK.is_set():
+            with FIFO_LOCK:
+                fill = len(FIFO)
+
+            if fill < REFILL_THRESHOLD:
+                # Send request: 0xAA + 4-byte length
+                request_len = 1024
+                request = b'\xAA' + struct.pack('>I', request_len)
+                sock.sendall(request)
+
+                rx = bytearray()
+                while len(rx) < request_len:
+                    chunk = sock.recv(request_len - len(rx))
+                    if not chunk:
+                        print("[Python] Server disconnected.")
+                        STOP_PLAYBACK.set()
+                        return
+                    rx.extend(chunk)
+
+                with FIFO_LOCK:
+                    FIFO.extend(rx)
+            time.sleep(0.01)
+    except Exception as e:
+        print("[Python] Error in buffer filler:", e)
+        STOP_PLAYBACK.set()
+
+def audio_callback(outdata, frames, time_info, status):
+    if status:
+        print("[Python] Audio callback status:", status)
+    samples = bytearray()
+
+    with FIFO_LOCK:
+        while len(samples) < frames:
+            if FIFO:
+                samples.append(FIFO.popleft())
+            else:
+                samples.append(0x00)  # Silence if buffer underflow
+
+    # Convert bytes to signed 8-bit samples centered at 0
+    outdata[:] = (np.frombuffer(bytes(samples), dtype=np.uint8).astype(np.int16) - 128).reshape(-1, 1)
 
 def main_menu():
     while True:
@@ -119,6 +208,7 @@ def main_menu():
         print("1: Start PRBS15/23 Test")
         print("2: PRBS23 test (request N bytes once)")
         print("3: PRBS23 test (loop mode)")
+        print("4: Audio Streaming via Sound Card")
         print("0: Exit")
         choice = input("Enter choice: ").strip()
         
@@ -128,11 +218,14 @@ def main_menu():
             run_mode_2_request()
         elif choice == "3":
             run_mode_3_loop()
+        elif choice == "4":
+            run_audio_mode_4()
         elif choice == "0":
             print("Exiting.")
             break
         else:
             print("Invalid choice. Try again.")
+
 
 
 if __name__ == "__main__":
