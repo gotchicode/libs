@@ -1,5 +1,4 @@
-
-//gcc test.c -o test.exe -lws2_32
+// gcc test.c -o test.exe -lws2_32
 
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include <winsock2.h>
@@ -19,7 +18,7 @@ void generate_prbs23(uint8_t *buffer, int length) {
     }
 }
 
-int main() {
+void run_prbs_server() {
     WSADATA wsa;
     SOCKET server, client;
     struct sockaddr_in server_addr, client_addr;
@@ -27,13 +26,14 @@ int main() {
 
     printf("[C] Initializing Winsock...\n");
     if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0) {
-        printf("[C] Winsock failed. Error Code : %d", WSAGetLastError());
-        return 1;
+        printf("[C] Winsock failed. Error Code : %d\n", WSAGetLastError());
+        return;
     }
 
     if ((server = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET) {
-        printf("[C] Could not create socket : %d", WSAGetLastError());
-        return 1;
+        printf("[C] Could not create socket : %d\n", WSAGetLastError());
+        WSACleanup();
+        return;
     }
 
     server_addr.sin_family = AF_INET;
@@ -41,18 +41,22 @@ int main() {
     server_addr.sin_port = htons(12345);
 
     if (bind(server, (struct sockaddr *)&server_addr, sizeof(server_addr)) == SOCKET_ERROR) {
-        printf("[C] Bind failed with error code : %d", WSAGetLastError());
-        return 1;
+        printf("[C] Bind failed with error code : %d\n", WSAGetLastError());
+        closesocket(server);
+        WSACleanup();
+        return;
     }
 
-    listen(server, 3);
-    printf("[C] Waiting for incoming connections...\n");
+    listen(server, 1);
+    printf("[C] Waiting for incoming connection...\n");
 
     c = sizeof(struct sockaddr_in);
     client = accept(server, (struct sockaddr *)&client_addr, &c);
     if (client == INVALID_SOCKET) {
-        printf("[C] Accept failed: %d", WSAGetLastError());
-        return 1;
+        printf("[C] Accept failed: %d\n", WSAGetLastError());
+        closesocket(server);
+        WSACleanup();
+        return;
     }
 
     printf("[C] Connection accepted\n");
@@ -60,10 +64,15 @@ int main() {
     while (1) {
         uint8_t buffer[255];
         int recv_size = recv(client, (char*)buffer, sizeof(buffer), 0);
-        if (recv_size <= 0) break;
+        if (recv_size <= 0) {
+            printf("[C] Connection closed or error.\n");
+            break;
+        }
 
         printf("[C] Received PRBS15 Frame: ");
-        for (int i = 0; i < recv_size; i++) printf("%02X", buffer[i]);
+        for (int i = 0; i < recv_size; i++) {
+            printf("%02X", buffer[i]);
+        }
         printf("\n");
 
         uint8_t response[255];
@@ -75,7 +84,29 @@ int main() {
     }
 
     closesocket(client);
+    closesocket(server);
     WSACleanup();
+}
+
+int main() {
+    char choice[10];
+
+    while (1) {
+        printf("\n=== C Server Menu ===\n");
+        printf("1: Start PRBS15/23 Test\n");
+        printf("0: Exit\n");
+        printf("Enter choice: ");
+        fgets(choice, sizeof(choice), stdin);
+
+        if (choice[0] == '1') {
+            run_prbs_server();
+        } else if (choice[0] == '0') {
+            printf("Exiting.\n");
+            break;
+        } else {
+            printf("Invalid choice. Try again.\n");
+        }
+    }
 
     return 0;
 }

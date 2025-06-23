@@ -20,10 +20,11 @@ def decode_prbs23(data):
 HOST = "127.0.0.1"
 PORT = 12345
 
-while True:
+def run_prbs_test():
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.connect((HOST, PORT))
+            print("[Python] Connected to server.")
             while True:
                 tx_frame = prbs15()
                 s.sendall(tx_frame)
@@ -31,6 +32,7 @@ while True:
 
                 rx_frame = s.recv(255)
                 if not rx_frame:
+                    print("[Python] Server closed connection.")
                     break
                 decoded = decode_prbs23(rx_frame)
                 print("[Python] Received PRBS23 Frame:", decoded.hex())
@@ -39,3 +41,21 @@ while True:
     except Exception as e:
         print(f"[Python] Connection error: {e}")
         time.sleep(2)
+
+def main_menu():
+    while True:
+        print("\n=== Python Client Menu ===")
+        print("1: Start PRBS15/23 Test")
+        print("0: Exit")
+        choice = input("Enter choice: ").strip()
+        
+        if choice == "1":
+            run_prbs_test()
+        elif choice == "0":
+            print("Exiting.")
+            break
+        else:
+            print("Invalid choice. Try again.")
+
+if __name__ == "__main__":
+    main_menu()
