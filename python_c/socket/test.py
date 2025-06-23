@@ -159,6 +159,59 @@ def run_audio_mode_4():
         print(f"[Python] Audio mode connection error: {e}")
         STOP_PLAYBACK.set()
 
+def run_audio_mode_5():
+    global FIFO, STOP_PLAYBACK, RECORDED_SAMPLES, RECORD_MODE
+    import os
+    FIFO.clear()
+    STOP_PLAYBACK.clear()
+    RECORDED_SAMPLES = []
+    RECORD_MODE = True
+
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect((HOST, PORT))
+            print("[Python] Connected to C server for audio streaming + recording.")
+
+            # Pre-fill buffer with initial data
+            while len(FIFO) < SAMPLE_RATE // 2:
+                s.sendall(b'\xAA' + struct.pack('>I', 2048))
+                chunk = s.recv(2048)
+                with FIFO_LOCK:
+                    FIFO.extend(chunk)
+
+            # Start fetcher thread
+            fetcher = threading.Thread(target=fill_buffer_loop, args=(s,))
+            fetcher.start()
+
+            # Start audio playback
+            with sd.OutputStream(
+                samplerate=SAMPLE_RATE,
+                blocksize=CHUNK_SIZE,
+                dtype='float32',
+                channels=1,
+                callback=audio_callback
+            ):
+                print("[Python] Audio stream started. Press Ctrl+C to stop recording.")
+                try:
+                    while not STOP_PLAYBACK.is_set():
+                        time.sleep(0.1)
+                except KeyboardInterrupt:
+                    print("[Python] Stopping audio stream.")
+                    STOP_PLAYBACK.set()
+
+            fetcher.join()
+
+            # Save as CSV-like text file
+            print("[Python] Saving recorded samples to output.txt...")
+            with open("output.txt", "w") as f:
+                for sample in RECORDED_SAMPLES:
+                    f.write(f"{sample:.6f}\n")
+            print("[Python] File saved: output.txt")
+
+    except Exception as e:
+        print(f"[Python] Audio mode connection error: {e}")
+        STOP_PLAYBACK.set()
+
 def fill_buffer_loop(sock):
     try:
         while not STOP_PLAYBACK.is_set():
@@ -198,9 +251,16 @@ def audio_callback(outdata, frames, time_info, status):
                 samples.append(FIFO.popleft())
             else:
                 samples.append(0x00)  # Silence if buffer underflow
+                print("Buffer underflow happened")
 
     # Convert bytes to signed 8-bit samples centered at 0
     outdata[:] = (np.frombuffer(bytes(samples), dtype=np.uint8).astype(np.int16) - 128).reshape(-1, 1)
+
+    # ✅ Make sure this is defined BEFORE recording
+    float_array = np.array(samples, dtype='float32')
+
+    if RECORD_MODE:
+            RECORDED_SAMPLES.extend(float_array.tolist())  # store float samples directly
 
 def main_menu():
     while True:
@@ -209,6 +269,7 @@ def main_menu():
         print("2: PRBS23 test (request N bytes once)")
         print("3: PRBS23 test (loop mode)")
         print("4: Audio Streaming via Sound Card")
+        print("5: Audio Streaming + Save to File")
         print("0: Exit")
         choice = input("Enter choice: ").strip()
         
@@ -220,6 +281,8 @@ def main_menu():
             run_mode_3_loop()
         elif choice == "4":
             run_audio_mode_4()
+        elif choice == "5":
+            run_audio_mode_5()
         elif choice == "0":
             print("Exiting.")
             break

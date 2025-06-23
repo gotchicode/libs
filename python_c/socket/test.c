@@ -225,6 +225,7 @@ void generate_modulated_sine(uint8_t *buffer, int length) {
         double sample = amp * sin(sine_phase_mod);
         buffer[i] = (uint8_t)(128 + sample * 127);
 
+
         sine_phase_mod += sine_step;
         amp_phase += amp_step;
 
