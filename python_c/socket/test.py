@@ -8,8 +8,8 @@ import sounddevice as sd
 from collections import deque
 
 SAMPLE_RATE = 44800  # Hz
-BUFFER_SIZE = 4096   # Total size of FIFO buffer
-REFILL_THRESHOLD = 1024  # Refill when buffer drops below this
+BUFFER_SIZE = 65536   # Total size of FIFO buffer
+REFILL_THRESHOLD = 16384  # Refill when buffer drops below this
 CHUNK_SIZE = 512     # Bytes to stream per audio callback
 FIFO = deque()
 FIFO_LOCK = threading.Lock()
