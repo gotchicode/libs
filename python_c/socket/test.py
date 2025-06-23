@@ -142,7 +142,7 @@ def run_audio_mode_4():
             with sd.OutputStream(
                 samplerate=SAMPLE_RATE,
                 blocksize=CHUNK_SIZE,
-                dtype='int16',
+                dtype='float32',
                 channels=1,
                 callback=audio_callback
             ):
