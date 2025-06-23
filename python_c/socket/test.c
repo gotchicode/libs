@@ -4,6 +4,7 @@
 #include <winsock2.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <windows.h>
 
 #pragma comment(lib, "ws2_32.lib")
@@ -18,7 +19,114 @@ void generate_prbs23(uint8_t *buffer, int length) {
     }
 }
 
-void run_prbs_server() {
+void handle_mode1(SOCKET client) {
+    while (1) {
+        uint8_t buffer[255];
+        int recv_size = recv(client, (char*)buffer, sizeof(buffer), 0);
+        if (recv_size <= 0) {
+            printf("[C] Connection closed or error.\n");
+            break;
+        }
+
+        printf("[C] Received PRBS15 Frame: ");
+        for (int i = 0; i < recv_size; i++) {
+            printf("%02X", buffer[i]);
+        }
+        printf("\n");
+
+        uint8_t response[255];
+        generate_prbs23(response, 255);
+        send(client, (char*)response, 255, 0);
+        printf("[C] Sent PRBS23 Frame\n");
+
+        Sleep(100);
+    }
+}
+
+void handle_mode2_once(SOCKET client) {
+    uint8_t header[5];
+    int received = 0;
+    while (received < 5) {
+        int r = recv(client, (char*)&header[received], 5 - received, 0);
+        if (r <= 0) {
+            printf("[C] Error receiving mode 2 header.\n");
+            return;
+        }
+        received += r;
+    }
+
+    if (header[0] != 0xAA) {
+        printf("[C] Invalid mode 2 header byte.\n");
+        return;
+    }
+
+    uint32_t length = (header[1] << 24) | (header[2] << 16) | (header[3] << 8) | header[4];
+    if (length == 0 || length > 4096) {
+        printf("[C] Invalid requested length: %u\n", length);
+        return;
+    }
+
+    printf("[C] Mode 2: Sending %u PRBS23 bytes\n", length);
+
+    uint8_t *response = (uint8_t*)malloc(length);
+    if (!response) {
+        printf("[C] Memory allocation failed.\n");
+        return;
+    }
+
+    generate_prbs23(response, length);
+    send(client, (char*)response, length, 0);
+    printf("[C] Sent PRBS23 response.\n");
+
+    free(response);
+}
+
+void handle_mode3_loop(SOCKET client) {
+    printf("[C] Entering mode 3 (looping PRBS23 responder)...\n");
+
+    while (1) {
+        uint8_t header[5];
+        int received = 0;
+
+        // Wait for header (0xAA + 4 bytes)
+        while (received < 5) {
+            int r = recv(client, (char*)&header[received], 5 - received, 0);
+            if (r <= 0) {
+                printf("[C] Client disconnected or error.\n");
+                return;
+            }
+            received += r;
+        }
+
+        if (header[0] != 0xAA) {
+            printf("[C] Invalid header prefix: 0x%02X\n", header[0]);
+            continue;
+        }
+
+        uint32_t length = (header[1] << 24) | (header[2] << 16) | (header[3] << 8) | header[4];
+        if (length == 0 || length > 4096) {
+            printf("[C] Invalid requested length: %u\n", length);
+            continue;
+        }
+
+        printf("[C] Mode 3: Received request for %u bytes\n", length);
+
+        uint8_t *response = (uint8_t*)malloc(length);
+        if (!response) {
+            printf("[C] Memory allocation failed.\n");
+            return;
+        }
+
+        generate_prbs23(response, length);
+        send(client, (char*)response, length, 0);
+        printf("[C] Sent PRBS23 response.\n");
+
+        free(response);
+        Sleep(100);
+    }
+}
+
+void run_server(int mode) {
     WSADATA wsa;
     SOCKET server, client;
     struct sockaddr_in server_addr, client_addr;
@@ -61,27 +169,12 @@ void run_prbs_server() {
 
     printf("[C] Connection accepted\n");
 
-    while (1) {
-        uint8_t buffer[255];
-        int recv_size = recv(client, (char*)buffer, sizeof(buffer), 0);
-        if (recv_size <= 0) {
-            printf("[C] Connection closed or error.\n");
-            break;
-        }
-
-        printf("[C] Received PRBS15 Frame: ");
-        for (int i = 0; i < recv_size; i++) {
-            printf("%02X", buffer[i]);
-        }
-        printf("\n");
-
-        uint8_t response[255];
-        generate_prbs23(response, 255);
-        send(client, (char*)response, 255, 0);
-        printf("[C] Sent PRBS23 Frame\n");
-
-        Sleep(100);
-    }
+    if (mode == 1)
+        handle_mode1(client);
+    else if (mode == 2)
+        handle_mode2_once(client);
+    else if (mode == 3)
+        handle_mode3_loop(client);
 
     closesocket(client);
     closesocket(server);
@@ -94,12 +187,18 @@ int main() {
     while (1) {
         printf("\n=== C Server Menu ===\n");
         printf("1: Start PRBS15/23 Test\n");
+        printf("2: Respond to PRBS23 request (once)\n");
+        printf("3: Respond to PRBS23 requests in loop\n");
         printf("0: Exit\n");
         printf("Enter choice: ");
         fgets(choice, sizeof(choice), stdin);
 
         if (choice[0] == '1') {
-            run_prbs_server();
+            run_server(1);
+        } else if (choice[0] == '2') {
+            run_server(2);
+        } else if (choice[0] == '3') {
+            run_server(3);
         } else if (choice[0] == '0') {
             printf("Exiting.\n");
             break;
