@@ -10,10 +10,16 @@
 #define PI 3.14159265358979323846
 #define SAMPLE_RATE 44800.0
 #define SINE_FREQ 1000.0
+#define MOD_SINE_FREQ 1000.0
+#define MOD_AMPL_FREQ 1.0
+
 
 #pragma comment(lib, "ws2_32.lib")
 
 static double sine_phase = 0.0;
+static double sine_phase_mod = 0.0;
+static double amp_phase = 0.0;
+
 
 void generate_sine_wave(uint8_t *buffer, int length) {
     double phase_step = 2.0 * PI * SINE_FREQ / SAMPLE_RATE;
@@ -186,6 +192,65 @@ void handle_mode4_audio_stream(SOCKET client) {
     }
 }
 
+void generate_modulated_sine(uint8_t *buffer, int length) {
+    double sine_step = 2.0 * PI * MOD_SINE_FREQ / SAMPLE_RATE;
+    double amp_step = 2.0 * PI * MOD_AMPL_FREQ / SAMPLE_RATE;
+
+    for (int i = 0; i < length; ++i) {
+        double amp = 0.5 + 0.5 * sin(amp_phase); // amplitude in [0,1]
+        double sample = amp * sin(sine_phase_mod);
+        buffer[i] = (uint8_t)(128 + sample * 127);
+
+        sine_phase_mod += sine_step;
+        amp_phase += amp_step;
+
+        if (sine_phase_mod >= 2.0 * PI)
+            sine_phase_mod -= 2.0 * PI;
+        if (amp_phase >= 2.0 * PI)
+            amp_phase -= 2.0 * PI;
+    }
+}
+
+void handle_mode5_modulated_audio(SOCKET client) {
+    printf("[C] Entering mode 5 (modulated 1Hz on 1000Hz sine)...\n");
+
+    while (1) {
+        uint8_t header[5];
+        int received = 0;
+
+        while (received < 5) {
+            int r = recv(client, (char*)&header[received], 5 - received, 0);
+            if (r <= 0) {
+                printf("[C] Client disconnected or error.\n");
+                return;
+            }
+            received += r;
+        }
+
+        if (header[0] != 0xAA) {
+            printf("[C] Invalid header prefix: 0x%02X\n", header[0]);
+            continue;
+        }
+
+        uint32_t length = (header[1] << 24) | (header[2] << 16) | (header[3] << 8) | header[4];
+        if (length == 0 || length > 8192) {
+            printf("[C] Invalid requested length: %u\n", length);
+            continue;
+        }
+
+        uint8_t *response = (uint8_t*)malloc(length);
+        if (!response) {
+            printf("[C] Memory allocation failed.\n");
+            return;
+        }
+
+        generate_modulated_sine(response, length);
+        send(client, (char*)response, length, 0);
+        free(response);
+    }
+}
+
+
 void run_server(int mode) {
     WSADATA wsa;
     SOCKET server, client;
@@ -237,7 +302,8 @@ void run_server(int mode) {
         handle_mode3_loop(client);
     else if (mode == 4)
         handle_mode4_audio_stream(client);
-
+    else if (mode == 5)
+        handle_mode5_modulated_audio(client);
 
     closesocket(client);
     closesocket(server);
@@ -253,6 +319,7 @@ int main() {
         printf("2: Respond to PRBS23 request (once)\n");
         printf("3: Respond to PRBS23 requests in loop\n");
         printf("4: Stream 1000Hz sine wave (audio test)\n");
+        printf("5: Modulated 1Hz tremolo on 1000Hz tone (Compatible with 5)\n");
         printf("0: Exit\n");
         printf("Enter choice: ");
         fgets(choice, sizeof(choice), stdin);
@@ -265,6 +332,8 @@ int main() {
             run_server(3);
         } else if (choice[0] == '4') {
             run_server(4);
+        } else if (choice[0] == '5') {
+            run_server(5);
         } else if (choice[0] == '0') {
             printf("Exiting.\n");
             break;
