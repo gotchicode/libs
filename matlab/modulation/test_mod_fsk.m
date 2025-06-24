@@ -14,7 +14,7 @@ fsk_deviation=0.35 %Percentage of the bitrate which is referenced as 1
 
 %Data generation
 data_in = round(rand(1,nb_size));
-data_in = zeros(1,nb_size)+1;
+##data_in = zeros(1,nb_size)+1;
 
 %Modulate in FSK
 phase_in=0;
